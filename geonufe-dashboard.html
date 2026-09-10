@@ -60,7 +60,10 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .dd-dot-hollow{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:2px solid #8B4513;background:transparent}
 .dd-grad{width:18px;height:5px;border-radius:1px;flex-shrink:0}
 .dd-shape{width:9px;height:9px;flex-shrink:0;display:inline-block}
-.dd-section-label{padding:6px 10px 2px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2);background:var(--bg2)}
+.dd-section-label{padding:6px 10px 2px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;gap:6px}
+.dd-section-label>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.dd-section-selectall{font-family:var(--font);font-size:8px;font-weight:700;text-transform:none;letter-spacing:0;color:var(--c1);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;white-space:nowrap;flex-shrink:0}
+.dd-section-selectall:hover{color:#1e3a70}
 .dd-divider-row{padding:6px 10px;border-top:1px solid var(--border);font-size:9px;color:var(--t2);display:flex;align-items:center;gap:6px}
 .dd-star-icon{width:9px;height:9px;flex-shrink:0}
 .dd-geo-inner{padding:8px 10px}
@@ -226,7 +229,7 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
       <button class="dd-btn" id="dd-facilities-btn" onclick="toggleDropdown('facilities')"><span id="dd-facilities-label">Facilities</span><span class="dd-badge" id="dd-facilities-badge" style="display:none"></span><span class="dd-caret">▼</span></button>
       <div class="dd-panel" id="dd-facilities-panel">
         <div class="dd-panel-header"><span>Facilities</span><button class="dd-select-all" onclick="toggleAllFacilities()">Select all</button></div>
-        <div class="dd-section-label">Uranium production</div>
+        <div class="dd-section-label"><span>Uranium production</span><button class="dd-section-selectall" onclick="toggleFacilityGroup('mining',event)">Select all</button></div>
         <div class="dd-item" onclick="toggleSiteType('mine-openpit')"><input type="checkbox" id="cb-mine-openpit"><span class="dd-shape" id="shape-mine-openpit"></span>Open pit mines</div>
         <div class="dd-item" onclick="toggleSiteType('mine-underground')"><input type="checkbox" id="cb-mine-underground"><span class="dd-shape" id="shape-mine-underground"></span>Underground mines</div>
         <div class="dd-item" onclick="toggleSiteType('mine-isl')"><input type="checkbox" id="cb-mine-isl"><span class="dd-shape" id="shape-mine-isl"></span>ISL mines</div>
@@ -241,13 +244,13 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
           <svg class="dd-star-icon" viewBox="0 0 24 24"><path fill="#F2B705" d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.7 7-6.3-3.8L5.7 21l1.7-7-5.4-4.7 7.1-.7z"/></svg>
           Show HALEU-capable only
         </div>
-        <div class="dd-section-label">Fuel fabrication</div>
+        <div class="dd-section-label"><span>Fuel fabrication</span><button class="dd-section-selectall" onclick="toggleFacilityGroup('fuelfab',event)">Select all</button></div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-mox')"><input type="checkbox" id="cb-fuelfab-mox"><span class="dd-shape" id="shape-mox"></span>Fuel fab. — MoX</div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-bwrpwr')"><input type="checkbox" id="cb-fuelfab-bwrpwr"><span class="dd-shape" id="shape-bwrpwr"></span>Fuel fab. — BWR/PWR</div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-vver')"><input type="checkbox" id="cb-fuelfab-vver"><span class="dd-shape" id="shape-vver"></span>Fuel fab. — VVER</div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-combo')"><input type="checkbox" id="cb-fuelfab-combo"><span class="dd-shape" id="shape-combo"></span>Fuel fab. — BWR/PWR + VVER</div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-phwr')"><input type="checkbox" id="cb-fuelfab-phwr"><span class="dd-shape" id="shape-phwr"></span>Fuel fab. — PHWR</div>
-        <div class="dd-section-label">Nuclear power plants — by reactor type</div>
+        <div class="dd-section-label"><span>Nuclear power plants — by reactor type</span><button class="dd-section-selectall" onclick="toggleFacilityGroup('npp',event)">Select all</button></div>
         <div class="dd-item" onclick="toggleSiteType('npp-pwr')"><input type="checkbox" id="cb-npp-pwr"><span class="dd-shape" id="shape-npp-pwr"></span>PWR</div>
         <div class="dd-item" onclick="toggleSiteType('npp-bwr')"><input type="checkbox" id="cb-npp-bwr"><span class="dd-shape" id="shape-npp-bwr"></span>BWR</div>
         <div class="dd-item" onclick="toggleSiteType('npp-vver')"><input type="checkbox" id="cb-npp-vver"><span class="dd-shape" id="shape-npp-vver"></span>VVER</div>
@@ -542,6 +545,8 @@ function initYearSlider(){
 function updateHaleuChip(){const cb=document.getElementById('cb-haleu-only');if(cb)cb.checked=state.haleuOnly;}
 function toggleHaleuOnly(event){if(event)event.stopPropagation();state.haleuOnly=!state.haleuOnly;updateHaleuChip();renderMap();}
 function toggleAllFacilities(){const anyOn=Object.values(state.siteTypes).some(Boolean);Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=!anyOn;});state.chainStep='';clearChainUI();updateFacilitiesBtn();renderMap();}
+const FACILITY_GROUPS={mining:['mine-openpit','mine-underground','mine-isl','mill','minedev'],fuelfab:['fuelfab-mox','fuelfab-bwrpwr','fuelfab-vver','fuelfab-combo','fuelfab-phwr'],npp:NPP_TYPE_KEYS};
+function toggleFacilityGroup(key,event){if(event)event.stopPropagation();const types=FACILITY_GROUPS[key];if(!types)return;const anyOn=types.some(t=>state.siteTypes[t]);types.forEach(t=>{state.siteTypes[t]=!anyOn;});state.chainStep='';clearChainUI();updateFacilitiesBtn();renderMap();}
 function toggleAllFlows(){const anyOn=Object.values(state.flowMats).some(Boolean);Object.keys(state.flowMats).forEach(k=>{state.flowMats[k]=!anyOn;});state.chainStep='';clearChainUI();updateFlowsBtn();renderMap();}
 function setZoneFromDD(mode){state.zoneMode=mode;updateZoneBtn();renderMap();}
 function parseOwners(raw){if(!raw||!raw.trim())return[];return raw.split('/').map(s=>s.trim()).filter(Boolean).map(entry=>{const m=entry.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*%\)\s*$/);if(m)return{name:m[1].trim(),pct:parseFloat(m[2])};return{name:entry.trim(),pct:null};});}
