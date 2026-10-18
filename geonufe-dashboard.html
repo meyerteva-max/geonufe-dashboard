@@ -110,7 +110,7 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .zoom-reset{font-size:8px;font-weight:600;height:20px}
 .legend-box{position:absolute;left:10px;bottom:34px;pointer-events:none;z-index:10;display:flex;flex-direction:column;gap:4px;max-width:calc(100% - 60px)}
 .map-legend{background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(2px);padding:4px 8px;font-size:8.5px;display:none}
-.map-legend{pointer-events:auto}.ml-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;user-select:none;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);padding-bottom:3px}.ml-head:hover{color:var(--t0)}.map-legend.collapsed .ml-inner{display:none}.map-legend.collapsed .ml-head{padding-bottom:0}.ml-inner{display:flex;align-items:center;gap:0;flex-wrap:wrap;row-gap:2px}
+.map-legend{pointer-events:auto}.ml-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;user-select:none;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);padding-bottom:3px}.ml-head:hover{color:var(--t0)}.map-legend.collapsed .ml-inner{display:none}.map-legend.collapsed .ml-head{padding-bottom:0}.ml-grad{display:inline-block;width:110px;height:7px;border-radius:2px;flex-shrink:0}.ml-inner{display:flex;align-items:center;gap:0;flex-wrap:wrap;row-gap:2px}
 .ml-group{display:flex;align-items:center;gap:7px;padding:0 8px;flex-wrap:wrap}
 .ml-group:first-child{padding-left:0}
 .ml-vsep{width:1px;height:16px;background:var(--border);flex-shrink:0;margin:0 2px}
@@ -430,11 +430,6 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
           <button class="zoom-btn zoom-reset" onclick="zoomReset()">FIT</button>
         </div>
         <div class="legend-box">
-          <div class="choro-legend" id="choroLegend">
-            <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:2px" id="choro-title"></div>
-            <div class="choro-grad" id="choro-grad"></div>
-            <div class="choro-labels"><span>0%</span><span>100%</span></div>
-          </div>
           <div class="map-legend" id="mapLegend"><div class="ml-head" onclick="toggleLegend()" title="Show / hide legend"><span>Legend</span><span class="ml-caret" id="ml-caret">▾</span></div><div class="ml-inner" id="ml-inner"></div></div>
         </div>
         <div class="mtt" id="tooltip"><div class="ttc" id="ttc"></div><div class="ttr" id="ttr"></div></div>
@@ -582,9 +577,9 @@ let selectedSiteId=null,selectedLabelEl=null;
 let stageMax={},fitScale=1,lastShown={types:new Set(),statuses:new Set()};
 const MAP_W=760,MAP_H=390;
 // Marker sizing (screen px at zoom 1): area strictly proportional to capacity within a stage, floored at R_MIN_PX.
-const THEMES={light:{land:'#E6E4DF',landSel:'#D5D2CB',border:'#FFFFFF',halo:'rgba(255,255,255,.95)',label:'#16181B',labelHalo:'rgba(255,255,255,.92)',surface:'#FFFFFF',tick:'#7D838B',dark:false},dark:{land:'#1E262F',landSel:'#2C3743',border:'#0C1116',halo:'rgba(12,17,22,.95)',label:'#E8ECF0',labelHalo:'rgba(12,17,22,.92)',surface:'#141A20',tick:'#87919C',dark:true}};
+const THEMES={light:{land:'#EEECE8',landSel:'#DDDAD3',border:'#D2CEC6',tone:c=>d3.color(c).darker(0.9).formatHex(),halo:'rgba(255,255,255,.95)',label:'#16181B',labelHalo:'rgba(255,255,255,.92)',surface:'#FFFFFF',tick:'#7D838B',dark:false},dark:{land:'#1E262F',landSel:'#2C3743',border:'#0C1116',tone:c=>d3.color(c).brighter(0.6).formatHex(),halo:'rgba(12,17,22,.95)',label:'#E8ECF0',labelHalo:'rgba(12,17,22,.92)',surface:'#141A20',tick:'#87919C',dark:true}};
 function TH(){return THEMES[document.documentElement.dataset.theme==='dark'?'dark':'light'];}
-function lift(c){return TH().dark?d3.color(c).brighter(1.15).formatHex():c;}
+function lift(c){return TH().dark?d3.color(c).brighter(0.7).formatHex():c;}
 function zFrom(cfg){return TH().dark?d3.interpolateRgb(TH().land,cfg.color)(0.16):cfg.from;}
 function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('geonufeTheme',t);}catch(e){}
   try{d3.selectAll('.cp').attr('stroke',TH().border);renderMap();updateChartPanel();}catch(e){}}
@@ -736,12 +731,13 @@ function shapePath(shape,r){
   if(shape==='triangle'){const t=r*1.553,b=r*0.777,w=r*1.345;return `M0,${-t}L${w},${b}L${-w},${b}Z`;}
   return `M${-r},0A${r},${r} 0 1,0 ${r},0A${r},${r} 0 1,0 ${-r},0Z`;
 }
+const SHOW_HALEU=false; // HALEU display switched off for now; set to true to restore outline, legend, popup tag and filter
 function markerStyle(status,color,haleu){
-  color=lift(color);let fill=color,fo=0.85,stroke=TH().halo,sw=0.7,dash=null;
+  color=lift(color);let fill=color,fo=0.85,stroke=TH().tone(color),sw=0.6,dash=null;
   if(status==='under construction'){fo=0.42;stroke=color;sw=0.8;}
   else if(status==='planned'){fill=color;fo=0.14;stroke=color;sw=0.9;}
   else if(status==='suspended'){fill=TH().dark?'#4a525b':'#c4c4c0';fo=0.9;stroke=color;sw=1;}
-  if(haleu&&status==='operating'){stroke='#F2B705';sw=1;}
+  if(SHOW_HALEU&&haleu&&status==='operating'){stroke='#F2B705';sw=1;}
   return {fill,fo,stroke,sw,dash};
 }
 function symbolSVG(shape,color,r,status,haleu){
@@ -760,7 +756,7 @@ function showSitePopup(site,px,py,mw){
   bar.style.background=status==='planned'?`linear-gradient(${cfg.color}33,${cfg.color}33)`:cfg.color;
   const typeEl=document.getElementById('sp-type');
   let typeHTML=cfg.fullLabel||cfg.label;
-  if(site.type==='enrichment'&&site.haleu){
+  if(SHOW_HALEU&&site.type==='enrichment'&&site.haleu){
     typeHTML+=` <span class="sp-haleu-tag"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.7 7-6.3-3.8L5.7 21l1.7-7-5.4-4.7 7.1-.7z"/></svg>HALEU</span>`;
   }
   typeEl.innerHTML=typeHTML;
@@ -911,10 +907,10 @@ function applyStateToUI(){updateFacilitiesBtn();updateStatusBtn();updateFlowsBtn
 function toggleLegend(){const el=document.getElementById('mapLegend'),c=el.classList.toggle('collapsed');document.getElementById('ml-caret').textContent=c?'▸':'▾';try{localStorage.setItem('geonufeLegendCollapsed',c?'1':'0');}catch(e){}}
 (function(){try{if(localStorage.getItem('geonufeLegendCollapsed')==='1'){const el=document.getElementById('mapLegend');el.classList.add('collapsed');document.getElementById('ml-caret').textContent='▸';}}catch(e){}})();
 function updateLegend(){
-  const symEl=document.getElementById('mapLegend'),chorEl=document.getElementById('choroLegend'),inner=document.getElementById('ml-inner');
+  const symEl=document.getElementById('mapLegend'),inner=document.getElementById('ml-inner');
   const k=svgEl?d3.zoomTransform(svgEl.node()).k:1;
   const shownTypes=[...lastShown.types],activeFlowTypes=Object.entries(MAT).filter(([m])=>state.flowMats[m]);
-  const hasAnything=shownTypes.length>0||activeFlowTypes.length>0;
+  const zoneOn=state.zoneMode!=='none'&&ZONE_CFG[state.zoneMode];const hasAnything=shownTypes.length>0||activeFlowTypes.length>0||zoneOn;
   if(!hasAnything){symEl.style.display='none';}
   else{
     symEl.style.display='block';
@@ -923,7 +919,7 @@ function updateLegend(){
       const ordered=Object.keys(SITE_TYPES).filter(t=>lastShown.types.has(t));
       const items=ordered.map(t=>{const cfg=SITE_TYPES[t];return `<span class="ml-item">${symbolSVG(cfg.shape,cfg.color,3.4)}${cfg.label}</span>`;}).join('');
       html+=`<div class="ml-group"><span class="ml-label">Facilities</span>${items}</div>`;
-      if(lastShown.types.has('enrichment')){html+=`<span class="ml-item" style="margin-left:6px"><span class="ml-dot" style="background:#27498C;border:1.5px solid #F2B705;box-sizing:border-box"></span>HALEU-capable</span>`;}
+      if(SHOW_HALEU&&lastShown.types.has('enrichment')){html+=`<span class="ml-item" style="margin-left:6px"><span class="ml-dot" style="background:#27498C;border:1.5px solid #F2B705;box-sizing:border-box"></span>HALEU-capable</span>`;}
       const stsShown=STATUS_LIST.filter(s=>lastShown.statuses.has(s));
       if(stsShown.length>1||(stsShown.length===1&&stsShown[0]!=='operating')){
         html+=`<div class="ml-group"><span class="ml-label">Status</span>${stsShown.map(s=>`<span class="ml-item">${symbolSVG('circle','#6b6b6b',3.4,s)}${STATUS_LABEL[s]}</span>`).join('')}</div>`;
@@ -944,10 +940,10 @@ function updateLegend(){
       const strokeItems=levels.map(({frac,label})=>{const sw=(1.2+(frac*8)).toFixed(1);return `<span class="ml-stroke-item"><span class="ml-stroke-bar" style="width:24px;height:${sw}px"></span>${label}</span>`;}).join('');
       html+=`<div class="ml-group"><span class="ml-label">Flow type</span>${typeItems}<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Volume</span>${strokeItems}</div>`;
     }
+    if(zoneOn){const cfg=ZONE_CFG[state.zoneMode];
+      html=`<div class="ml-group"><span class="ml-label">${cfg.label}</span><span class="ml-item">0%</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${lift(cfg.color)})"></span><span class="ml-item">100%</span></div>`+html;}
     inner.innerHTML=html;
   }
-  if(state.zoneMode!=='none'){const cfg=ZONE_CFG[state.zoneMode];chorEl.style.display='block';document.getElementById('choro-title').textContent=cfg.label;document.getElementById('choro-grad').style.background=`linear-gradient(to right,${zFrom(cfg)},${lift(cfg.color)})`;}
-  else chorEl.style.display='none';
 }
 
 async function loadAll(){
@@ -1110,7 +1106,7 @@ function renderMap(){
     if(!state.statuses[status])return;
     if(!inC(site.country))return;
     if(of&&!siteHasOwner(site,of))return;
-    if(state.haleuOnly&&site.type==='enrichment'&&!site.haleu)return;
+    if(SHOW_HALEU&&state.haleuOnly&&site.type==='enrichment'&&!site.haleu)return;
     const pos=proj([site.lon,site.lat]);if(!pos||isNaN(pos[0]))return;
     items.push({site,cfg,status,sx:pos[0],sy:pos[1],rpx:radiusPx(site)});
   });
@@ -1147,13 +1143,14 @@ function renderMap(){
   if(cf.length)bt+=(bt?' · ':'')+`Country: <strong>${cf.length>3?cf.length+' countries':cf.join(', ')}</strong>`;
   if(of)bt+=(bt?' · ':'')+`Owner: <strong>${of}</strong>`;
   if(flowsOn&&flowYearLabel())bt+=(bt?' · ':'')+`Flow year: <strong>${flowYearLabel()}</strong>`;
-  if(state.haleuOnly)bt+=(bt?' · ':'')+`<strong>HALEU only</strong>`;
+  if(SHOW_HALEU&&state.haleuOnly)bt+=(bt?' · ':'')+`<strong>HALEU only</strong>`;
   const plain=bt.replace(/<[^>]+>/g,'');
   if(of){bt+=`<br><span class="fb-note">Flows and production share are not available for an owner selection.</span>`;}
   if(bt){banner.innerHTML=bt;banner.style.display='block';ia.textContent=plain;ia.style.display=plain?'':'none';}else{banner.style.display='none';ia.style.display='none';}
 }
 function zoomBy(f){svgEl.transition().duration(300).call(zoomBehavior.scaleBy,f);}
 function zoomReset(){svgEl.transition().duration(400).call(zoomBehavior.transform,d3.zoomIdentity);}
+if(!SHOW_HALEU){const r=document.getElementById('cb-haleu-only');if(r&&r.parentElement)r.parentElement.style.display='none';}
 loadAll();
 </script>
 </body>
