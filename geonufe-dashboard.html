@@ -685,6 +685,17 @@ function computeCapacityShares(types){
   });
   return totals;
 }
+function computeCapacityByOwner(types){
+  const totals={};
+  sites.forEach(s=>{
+    if(!types.includes(s.type)||!s.capacity||!isOp(s)||!inC(s.country))return;
+    const owners=parseOwners(s.shareholder||'');
+    if(!owners.length){totals['Not specified']=(totals['Not specified']||0)+s.capacity;return;}
+    const known=owners.filter(o=>o.pct!=null).reduce((a,o)=>a+o.pct,0),unk=owners.filter(o=>o.pct==null).length;
+    owners.forEach(o=>{const w=o.pct!=null?o.pct/100:(known>=100?1/owners.length:(100-known)/unk/100);totals[o.name]=(totals[o.name]||0)+s.capacity*w;});
+  });
+  return totals;
+}
 function computeCapacityByFuelType(types){
   const of=state.ownerFilter,totals={};
   sites.forEach(s=>{
@@ -847,7 +858,7 @@ function treemapChart(container,labels,values,unit,total,baseColor,colorFn,heigh
     const leaves=root.leaves(),n=leaves.length,dark=isDark(),mixTo=dark?'#2A3440':'#FFFFFF',base=dark?d3.color(baseColor).brighter(0.5).formatHex():baseColor;
     leaves.forEach((lf,i)=>{
       const d=lf.data,w=lf.x1-lf.x0,h=lf.y1-lf.y0;
-      let col;if(d.group)col=dark?'#3A4552':'#B9BDC2';else if(colorFn)col=colorFn(d.name);else col=d3.interpolateRgb(base,mixTo)(n>1?0.55*i/(n-1):0);
+      let col;if(d.group)col=dark?'#3A4552':'#B9BDC2';else if(colorFn&&colorFn(d.name))col=colorFn(d.name);else col=d3.interpolateRgb(base,mixTo)(n>1?0.55*i/(n-1):0);
       const c=d3.color(col),lum=0.299*c.r+0.587*c.g+0.114*c.b,txt=lum<150?'#FFFFFF':'#1A1D21';
       const el=document.createElement('div');
       el.style.cssText=`position:absolute;left:${lf.x0}px;top:${lf.y0}px;width:${w}px;height:${h}px;background:${col};color:${txt};border-radius:3px;overflow:hidden;padding:4px 5px;font-size:9px;line-height:1.25;cursor:default;transition:filter .12s`;
@@ -864,6 +875,7 @@ function treemapChart(container,labels,values,unit,total,baseColor,colorFn,heigh
   let lastW=container.clientWidth;const ro=new ResizeObserver(()=>{if(container.clientWidth!==lastW){lastW=container.clientWidth;draw();}});ro.observe(container);
   return {destroy(){ro.disconnect();const r=document.getElementById('chartPanelTip');if(r)r.style.display='none';}};
 }
+function smallCount(vals,total){const n=vals.filter(v=>v/total<0.025).length;return n>=3?n:0;}
 function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
   const meta=mode?CHART_META[mode]:null,of=state.ownerFilter;
@@ -884,9 +896,21 @@ function buildPanel(mode){
   const total=labels.reduce((s,l)=>s+data2[l],0);
   const cw=document.createElement('div');
   const note=document.createElement('div');note.className='cp-note';
-  note.textContent=`Computed from ${labels.length} countr${labels.length===1?'y':'ies'} · total ${Math.round(total).toLocaleString('en-US')} ${meta.unit} · operating sites only, derived from site capacities${of?'; where stakes are not given the owners are assumed to share equally':''}`;
+  const sC=smallCount(labels.map(l=>data2[l]),total);note.textContent=`Computed from ${labels.length} countr${labels.length===1?'y':'ies'}${sC?` (${sC} with less than 2.5% each, grouped as “Other”)`:''} · total ${Math.round(total).toLocaleString('en-US')} ${meta.unit} · operating sites only, derived from site capacities${of?'; where stakes are not given the owners are assumed to share equally':''}`;
   body.appendChild(cw);body.appendChild(note);
   activeChartInstances.push(treemapChart(cw,labels,labels.map(l=>data2[l]),meta.unit,total,CHAIN_COLORS[mode]||'#4A5A6A',null,240));
+  if(!of&&(mode==='natU'||mode==='convU'||mode==='enrU')){
+    const byOwner=computeCapacityByOwner(meta.types),ol=Object.keys(byOwner).sort((a,b)=>byOwner[b]-byOwner[a]);
+    if(ol.length>1){
+      const totalO=ol.reduce((s,l)=>s+byOwner[l],0);
+      const titleO=document.createElement('div');titleO.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 6px';titleO.textContent='Capacity share by owner';
+      const cwO=document.createElement('div');body.appendChild(titleO);body.appendChild(cwO);
+      const noteO=document.createElement('div');noteO.className='cp-note';
+      const sO=smallCount(ol.map(l=>byOwner[l]),totalO);noteO.textContent=`${ol.length} owner${ol.length===1?'':'s'}${sO?` · ${sO} of them hold less than 2.5% of capacity each (grouped as “Other”)`:''} · pro rata by stake; unstated stakes split equally among co-owners · names as in the data, not merged into parent groups`;
+      body.appendChild(noteO);
+      activeChartInstances.push(treemapChart(cwO,ol,ol.map(l=>byOwner[l]),meta.unit,totalO,CHAIN_COLORS[mode]||'#4A5A6A',l=>l==='Not specified'?'#B9BDC2':null,240));
+    }
+  }
   if(mode==='fuelAsm'){
     const byType=computeCapacityByFuelType(meta.types);
     const typeLabels=Object.keys(byType).sort((a,b)=>byType[b]-byType[a]);
