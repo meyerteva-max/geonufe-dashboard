@@ -432,6 +432,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
         <div class="legend-box">
           <div class="map-legend" id="mapLegend"><div class="ml-head" onclick="toggleLegend()" title="Show / hide legend"><span>Legend</span><span class="ml-caret" id="ml-caret">▾</span></div><div class="ml-inner" id="ml-inner"></div></div>
         </div>
+        <div class="mtt" id="chartPanelTip" style="position:fixed;display:none;z-index:3000;max-width:240px"></div>
         <div class="mtt" id="tooltip"><div class="ttc" id="ttc"></div><div class="ttr" id="ttr"></div></div>
         <div class="site-popup" id="sitePopup">
           <div class="sp-colorbar" id="sp-colorbar"></div>
@@ -830,6 +831,39 @@ function doughnut(canvas,labels,values,colors,unit,total){
   const tc=TH().tick,font={family:"'Hanken Grotesk',system-ui,sans-serif",size:9};
   return new Chart(canvas,{type:'doughnut',data:{labels,datasets:[{data:values,backgroundColor:colors,borderWidth:1.5,borderColor:TH().surface,borderRadius:2,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{display:true,position:'bottom',labels:{font,color:tc,boxWidth:10,padding:5,usePointStyle:true,pointStyleWidth:8}},tooltip:{titleFont:font,bodyFont:font,callbacks:{title:ctx=>ctx[0].label,label:ctx=>{const v=ctx.parsed,pct=((v/total)*100).toFixed(1);return `${Math.round(v).toLocaleString('en-US')} ${unit} (${pct}%)`;}}}}},plugins:[topSliceLabelPlugin]});
 }
+function treemapChart(container,labels,values,unit,total,baseColor,colorFn,height){
+  const H=height||240,isDark=()=>document.documentElement.dataset.theme==='dark';
+  container.style.cssText=`position:relative;width:100%;height:${H}px`;
+  const items=labels.map((l,i)=>({name:l,value:values[i]}));
+  const small=items.filter(it=>it.value/total<0.025),big=items.filter(it=>it.value/total>=0.025);
+  const main=small.length>=3?[...big,{name:`Other (${small.length})`,value:small.reduce((s,x)=>s+x.value,0),group:small}]:items;
+  const fmt=v=>Math.round(v).toLocaleString('en-US'),pc=v=>{const x=v/total*100;return (x>=10?x.toFixed(0):x.toFixed(1))+'%';};
+  const tip=document.getElementById('tooltip');
+  function draw(){
+    container.innerHTML='';
+    const W=container.clientWidth||260;
+    const root=d3.hierarchy({children:main}).sum(d=>d.value||0).sort((a,b)=>b.value-a.value);
+    d3.treemap().size([W,H]).paddingInner(2).round(true).tile(d3.treemapSquarify.ratio(1.2))(root);
+    const leaves=root.leaves(),n=leaves.length,dark=isDark(),mixTo=dark?'#2A3440':'#FFFFFF',base=dark?d3.color(baseColor).brighter(0.5).formatHex():baseColor;
+    leaves.forEach((lf,i)=>{
+      const d=lf.data,w=lf.x1-lf.x0,h=lf.y1-lf.y0;
+      let col;if(d.group)col=dark?'#3A4552':'#B9BDC2';else if(colorFn)col=colorFn(d.name);else col=d3.interpolateRgb(base,mixTo)(n>1?0.55*i/(n-1):0);
+      const c=d3.color(col),lum=0.299*c.r+0.587*c.g+0.114*c.b,txt=lum<150?'#FFFFFF':'#1A1D21';
+      const el=document.createElement('div');
+      el.style.cssText=`position:absolute;left:${lf.x0}px;top:${lf.y0}px;width:${w}px;height:${h}px;background:${col};color:${txt};border-radius:3px;overflow:hidden;padding:4px 5px;font-size:9px;line-height:1.25;cursor:default;transition:filter .12s`;
+      const nameFits=w>=36&&h>=26,pctFits=w>=24&&h>=15,wrap=h>=44;
+      el.innerHTML=nameFits?`<div style="font-weight:600;font-size:${w>110&&h>60?11:(w<52?8.5:10)}px;${wrap&&/\s/.test(d.name)?'display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical':'white-space:nowrap;text-overflow:ellipsis'};overflow:hidden">${d.name}</div><div style="opacity:.85">${pc(d.value)}</div>`:(pctFits?`<div style="opacity:.9;font-weight:600">${pc(d.value)}</div>`:'');
+      const extra=d.group?'<br><span style="opacity:.8">'+d.group.slice(0,14).map(g=>g.name+' '+pc(g.value)).join(', ')+(d.group.length>14?'…':'')+'</span>':'';
+      el.addEventListener('mousemove',ev=>{const r=document.getElementById('chartPanelTip');if(!r)return;r.style.display='block';r.innerHTML=`<strong>${d.name}</strong><br>${fmt(d.value)} ${unit} · ${pc(d.value)}${extra}`;const b=document.body.getBoundingClientRect();r.style.left=Math.min(ev.clientX+12,innerWidth-r.offsetWidth-8)+'px';r.style.top=(ev.clientY+14)+'px';});
+      el.addEventListener('mouseleave',()=>{const r=document.getElementById('chartPanelTip');if(r)r.style.display='none';});
+      el.addEventListener('mouseover',()=>{el.style.filter='brightness(1.08)';});el.addEventListener('mouseout',()=>{el.style.filter='';});
+      container.appendChild(el);
+    });
+  }
+  draw();
+  let lastW=container.clientWidth;const ro=new ResizeObserver(()=>{if(container.clientWidth!==lastW){lastW=container.clientWidth;draw();}});ro.observe(container);
+  return {destroy(){ro.disconnect();const r=document.getElementById('chartPanelTip');if(r)r.style.display='none';}};
+}
 function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
   const meta=mode?CHART_META[mode]:null,of=state.ownerFilter;
@@ -848,26 +882,24 @@ function buildPanel(mode){
   if(!labels.length){body.insertAdjacentHTML('beforeend',`<div class="cp-empty"><div class="cp-empty-icon">📊</div>No operating sites with capacity data match the current filters.</div>`);return;}
   if(labels.length===1&&state.countries.length===1&&!of)return;   // a one-slice doughnut adds nothing to the country summary
   const total=labels.reduce((s,l)=>s+data2[l],0);
-  const cw=document.createElement('div');cw.style.cssText='position:relative;height:220px';
-  const canvas=document.createElement('canvas');cw.appendChild(canvas);
+  const cw=document.createElement('div');
   const note=document.createElement('div');note.className='cp-note';
   note.textContent=`Computed from ${labels.length} countr${labels.length===1?'y':'ies'} · total ${Math.round(total).toLocaleString('en-US')} ${meta.unit} · operating sites only, derived from site capacities${of?'; where stakes are not given the owners are assumed to share equally':''}`;
   body.appendChild(cw);body.appendChild(note);
-  activeChartInstances.push(doughnut(canvas,labels,labels.map(l=>data2[l]),labels.map(countryColor),meta.unit,total));
+  activeChartInstances.push(treemapChart(cw,labels,labels.map(l=>data2[l]),meta.unit,total,CHAIN_COLORS[mode]||'#4A5A6A',null,240));
   if(mode==='fuelAsm'){
     const byType=computeCapacityByFuelType(meta.types);
     const typeLabels=Object.keys(byType).sort((a,b)=>byType[b]-byType[a]);
     if(typeLabels.length){
       const title2=document.createElement('div');title2.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 6px';title2.textContent='Capacity share by fuel type';
-      const cw2=document.createElement('div');cw2.style.cssText='position:relative;height:200px';
-      const canvas2=document.createElement('canvas');cw2.appendChild(canvas2);
+      const cw2=document.createElement('div');
       body.appendChild(title2);body.appendChild(cw2);
       const total2=typeLabels.reduce((s,l)=>s+byType[l],0);
       const note2=document.createElement('div');note2.className='cp-note';
       note2.textContent=`${typeLabels.length} fuel type${typeLabels.length===1?'':'s'} · total ${Math.round(total2).toLocaleString('en-US')} ${meta.unit}`;
       body.appendChild(note2);
       const colorOf=l=>{const k=FAB_KEYS.find(k=>SITE_TYPES[k].label===l);return k?SITE_TYPES[k].color:'#999';};
-      activeChartInstances.push(doughnut(canvas2,typeLabels,typeLabels.map(l=>byType[l]),typeLabels.map(colorOf),meta.unit,total2));
+      activeChartInstances.push(treemapChart(cw2,typeLabels,typeLabels.map(l=>byType[l]),meta.unit,total2,'#4A5A6A',colorOf,180));
     }
   }
 }
