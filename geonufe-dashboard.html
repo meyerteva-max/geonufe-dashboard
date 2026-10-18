@@ -521,7 +521,7 @@ const STATUS_LIST=['operating','suspended','under construction','planned'];
 const STATUS_LABEL={operating:'Operating',suspended:'Suspended','under construction':'Under construction',planned:'Planned'};
 const MINE_METHOD={'mine-isl':'ISL','mine-underground':'Underground','mine-openpit':'Open pit'};
 const MAT={'Natural U':{label:'Natural uranium',color:'#8B4513'},'Converted U':{label:'Converted uranium',color:'#E8820A'},'Enriched U':{label:'Enriched uranium',color:'#27498C'},'Fuel asm.':{label:'Fuel assemblies',color:'#4C8C4A'}};
-const ZONE_CFG={natU:{label:'Natural uranium production share (%)',color:'#8B4513',from:'#f5ede8'},convU:{label:'Converted uranium production share (%)',color:'#E8820A',from:'#fdf0e4'},enrU:{label:'Enriched uranium production share (%)',color:'#27498C',from:'#e8eef8'},nucMix:{label:'Nuclear share in electricity mix (%)',color:'#C0392B',from:'#faecec'},resCost40:{label:'Uranium identified recoverable resources — <USD 40/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost80:{label:'Uranium identified recoverable resources — <USD 80/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost130:{label:'Uranium identified recoverable resources — <USD 130/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost260:{label:'Uranium identified recoverable resources — <USD 260/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'}};
+const ZONE_CFG={natU:{label:'Natural uranium production share (%)',color:'#8B4513',from:'#f5ede8'},convU:{label:'Converted uranium production share (%)',color:'#E8820A',from:'#fdf0e4'},enrU:{label:'Enriched uranium production share (%)',color:'#27498C',from:'#e8eef8'},nucMix:{label:'Nuclear share in electricity mix (%)',color:'#3A4756',from:'#eef0f3',dark:'#B9C6D6'},resCost40:{label:'Uranium identified recoverable resources — <USD 40/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost80:{label:'Uranium identified recoverable resources — <USD 80/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost130:{label:'Uranium identified recoverable resources — <USD 130/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost260:{label:'Uranium identified recoverable resources — <USD 260/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'}};
 const CHAIN_MAP={
   natU:{sites:[...MINE_KEYS,'mill'],flows:[],zone:'natU'},
   convU:{sites:['conversion'],flows:[],zone:'convU'},
@@ -580,6 +580,7 @@ const MAP_W=760,MAP_H=390;
 const THEMES={light:{land:'#EEECE8',landSel:'#DDDAD3',border:'#D2CEC6',tone:c=>d3.color(c).darker(0.9).formatHex(),halo:'rgba(255,255,255,.95)',label:'#16181B',labelHalo:'rgba(255,255,255,.92)',surface:'#FFFFFF',tick:'#7D838B',dark:false},dark:{land:'#1E262F',landSel:'#2C3743',border:'#0C1116',tone:c=>d3.color(c).brighter(0.6).formatHex(),halo:'rgba(12,17,22,.95)',label:'#E8ECF0',labelHalo:'rgba(12,17,22,.92)',surface:'#141A20',tick:'#87919C',dark:true}};
 function TH(){return THEMES[document.documentElement.dataset.theme==='dark'?'dark':'light'];}
 function lift(c){return TH().dark?d3.color(c).brighter(0.7).formatHex():c;}
+function zTo(cfg){return TH().dark&&cfg.dark?cfg.dark:lift(cfg.color);}
 function zFrom(cfg){return TH().dark?d3.interpolateRgb(TH().land,cfg.color)(0.16):cfg.from;}
 function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('geonufeTheme',t);}catch(e){}
   try{d3.selectAll('.cp').attr('stroke',TH().border);renderMap();updateChartPanel();}catch(e){}}
@@ -941,7 +942,7 @@ function updateLegend(){
       html+=`<div class="ml-group"><span class="ml-label">Flow type</span>${typeItems}<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Volume</span>${strokeItems}</div>`;
     }
     if(zoneOn){const cfg=ZONE_CFG[state.zoneMode];
-      html=`<div class="ml-group"><span class="ml-label">${cfg.label}</span><span class="ml-item">0%</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${lift(cfg.color)})"></span><span class="ml-item">100%</span></div>`+html;}
+      html=`<div class="ml-group"><span class="ml-label">${cfg.label}</span><span class="ml-item">0%</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${zTo(cfg)})"></span><span class="ml-item">100%</span></div>`+html;}
     inner.innerHTML=html;
   }
 }
@@ -1014,7 +1015,7 @@ function getZoneData(feature){
   if(withVal.length)return withVal[0];
   return candidates.slice().sort((a,b)=>b.year-a.year)[0];
 }
-function choroColor(val,cfg){return d3.interpolateRgb(zFrom(cfg),lift(cfg.color))(Math.sqrt(Math.min(val/100,1)));}
+function choroColor(val,cfg){return d3.interpolateRgb(zFrom(cfg),zTo(cfg))(Math.sqrt(Math.min(val/100,1)));}
 function buildArrowRibbonPath(x1,y1,mx,my,x2,y2,halfWidth,arrowLen,arrowHalfWidth){
   const N=14,pts=[];
   for(let i=0;i<=N;i++){const t=i/N,o=1-t;pts.push([o*o*x1+2*o*t*mx+t*t*x2,o*o*y1+2*o*t*my+t*t*y2]);}
