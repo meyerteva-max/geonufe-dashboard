@@ -513,7 +513,7 @@ const SITE_TYPES={
   'mine-underground': {label:'Uranium mine — underground',     color:MINE_COLOR,unit:'tU/yr',  shape:'triangle',stage:'mining',hasCapacity:true},
   'mine-isl':         {label:'Uranium mine — ISL',             color:MINE_COLOR,unit:'tU/yr',  shape:'triangle',stage:'mining',hasCapacity:true},
   'mine-unspecified': {label:'Uranium mine — method not specified',color:MINE_COLOR,unit:'tU/yr',shape:'triangle',stage:'mining',hasCapacity:true},
-  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'hexagon', stage:'mill',  hasCapacity:true,fixed:true,fixedR:4.3},
+  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'hexagon', stage:'mill',  hasCapacity:true,fixed:true,fixedR:5},
   conversion:         {label:'Conversion plant',               color:'#E8820A', unit:'tU/yr',  shape:'diamond', stage:'conversion',hasCapacity:true},
   enrichment:         {label:'Enrichment plant',               color:'#27498C', unit:'tSWU/yr',shape:'diamond', stage:'enrichment',hasCapacity:true},
   'fuelfab-mox':    {label:'MoX',           fullLabel:'Fuel fabrication — MoX',            color:FC.mox,   unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
@@ -766,6 +766,7 @@ function markerStyle(status,color,haleu){
   else if(status==='planned'){fill=color;fo=0.14;stroke=color;sw=0.9;}
   else if(status==='suspended'){fill=TH().dark?'#4a525b':'#c4c4c0';fo=0.9;stroke=color;sw=1;}
   if(SHOW_HALEU&&haleu&&status==='operating'){stroke='#F2B705';sw=1;}
+  if(status==='operating'&&(color==='#5A2C0C'||color==='#E3C39B')){stroke=document.documentElement.dataset.theme==='dark'?'#10151A':'#FFFFFF';sw=1.6;fo=1;}   // uranium mill: contrasting halo so it stands out over mine triangles
   return {fill,fo,stroke,sw,dash};
 }
 function symbolSVG(shape,color,r,status,haleu){
