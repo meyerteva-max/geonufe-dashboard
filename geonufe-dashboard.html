@@ -513,7 +513,7 @@ const SITE_TYPES={
   'mine-underground': {label:'Uranium mine — underground',     color:MINE_COLOR,unit:'tU/yr',  shape:'triangle',stage:'mining',hasCapacity:true},
   'mine-isl':         {label:'Uranium mine — ISL',             color:MINE_COLOR,unit:'tU/yr',  shape:'triangle',stage:'mining',hasCapacity:true},
   'mine-unspecified': {label:'Uranium mine — method not specified',color:MINE_COLOR,unit:'tU/yr',shape:'triangle',stage:'mining',hasCapacity:true},
-  mill:               {label:'Uranium mill',                   color:MINE_COLOR,unit:'tU/yr',  shape:'square',  stage:'mill',  hasCapacity:true,fixed:true},
+  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'hexagon', stage:'mill',  hasCapacity:true,fixed:true,fixedR:4.3},
   conversion:         {label:'Conversion plant',               color:'#E8820A', unit:'tU/yr',  shape:'diamond', stage:'conversion',hasCapacity:true},
   enrichment:         {label:'Enrichment plant',               color:'#27498C', unit:'tSWU/yr',shape:'diamond', stage:'enrichment',hasCapacity:true},
   'fuelfab-mox':    {label:'MoX',           fullLabel:'Fuel fabrication — MoX',            color:FC.mox,   unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
@@ -594,13 +594,13 @@ const MAP_W=760,MAP_H=390;
 // Marker sizing (screen px at zoom 1): area strictly proportional to capacity within a stage, floored at R_MIN_PX.
 const THEMES={light:{land:'#EEECE8',landSel:'#DDDAD3',border:'#D2CEC6',tone:c=>d3.color(c).darker(0.9).formatHex(),halo:'rgba(255,255,255,.95)',label:'#16181B',labelHalo:'rgba(255,255,255,.92)',surface:'#FFFFFF',tick:'#7D838B',dark:false},dark:{land:'#1E262F',landSel:'#2C3743',border:'#0C1116',tone:c=>d3.color(c).brighter(0.6).formatHex(),halo:'rgba(12,17,22,.95)',label:'#E8ECF0',labelHalo:'rgba(12,17,22,.92)',surface:'#141A20',tick:'#87919C',dark:true}};
 function TH(){return THEMES[document.documentElement.dataset.theme==='dark'?'dark':'light'];}
-function lift(c){return TH().dark?d3.color(c).brighter(0.7).formatHex():c;}
+function lift(c){return TH().dark?(c==='#5A2C0C'?'#E3C39B':d3.color(c).brighter(0.7).formatHex()):c;}
 function zTo(cfg){return TH().dark&&cfg.dark?cfg.dark:lift(cfg.color);}
 function zFrom(cfg){return TH().dark?d3.interpolateRgb(TH().land,cfg.color)(0.16):cfg.from;}
 function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('geonufeTheme',t);}catch(e){}
   try{d3.selectAll('.cp').attr('stroke',TH().border);renderMap();updateToponyms();updateChartPanel();}catch(e){}}
 const R_MAX_PX=10.5,R_MIN_PX=2.5,R_STD_PX=5.5;
-function radiusPx(site){const cfg=SITE_TYPES[site.type];if(!cfg)return R_STD_PX;if(cfg.fixed||site.fixedSize||!site.capacity)return R_STD_PX;const m=stageMax[cfg.stage];if(!m)return R_STD_PX;return Math.max(R_MIN_PX,R_MAX_PX*Math.sqrt(site.capacity/m));}
+function radiusPx(site){const cfg=SITE_TYPES[site.type];if(!cfg)return R_STD_PX;if(cfg.fixedR)return cfg.fixedR;if(cfg.fixed||site.fixedSize||!site.capacity)return R_STD_PX;const m=stageMax[cfg.stage];if(!m)return R_STD_PX;return Math.max(R_MIN_PX,R_MAX_PX*Math.sqrt(site.capacity/m));}
 function niceRound(v){if(v<=0)return 0;let step;if(v<10)step=1;else if(v<100)step=10;else if(v<1000)step=50;else if(v<10000)step=500;else step=1000;return Math.round(v/step)*step||step;}
 function isOp(s){return (s.status||'operating')==='operating';}
 function ownerLocked(){return !!state.ownerFilter;}
@@ -754,6 +754,7 @@ function getCountryPos(name){return centroids[name]||null;}
 // Equal-area outlines centred on (0,0): every shape has the same area as a circle of radius r.
 function shapePath(shape,r){
   if(shape==='square'){const h=r*0.886;return `M${-h},${-h}H${h}V${h}H${-h}Z`;}
+  if(shape==='hexagon'){const q=r*1.1,a=q*0.866,b=q*0.5;return `M${q},0L${b},${a}L${-b},${a}L${-q},0L${-b},${-a}L${b},${-a}Z`;}
   if(shape==='diamond'){const d=r*1.2533;return `M0,${-d}L${d},0L0,${d}L${-d},0Z`;}
   if(shape==='triangle'){const t=r*1.553,b=r*0.777,w=r*1.345;return `M0,${-t}L${w},${b}L${-w},${b}Z`;}
   return `M${-r},0A${r},${r} 0 1,0 ${r},0A${r},${r} 0 1,0 ${-r},0Z`;
@@ -1376,7 +1377,7 @@ function renderMap(){
     const pos=proj([site.lon,site.lat]);if(!pos||isNaN(pos[0]))return;
     items.push({site,cfg,status,sx:pos[0],sy:pos[1],rpx:radiusPx(site)});
   });
-  items.sort((a,b)=>b.rpx-a.rpx);   // large symbols first so small ones stay visible on top
+  items.sort((a,b)=>((a.cfg.stage==='mill')-(b.cfg.stage==='mill'))||(b.rpx-a.rpx));   // large symbols first so small ones stay visible on top
   items.forEach(({site,cfg,status,sx,sy,rpx})=>{
     lastShown.types.add(site.type);lastShown.statuses.add(status);
     const r=rpx/fitScale;   // map units: appears as rpx screen px at zoom 1
