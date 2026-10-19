@@ -877,8 +877,79 @@ function treemapChart(container,labels,values,unit,total,baseColor,colorFn,heigh
   return {destroy(){ro.disconnect();const r=document.getElementById('chartPanelTip');if(r)r.style.display='none';}};
 }
 function smallCount(vals,total){const n=vals.filter(v=>v/total<0.025).length;return n>=3?n:0;}
+// ── Flow statistics (panel) ──
+let _flowTab=null;
+function flowsActive(){return Object.values(state.flowMats).some(Boolean)&&!ownerLocked();}
+function flowsOnlyMode(){return flowsActive()&&!state.chainStep&&!Object.values(state.siteTypes).some(Boolean)&&!state.showAllTypes&&!state.countries.length&&!state.ownerFilter;}
+function flowFmt(v){return Math.round(v).toLocaleString('en-US');}
+function flowPct(x){return (x>=10?x.toFixed(0):x.toFixed(1))+'%';}
+function flowHead(text,first){const d=document.createElement('div');d.style.cssText=`font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:${first?'0':'16'}px 0 6px`;d.textContent=text;return d;}
+function flowNote(text){const n=document.createElement('div');n.className='cp-note';n.textContent=text;return n;}
+// ranked horizontal bars: name, value and share on one line, thin bar underneath
+function flowBars(rows,total,color,maxRows){
+  const wrap=document.createElement('div'),dark=document.documentElement.dataset.theme==='dark',col=dark?d3.color(color).brighter(0.7).formatHex():color;
+  let list=rows.slice();
+  if(list.length>maxRows){const rest=list.slice(maxRows-1);list=list.slice(0,maxRows-1).concat([{name:`Other (${rest.length})`,value:rest.reduce((s,r)=>s+r.value,0),other:true,tip:rest.slice(0,14).map(r=>r.name).join(', ')+(rest.length>14?'…':'')}]);}
+  const mx=Math.max(...list.map(r=>r.value),1);
+  list.forEach(r=>{
+    const row=document.createElement('div');row.style.cssText='margin:0 0 7px';if(r.tip||r.name)row.title=r.tip||r.name;
+    row.innerHTML=`<div style="display:flex;justify-content:space-between;gap:8px;font-size:10px;line-height:1.3"><span style="font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</span><span style="color:var(--t2);white-space:nowrap">${flowFmt(r.value)} t · ${flowPct(r.value/total*100)}</span></div><div style="height:5px;border-radius:3px;background:var(--border);margin-top:3px;overflow:hidden"><div style="height:100%;width:${Math.max(1.5,r.value/mx*100)}%;background:${r.other?(dark?'#3A4552':'#B9BDC2'):col};border-radius:3px"></div></div>`;
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+function flowSel(m){return flows.filter(f=>f.mat===m&&inFlowYearRange(f.year)&&f.vol>0);}
+function sumBy(arr,key){const o={};arr.forEach(f=>{o[f[key]]=(o[f[key]]||0)+f.vol;});return o;}
+function sortedRows(o){return Object.keys(o).map(k=>({name:k,value:o[k]})).sort((a,b)=>b.value-a.value);}
+function buildFlowPanel(body){
+  const mats=Object.keys(MAT).filter(m=>state.flowMats[m]);
+  if(!mats.length)return;
+  if(!_flowTab||!mats.includes(_flowTab))_flowTab=mats[0];
+  document.getElementById('cp-title').textContent='Material flows';
+  document.getElementById('cp-subtitle').textContent=(flowYearLabel()?'Flow year: '+flowYearLabel()+' · ':'')+'volumes in tonnes';
+  if(mats.length>1){
+    const tabs=document.createElement('div');tabs.style.cssText='display:flex;flex-wrap:wrap;gap:5px;margin:0 0 12px';
+    mats.forEach(m=>{const b=document.createElement('button'),on=m===_flowTab;b.textContent=MAT[m].label;b.style.cssText=`font:inherit;font-size:10px;font-weight:600;padding:4px 9px;border-radius:12px;cursor:pointer;border:1px solid ${on?MAT[m].color:'var(--border)'};background:${on?MAT[m].color:'transparent'};color:${on?'#fff':'var(--t1)'}`;b.onclick=()=>{_flowTab=m;updateChartPanel();};tabs.appendChild(b);});
+    body.appendChild(tabs);
+  }
+  const m=_flowTab,fl=flowSel(m),c=MAT[m].color;
+  if(!fl.length){body.insertAdjacentHTML('beforeend',`<div class="cp-empty"><div class="cp-empty-icon">📊</div>No ${MAT[m].label.toLowerCase()} flows recorded for the selected years.</div>`);return;}
+  const total=fl.reduce((s,f)=>s+f.vol,0),routes={},ex=sumBy(fl,'from'),im=sumBy(fl,'to');
+  fl.forEach(f=>{const k=f.from+' → '+f.to;routes[k]=(routes[k]||0)+f.vol;});
+  const nRoutes=Object.keys(routes).length,nC=new Set(fl.flatMap(f=>[f.from,f.to])).size;
+  const kp=document.createElement('div');kp.style.cssText='display:flex;gap:14px;margin:0 0 14px;flex-wrap:wrap';
+  [[flowFmt(total)+' t','total volume'],[nRoutes,'routes'],[nC,'countries']].forEach(([v,l])=>{kp.insertAdjacentHTML('beforeend',`<div><div style="font-size:15px;font-weight:700;color:var(--t1);line-height:1.1">${v}</div><div style="font-size:9px;color:var(--t2);margin-top:2px">${l}</div></div>`);});
+  body.appendChild(kp);
+  body.appendChild(flowHead('Top routes',true));
+  body.appendChild(flowBars(sortedRows(routes),total,c,10));
+  body.appendChild(flowNote(`${nRoutes} route${nRoutes===1?'':'s'}, volumes summed over ${flowYearLabel()||'all years'}`));
+  const mk=(title,obj,verb)=>{
+    body.appendChild(flowHead(title));const cw=document.createElement('div');body.appendChild(cw);
+    const l=Object.keys(obj).sort((a,b)=>obj[b]-obj[a]);
+    const sC=smallCount(l.map(k=>obj[k]),total);
+    body.appendChild(flowNote(`${l.length} countr${l.length===1?'y':'ies'}${sC?` · ${sC} with less than 2.5% each grouped as “Other”`:''} · share of the ${flowFmt(total)} t ${verb}`));
+    activeChartInstances.push(treemapChart(cw,l,l.map(k=>obj[k]),'t',total,c,null,200));
+  };
+  mk('Exporters',ex,'sent');mk('Importers',im,'received');
+  body.appendChild(flowNote('Each material is shown separately: volumes of different materials are not added together.'));
+}
+// For each selected country and active material: where do its imports come from (or, if it has none, where do its exports go)
+function buildCountryFlowSections(body){
+  const mats=Object.keys(MAT).filter(m=>state.flowMats[m]);
+  state.countries.slice().sort().forEach(cn=>{
+    mats.forEach(m=>{
+      const fl=flowSel(m),imp=fl.filter(f=>f.to===cn),exp=fl.filter(f=>f.from===cn),lab=MAT[m].label.toLowerCase();
+      if(!imp.length&&!exp.length)return;
+      const useImp=imp.length>0,arr=useImp?imp:exp,key=useImp?'from':'to',total=arr.reduce((s,f)=>s+f.vol,0);
+      body.appendChild(flowHead(useImp?`Where does ${cn}’s ${lab} come from?`:`Where does ${cn}’s ${lab} go?`));
+      body.appendChild(flowBars(sortedRows(sumBy(arr,key)),total,MAT[m].color,8));
+      body.appendChild(flowNote(`${useImp?'Imports':'No recorded imports; exports'} of ${lab}: ${flowFmt(total)} t over ${flowYearLabel()||'all years'}`+(useImp&&exp.length?` · exports ${flowFmt(exp.reduce((s,f)=>s+f.vol,0))} t`:'')));
+    });
+  });
+}
 function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
+  if(flowsOnlyMode()){buildFlowPanel(body);return;}
   const meta=mode?CHART_META[mode]:null,of=state.ownerFilter;
   document.getElementById('cp-title').textContent=meta?meta.title:'Country summary';
   const bits=[];
@@ -886,8 +957,10 @@ function buildPanel(mode){
   if(state.countries.length)bits.push(state.countries.length===1?state.countries[0]:`${state.countries.length} countries`);
   if(of)bits.push(`Owner: ${of} (pro rata by stake)`);
   document.getElementById('cp-subtitle').textContent=bits.join(' · ');
+  if(state.countries.length&&flowsActive()&&!of){document.getElementById('cp-title').textContent='Country summary';document.getElementById('cp-subtitle').textContent=(state.countries.length===1?state.countries[0]:state.countries.length+' countries')+(flowYearLabel()?' · Flow year: '+flowYearLabel():'');}
   if(state.countries.length){
     body.insertAdjacentHTML('beforeend',[...state.countries].sort().map(buildCountrySummary).join('')+`<div class="cs-foot" style="padding:0 0 10px">Capacity shares are computed from operating sites in this dataset (mills excluded).</div>`);
+    if(flowsActive())buildCountryFlowSections(body);
   }
   if(!meta)return;
   const data2=computeCapacityShares(meta.types);
