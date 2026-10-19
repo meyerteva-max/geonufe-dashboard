@@ -367,7 +367,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
       </div>
     </div>
     <div class="dd-wrap" id="dd-route" style="display:none">
-      <button class="dd-btn" id="dd-route-btn" onclick="toggleDropdown('route')"><span id="dd-route-label">Route</span><span class="dd-caret">▼</span></button>
+      <button class="dd-btn" id="dd-route-btn" onclick="toggleDropdown('route')" title="Choose origin and destination countries for flows"><span id="dd-route-label">From → To</span><span class="dd-caret">▼</span></button>
       <div class="dd-panel" id="dd-route-panel" style="min-width:470px">
         <div class="dd-panel-header"><span>Flow route · from → to</span><button class="dd-select-all" onclick="clearRoute()">All → All</button></div>
         <div class="rt-grid">
@@ -994,7 +994,7 @@ function updateRouteBtn(){
   const wrap=document.getElementById('dd-route');if(!wrap)return;
   wrap.style.display=flowsActive()?'':'none';
   const btn=document.getElementById('dd-route-btn'),lab=document.getElementById('dd-route-label'),on=state.routeFrom.length||state.routeTo.length;
-  btn.classList.toggle('has-selection',!!on);lab.textContent=on?routeLabelText():'Route';
+  btn.classList.toggle('has-selection',!!on);lab.textContent=on?routeLabelText():'From → To';
   if(!flowsActive()&&openDropdown==='route')closeAllDropdowns();
 }
 function onRouteChanged(){syncRouteChecks();updateRouteBtn();renderMap();refreshZoom();}
