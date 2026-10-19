@@ -18058,7 +18058,7 @@
    "year": 2024,
    "natU": null,
    "convU": null,
-   "enrU": null,
+   "enrU": 0.03,
    "nucMix": 7,
    "resCost40": 0,
    "resCost80": 1.026,
