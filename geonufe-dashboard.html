@@ -943,7 +943,24 @@ function onSelectionChanged(){
     state.chainStep='';clearChainUI();Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=false;});state.showAllTypes=true;
   }else state.showAllTypes=false;
   if(state.ownerFilter){Object.keys(state.flowMats).forEach(k=>{state.flowMats[k]=false;});state.zoneMode='none';}
-  applyStateToUI();renderMap();
+  applyStateToUI();renderMap();zoomToCountries();
+}
+// Zoom the map onto the selected countries (main landmass only, so overseas parts of USA/France/Russia don't blow up the box); back to world view when cleared.
+let _zoomedToC=false;
+function zoomToCountries(){
+  if(!svgEl||!proj)return;
+  if(!state.countries.length){if(_zoomedToC){_zoomedToC=false;zoomReset();}return;}
+  const path=d3.geoPath(proj),ids=state.countries.map(c=>nameToId[c]).filter(x=>x!=null).map(Number);
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  worldFeatures.filter(f=>ids.includes(+f.id)).forEach(f=>{
+    let polys=f.geometry.type==='MultiPolygon'?f.geometry.coordinates.map(c=>({type:'Polygon',coordinates:c})):[f.geometry];
+    const ar=polys.map(g=>d3.geoArea(g)),mx=Math.max(...ar);polys=polys.filter((g,i)=>ar[i]>=0.25*mx);
+    polys.forEach(g=>{const b=path.bounds(g);x0=Math.min(x0,b[0][0]);y0=Math.min(y0,b[0][1]);x1=Math.max(x1,b[1][0]);y1=Math.max(y1,b[1][1]);});
+  });
+  if(x0>x1)return;
+  const dx=Math.max(x1-x0,1),dy=Math.max(y1-y0,1),k=Math.max(1,Math.min(10,0.8/Math.max(dx/MAP_W,dy/MAP_H))),cx=(x0+x1)/2,cy=(y0+y1)/2;
+  _zoomedToC=true;
+  svgEl.transition().duration(700).call(zoomBehavior.transform,d3.zoomIdentity.translate(MAP_W/2-k*cx,MAP_H/2-k*cy).scale(k));
 }
 function clearCountryFilter(){state.countries=[];onSelectionChanged();}
 function applyOwnerFilter(){state.ownerFilter=document.getElementById('owner-sel').value;closeAllDropdowns();onSelectionChanged();}
