@@ -766,7 +766,7 @@ function markerStyle(status,color,haleu){
   else if(status==='planned'){fill=color;fo=0.14;stroke=color;sw=0.9;}
   else if(status==='suspended'){fill=TH().dark?'#4a525b':'#c4c4c0';fo=0.9;stroke=color;sw=1;}
   if(SHOW_HALEU&&haleu&&status==='operating'){stroke='#F2B705';sw=1;}
-  if(status==='operating'&&(color==='#5A2C0C'||color==='#E3C39B')){stroke=document.documentElement.dataset.theme==='dark'?'#10151A':'#FFFFFF';sw=1.6;fo=1;}   // uranium mill: contrasting halo so it stands out over mine triangles
+  if(status==='operating'&&(color==='#5A2C0C'||color==='#E3C39B')){const dk=document.documentElement.dataset.theme==='dark';fill=dk?'#10151A':'#FFFFFF';stroke=dk?'#E3C39B':'#5A2C0C';sw=1.8;fo=1;}   // uranium mill: contrasting halo so it stands out over mine triangles
   return {fill,fo,stroke,sw,dash};
 }
 function symbolSVG(shape,color,r,status,haleu){
