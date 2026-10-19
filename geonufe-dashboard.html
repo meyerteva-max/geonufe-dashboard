@@ -947,6 +947,16 @@ function onSelectionChanged(){
   applyStateToUI();renderMap();updateToponyms();zoomToCountries();
 }
 // Zoom the map onto the selected countries (main landmass only, so overseas parts of USA/France/Russia don't blow up the box); back to world view when cleared.
+// Finer basemap: the 110m geometry is swapped for 50m the first time the user zooms in (loaded on demand, then cached).
+let _detail=0;
+async function maybeLoadDetail(k){
+  if(_detail||k<2.5||!svgEl)return;_detail=1;
+  try{
+    const w=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json'),f=topojson.feature(w,w.objects.countries).features,path=d3.geoPath(proj);
+    d3.select('#countries-layer').selectAll('path').data(f,function(d){return d?d.id:this._id;}).attr('d',path);
+    _detail=2;
+  }catch(e){_detail=0;setTimeout(()=>{},0);}
+}
 // Country names: greedy label placement by country size, hidden when they don't fit the country or collide; selected countries always shown.
 let topoOn=true,topoData=[];try{topoOn=localStorage.getItem('geonufeLabels')!=='off';}catch(e){}
 const TOPO_ALIAS={'United States of America':'USA','United Kingdom':'UK','Dem. Rep. Congo':'DR Congo','Central African Rep.':'C.A.R.','Bosnia and Herz.':'Bosnia & Herz.','Dominican Rep.':'Dominican Rep.'};
@@ -1096,7 +1106,7 @@ async function initMap(){
   const path=d3.geoPath(proj),mw=document.getElementById('mapwrap');
   buildCentroids(worldFeatures);
   initToponyms(path);
-  zoomBehavior=d3.zoom().scaleExtent([1,12]).translateExtent([[0,0],[W,H]]).on('zoom',event=>{d3.select('#zoomable').attr('transform',event.transform);applyZoomScale(event.transform.k);updateToponyms(event.transform);closeSitePopup();}).on('end',()=>updateLegend());
+  zoomBehavior=d3.zoom().scaleExtent([1,12]).translateExtent([[0,0],[W,H]]).on('zoom',event=>{d3.select('#zoomable').attr('transform',event.transform);applyZoomScale(event.transform.k);updateToponyms(event.transform);maybeLoadDetail(event.transform.k);closeSitePopup();}).on('end',()=>updateLegend());
   svgEl.call(zoomBehavior).on('dblclick.zoom',null);
   d3.select('#countries-layer').selectAll('path').data(worldFeatures).join('path').attr('class','cp').attr('d',path).attr('fill',TH().land).attr('stroke',TH().border).attr('stroke-width',0.6).each(function(d){this._id=d.id;})
     .on('mousemove',function(event,d){if(state.zoneMode==='none')return;const zd=getZoneData(d);if(!zd)return;const r=mw.getBoundingClientRect(),cfg=ZONE_CFG[state.zoneMode],val=zd[state.zoneMode];document.getElementById('ttc').textContent=zd.country;document.getElementById('ttr').textContent=cfg?`${cfg.label}: ${val!=null?val+'%':'no data'}`:'';const tt=document.getElementById('tooltip');tt.style.display='block';tt.style.left=Math.min(event.clientX-r.left+14,360)+'px';tt.style.top=Math.min(event.clientY-r.top-10,340)+'px';})
