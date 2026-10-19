@@ -76,6 +76,7 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .dd-clear-row{display:flex;justify-content:flex-end;padding:0 10px 7px}
 .dd-clear-btn{font-family:var(--font);font-size:9px;color:var(--t2);background:none;border:none;cursor:pointer;text-decoration:underline}
 .dd-clear-btn:hover{color:#C0392B}
+.rt-grid{display:flex;gap:8px;padding:8px 10px;align-items:stretch}.rt-col{flex:1;min-width:0}.rt-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:5px}.rt-search{width:100%;box-sizing:border-box;font:inherit;font-size:10px;padding:5px 7px;border:1px solid var(--border);background:var(--bg1);color:var(--t1);margin-bottom:6px;border-radius:4px}.rt-list{height:230px}.rt-swap{align-self:center;width:26px;height:26px;border:1px solid var(--border);background:var(--bg1);color:var(--t1);cursor:pointer;border-radius:50%;font-size:13px;flex-shrink:0}.rt-swap:hover{background:var(--c1);color:#fff;border-color:var(--c1)}
 .dd-panel.align-right{left:auto;right:0}
 .bar1-sep{width:1px;height:24px;background:var(--border);flex-shrink:0;margin:0 2px}
 .year-slider-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;padding:0 4px}
@@ -365,6 +366,18 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
         <div class="dd-item" onclick="toggleFlowMat('Fuel asm.')"><input type="checkbox" id="cb-Fuel asm."><span class="dd-dot" style="background:#4C8C4A"></span>Fuel assemblies</div>
       </div>
     </div>
+    <div class="dd-wrap" id="dd-route" style="display:none">
+      <button class="dd-btn" id="dd-route-btn" onclick="toggleDropdown('route')"><span id="dd-route-label">Route</span><span class="dd-caret">▼</span></button>
+      <div class="dd-panel" id="dd-route-panel" style="min-width:470px">
+        <div class="dd-panel-header"><span>Flow route · from → to</span><button class="dd-select-all" onclick="clearRoute()">All → All</button></div>
+        <div class="rt-grid">
+          <div class="rt-col"><div class="rt-title">From</div><input class="rt-search" id="rt-search-from" type="search" placeholder="Search a country" oninput="renderRouteList('from')"><div class="dd-checklist rt-list" id="rt-list-from"></div></div>
+          <button class="rt-swap" onclick="swapRoute()" title="Swap From and To" aria-label="Swap From and To">⇄</button>
+          <div class="rt-col"><div class="rt-title">To</div><input class="rt-search" id="rt-search-to" type="search" placeholder="Search a country" oninput="renderRouteList('to')"><div class="dd-checklist rt-list" id="rt-list-to"></div></div>
+        </div>
+        <div class="dd-clear-row" style="font-size:9px;color:var(--t2);padding:6px 10px">Flows from any selected origin to any selected destination · same-country pairs are excluded</div>
+      </div>
+    </div>
     <div class="dd-wrap" id="dd-zone">
       <button class="dd-btn" id="dd-zone-btn" onclick="toggleDropdown('zone')"><span id="dd-zone-label">Production share</span><span class="dd-caret">▼</span></button>
       <div class="dd-panel" id="dd-zone-panel">
@@ -568,7 +581,7 @@ let state={
   siteTypes:{},
   statuses:{operating:true,suspended:false,'under construction':false,planned:false},
   flowMats:{'Natural U':false,'Converted U':false,'Enriched U':false,'Fuel asm.':false},
-  yearRange:null,zoneMode:'none',chainStep:'',countries:[],ownerFilter:'',
+  yearRange:null,zoneMode:'none',chainStep:'',countries:[],ownerFilter:'',routeFrom:[],routeTo:[],
   showAllTypes:false,haleuOnly:false
 };
 Object.keys(SITE_TYPES).forEach(k=>{state.siteTypes[k]=false;});
@@ -593,7 +606,7 @@ function isOp(s){return (s.status||'operating')==='operating';}
 function ownerLocked(){return !!state.ownerFilter;}
 function inC(country){return !state.countries.length||state.countries.includes(country);}
 
-const DD_IDS=['facilities','status','flows','zone','country','owner'];
+const DD_IDS=['facilities','status','flows','route','zone','country','owner'];
 let openDropdown=null;
 function toggleDropdown(id){
   if((id==='flows'||id==='zone')&&ownerLocked())return;
@@ -611,7 +624,7 @@ function updateStatusBtn(){const on=STATUS_LIST.filter(s=>state.statuses[s]);con
   const isDefault=on.length===1&&on[0]==='operating';
   if(isDefault){btn.classList.remove('has-selection');badge.style.display='none';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=on.length;}
   STATUS_LIST.forEach(s=>{const cb=document.getElementById('cb-st-'+s);if(cb)cb.checked=state.statuses[s];});}
-function updateFlowsBtn(){const active=Object.entries(state.flowMats).filter(([,v])=>v).length,total=Object.keys(state.flowMats).length;const btn=document.getElementById('dd-flows-btn'),badge=document.getElementById('dd-flows-badge');if(active===0){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows';}else if(active===total){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows (all)';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=active;document.getElementById('dd-flows-label').textContent='Flows';}Object.entries(state.flowMats).forEach(([k,v])=>{const cb=document.getElementById('cb-'+k);if(cb)cb.checked=v;});updateYearSliderVisibility();}
+function updateFlowsBtn(){const active=Object.entries(state.flowMats).filter(([,v])=>v).length,total=Object.keys(state.flowMats).length;const btn=document.getElementById('dd-flows-btn'),badge=document.getElementById('dd-flows-badge');if(active===0){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows';}else if(active===total){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows (all)';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=active;document.getElementById('dd-flows-label').textContent='Flows';}Object.entries(state.flowMats).forEach(([k,v])=>{const cb=document.getElementById('cb-'+k);if(cb)cb.checked=v;});updateYearSliderVisibility();;updateRouteBtn();}
 function updateZoneBtn(){const btn=document.getElementById('dd-zone-btn');if(state.zoneMode==='none'){btn.classList.remove('has-selection');}else{btn.classList.add('has-selection');}['none','natU','convU','enrU','nucMix','resCost40','resCost80','resCost130','resCost260'].forEach(m=>{const r=document.getElementById('zr-'+m);if(r)r.checked=(state.zoneMode===m);});}
 function updateCountryBtn(){const btn=document.getElementById('dd-country-btn'),label=document.getElementById('dd-country-label'),n=state.countries.length;if(n){btn.classList.add('has-selection');label.textContent=n===1?state.countries[0]:`${n} countries`;}else{btn.classList.remove('has-selection');label.textContent='Country';}
   document.querySelectorAll('#country-list input').forEach(cb=>{cb.checked=state.countries.includes(cb.value);});}
@@ -898,15 +911,16 @@ function flowBars(rows,total,color,maxRows){
   });
   return wrap;
 }
-function flowSel(m){return flows.filter(f=>f.mat===m&&inFlowYearRange(f.year)&&f.vol>0);}
+function flowSel(m){return flows.filter(f=>f.mat===m&&inFlowYearRange(f.year)&&f.vol>0&&inRoute(f));}
 function sumBy(arr,key){const o={};arr.forEach(f=>{o[f[key]]=(o[f[key]]||0)+f.vol;});return o;}
 function sortedRows(o){return Object.keys(o).map(k=>({name:k,value:o[k]})).sort((a,b)=>b.value-a.value);}
 function buildFlowPanel(body){
   const mats=Object.keys(MAT).filter(m=>state.flowMats[m]);
   if(!mats.length)return;
   if(!_flowTab||!mats.includes(_flowTab))_flowTab=mats[0];
+  if(!flowSel(_flowTab).length){const alt=mats.find(x=>flowSel(x).length);if(alt)_flowTab=alt;}
   document.getElementById('cp-title').textContent='Material flows';
-  document.getElementById('cp-subtitle').textContent=(flowYearLabel()?'Flow year: '+flowYearLabel()+' · ':'')+'volumes in tonnes';
+  document.getElementById('cp-subtitle').textContent=(routeActive()?routeLabelText()+' · ':'')+(flowYearLabel()?'Flow year: '+flowYearLabel()+' · ':'')+'volumes in tonnes';
   if(mats.length>1){
     const tabs=document.createElement('div');tabs.style.cssText='display:flex;flex-wrap:wrap;gap:5px;margin:0 0 12px';
     mats.forEach(m=>{const b=document.createElement('button'),on=m===_flowTab;b.textContent=MAT[m].label;b.style.cssText=`font:inherit;font-size:10px;font-weight:600;padding:4px 9px;border-radius:12px;cursor:pointer;border:1px solid ${on?MAT[m].color:'var(--border)'};background:${on?MAT[m].color:'transparent'};color:${on?'#fff':'var(--t1)'}`;b.onclick=()=>{_flowTab=m;updateChartPanel();};tabs.appendChild(b);});
@@ -920,14 +934,19 @@ function buildFlowPanel(body){
   const kp=document.createElement('div');kp.style.cssText='display:flex;gap:14px;margin:0 0 14px;flex-wrap:wrap';
   [[flowFmt(total)+' t','total volume'],[nRoutes,'routes'],[nC,'countries']].forEach(([v,l])=>{kp.insertAdjacentHTML('beforeend',`<div><div style="font-size:15px;font-weight:700;color:var(--t1);line-height:1.1">${v}</div><div style="font-size:9px;color:var(--t2);margin-top:2px">${l}</div></div>`);});
   body.appendChild(kp);
-  body.appendChild(flowHead('Top routes',true));
-  body.appendChild(flowBars(sortedRows(routes),total,c,10));
-  body.appendChild(flowNote(`${nRoutes} route${nRoutes===1?'':'s'}, volumes summed over ${flowYearLabel()||'all years'}`));
+  body.appendChild(flowHead('Volume by year',true));
+  const tw=document.createElement('div');body.appendChild(tw);activeChartInstances.push(flowTrend(tw,m));
+  body.appendChild(flowNote(`${MAT[m].label}${routeActive()?' · '+routeLabelText():''} · selected years highlighted`));
+  if(nRoutes>1){
+    body.appendChild(flowHead('Top routes'));
+    body.appendChild(flowBars(sortedRows(routes),total,c,10));
+    body.appendChild(flowNote(`${nRoutes} routes, volumes summed over ${flowYearLabel()||'all years'}`));
+  }
   const mk=(title,obj,verb)=>{
+    const l=Object.keys(obj).sort((a,b)=>obj[b]-obj[a]);if(l.length<2)return;
     body.appendChild(flowHead(title));const cw=document.createElement('div');body.appendChild(cw);
-    const l=Object.keys(obj).sort((a,b)=>obj[b]-obj[a]);
     const sC=smallCount(l.map(k=>obj[k]),total);
-    body.appendChild(flowNote(`${l.length} countr${l.length===1?'y':'ies'}${sC?` · ${sC} with less than 2.5% each grouped as “Other”`:''} · share of the ${flowFmt(total)} t ${verb}`));
+    body.appendChild(flowNote(`${l.length} countries${sC?` · ${sC} with less than 2.5% each grouped as “Other”`:''} · share of the ${flowFmt(total)} t ${verb}`));
     activeChartInstances.push(treemapChart(cw,l,l.map(k=>obj[k]),'t',total,c,null,200));
   };
   mk('Exporters',ex,'sent');mk('Importers',im,'received');
@@ -946,6 +965,67 @@ function buildCountryFlowSections(body){
       body.appendChild(flowNote(`${useImp?'Imports':'No recorded imports; exports'} of ${lab}: ${flowFmt(total)} t over ${flowYearLabel()||'all years'}`+(useImp&&exp.length?` · exports ${flowFmt(exp.reduce((s,f)=>s+f.vol,0))} t`:'')));
     });
   });
+}
+// ── Route filter (From → To) for flows ──
+function routeActive(){return flowsActive()&&(state.routeFrom.length>0||state.routeTo.length>0);}
+function inRoute(f){if(f.from===f.to)return false;return (!state.routeFrom.length||state.routeFrom.includes(f.from))&&(!state.routeTo.length||state.routeTo.includes(f.to));}
+function routeTint(c){if(!c||!routeActive())return null;const a=state.routeFrom.includes(c),b=state.routeTo.includes(c);if(!a&&!b)return null;const d=document.documentElement.dataset.theme==='dark';return a&&b?(d?'#47405C':'#DCCFE4'):a?(d?'#5C4632':'#F1D9BC'):(d?'#2F4560':'#C6D9EE');}
+function routeLegend(){if(!routeActive())return'';const d=document.documentElement.dataset.theme==='dark',sw=c=>`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${c};border:1px solid var(--border);margin-right:4px;vertical-align:-1px"></span>`;return `<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Route</span><span class="ml-item">${state.routeFrom.length?sw(d?'#5C4632':'#F1D9BC')+'From':''}</span><span class="ml-item">${state.routeTo.length?sw(d?'#2F4560':'#C6D9EE')+'To':''}</span>`;}
+function routeSideLabel(a){return !a.length?'All':a.length===1?a[0]:`${a.length} countries`;}
+function routeLabelText(){return routeSideLabel(state.routeFrom)+' → '+routeSideLabel(state.routeTo);}
+const routeLists={from:[],to:[]};
+function buildRouteLists(){
+  routeLists.from=[...new Set(flows.map(f=>f.from))].sort();routeLists.to=[...new Set(flows.map(f=>f.to))].sort();
+  ['from','to'].forEach(side=>{
+    const el=document.getElementById('rt-list-'+side);if(!el)return;
+    el.addEventListener('change',e=>{const i=e.target;let arr=side==='from'?state.routeFrom:state.routeTo;
+      if(i.dataset.all)arr=[];else arr=i.checked?[...arr,i.value]:arr.filter(x=>x!==i.value);
+      if(side==='from')state.routeFrom=arr;else state.routeTo=arr;onRouteChanged();});
+    renderRouteList(side);
+  });
+}
+function renderRouteList(side){
+  const el=document.getElementById('rt-list-'+side),q=(document.getElementById('rt-search-'+side).value||'').trim().toLowerCase(),sel=side==='from'?state.routeFrom:state.routeTo,top=el.scrollTop;
+  el.innerHTML=`<label class="dd-check-item" style="font-weight:600"><input type="checkbox" data-all="1" ${sel.length?'':'checked'}>All countries</label>`+routeLists[side].filter(c=>!q||c.toLowerCase().includes(q)).map(c=>`<label class="dd-check-item"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" ${sel.includes(c)?'checked':''}>${c}</label>`).join('');
+  el.scrollTop=top;
+}
+function syncRouteChecks(){['from','to'].forEach(side=>{const sel=side==='from'?state.routeFrom:state.routeTo;document.querySelectorAll('#rt-list-'+side+' input').forEach(i=>{i.checked=i.dataset.all?!sel.length:sel.includes(i.value);});});}
+function updateRouteBtn(){
+  const wrap=document.getElementById('dd-route');if(!wrap)return;
+  wrap.style.display=flowsActive()?'':'none';
+  const btn=document.getElementById('dd-route-btn'),lab=document.getElementById('dd-route-label'),on=state.routeFrom.length||state.routeTo.length;
+  btn.classList.toggle('has-selection',!!on);lab.textContent=on?routeLabelText():'Route';
+  if(!flowsActive()&&openDropdown==='route')closeAllDropdowns();
+}
+function onRouteChanged(){syncRouteChecks();updateRouteBtn();renderMap();refreshZoom();}
+function swapRoute(){const a=state.routeFrom;state.routeFrom=state.routeTo;state.routeTo=a;onRouteChanged();}
+function clearRoute(){state.routeFrom=[];state.routeTo=[];onRouteChanged();}
+// zoom: selected countries first; else the countries involved in the filtered route; else back to the world view
+function refreshZoom(){
+  if(state.countries.length){zoomToCountries();return;}
+  if(routeActive()){
+    const ends=new Set();flows.forEach(f=>{if(Object.keys(MAT).some(m=>m===f.mat&&state.flowMats[m])&&inFlowYearRange(f.year)&&inRoute(f)){ends.add(f.from);ends.add(f.to);}});
+    if(ends.size){zoomToCountries([...ends]);return;}
+  }
+  zoomToCountries([]);
+}
+// year-by-year volume of the filtered flows for one material (selected years highlighted)
+function flowTrend(container,m){
+  const col=document.documentElement.dataset.theme==='dark'?d3.color(MAT[m].color).brighter(0.7).formatHex():MAT[m].color;
+  const years=[...new Set(flows.map(f=>f.year).filter(y=>y!=null))].sort((a,b)=>a-b),by={};
+  flows.forEach(f=>{if(f.mat===m&&f.vol>0&&inRoute(f))by[f.year]=(by[f.year]||0)+f.vol;});
+  const W=container.clientWidth||260,H=112,pl=2,pb=16,pt=14,bw=(W-pl)/years.length,mx=Math.max(...years.map(y=>by[y]||0),1);
+  const svg=d3.select(container).append('svg').attr('width',W).attr('height',H).style('display','block');
+  svg.append('text').attr('x',pl).attr('y',9).attr('font-size',9).attr('fill','var(--t2)').text(flowFmt(mx)+' t max');
+  const tip=()=>document.getElementById('chartPanelTip');
+  years.forEach((y,i)=>{
+    const v=by[y]||0,h=v?Math.max(1.5,v/mx*(H-pt-pb)):0,inR=inFlowYearRange(y);
+    svg.append('rect').attr('x',pl+i*bw+1).attr('width',Math.max(1,bw-2)).attr('y',H-pb-h).attr('height',h).attr('rx',1.5).attr('fill',col).attr('opacity',inR?0.95:0.28)
+      .on('mousemove',ev=>{const r=tip();if(!r)return;r.style.display='block';r.innerHTML=`<strong>${y}</strong><br>${flowFmt(v)} t`;r.style.left=Math.min(ev.clientX+12,innerWidth-r.offsetWidth-8)+'px';r.style.top=(ev.clientY+14)+'px';})
+      .on('mouseleave',()=>{const r=tip();if(r)r.style.display='none';});
+    if(i%2===0||i===years.length-1)svg.append('text').attr('x',i===years.length-1?W-1:pl+i*bw+bw/2).attr('y',H-4).attr('text-anchor',i===years.length-1?'end':'middle').attr('font-size',8.5).attr('fill','var(--t2)').text("’"+String(y).slice(2));
+  });
+  return {destroy(){const r=tip();if(r)r.style.display='none';}};
 }
 function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
@@ -1017,7 +1097,7 @@ function onSelectionChanged(){
     state.chainStep='';clearChainUI();Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=false;});state.showAllTypes=true;
   }else state.showAllTypes=false;
   if(state.ownerFilter){Object.keys(state.flowMats).forEach(k=>{state.flowMats[k]=false;});state.zoneMode='none';}
-  applyStateToUI();renderMap();updateToponyms();zoomToCountries();
+  applyStateToUI();renderMap();updateToponyms();refreshZoom();
 }
 // Zoom the map onto the selected countries (main landmass only, so overseas parts of USA/France/Russia don't blow up the box); back to world view when cleared.
 // Finer basemap: the 110m geometry is swapped for 50m the first time the user zooms in (loaded on demand, then cached).
@@ -1058,10 +1138,10 @@ function updateToponyms(t){
 }
 function toggleToponyms(){topoOn=!topoOn;try{localStorage.setItem('geonufeLabels',topoOn?'on':'off');}catch(e){}updateToponyms();const b=document.getElementById('topoBtn');if(b)b.style.opacity=topoOn?1:0.45;}
 let _zoomedToC=false;
-function zoomToCountries(){
-  if(!svgEl||!proj)return;
-  if(!state.countries.length){if(_zoomedToC){_zoomedToC=false;zoomReset();}return;}
-  const path=d3.geoPath(proj),ids=state.countries.map(c=>nameToId[c]).filter(x=>x!=null).map(Number);
+function zoomToCountries(names){
+  if(!svgEl||!proj)return;names=names||state.countries;
+  if(!names.length){if(_zoomedToC){_zoomedToC=false;zoomReset();}return;}
+  const path=d3.geoPath(proj),ids=names.map(c=>nameToId[c]).filter(x=>x!=null).map(Number);
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   worldFeatures.filter(f=>ids.includes(+f.id)).forEach(f=>{
     let polys=f.geometry.type==='MultiPolygon'?f.geometry.coordinates.map(c=>({type:'Polygon',coordinates:c})):[f.geometry];
@@ -1123,7 +1203,7 @@ function updateLegend(){
       const typeItems=activeFlowTypes.map(([m,cfg])=>`<span class="ml-item"><span class="ml-dot" style="background:${cfg.color}"></span>${cfg.label}</span>`).join('');
       const levels=[0.2,0.5,1.0].map(frac=>({frac,label:`${Math.round(maxVol*frac).toLocaleString('en-US')} t`}));
       const strokeItems=levels.map(({frac,label})=>{const sw=(1.2+(frac*8)).toFixed(1);return `<span class="ml-stroke-item"><span class="ml-stroke-bar" style="width:24px;height:${sw}px"></span>${label}</span>`;}).join('');
-      html+=`<div class="ml-group"><span class="ml-label">Flow type</span>${typeItems}<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Volume</span>${strokeItems}</div>`;
+      html+=`<div class="ml-group"><span class="ml-label">Flow type</span>${typeItems}<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Volume</span>${strokeItems}${routeLegend()}</div>`;
     }
     if(zoneOn){const cfg=ZONE_CFG[state.zoneMode];
       html=`<div class="ml-group"><span class="ml-label">${cfg.label}</span><span class="ml-item">0%</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${zTo(cfg)})"></span><span class="ml-item">100%</span></div>`+html;}
@@ -1151,7 +1231,7 @@ async function loadAll(){
   if(meta.lastUpdated){const d=new Date(meta.lastUpdated+'T00:00:00');document.getElementById('info-updated').innerHTML='Data last updated: <strong>'+(isNaN(d)?meta.lastUpdated:d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}))+'</strong>';}
   initYearSlider();
   const allC=[...new Set([...sites.map(s=>s.country),...flows.map(f=>[f.from,f.to]).flat(),...zones.map(z=>z.country)].filter(Boolean))].sort();
-  buildCountryList(allC);
+  buildCountryList(allC);buildRouteLists();
   document.getElementById('owner-sel').innerHTML='<option value="">All owners</option>'+buildOwnerList().map(o=>`<option value="${o.replace(/"/g,'&quot;')}">${o}</option>`).join('');
   populateShapeSwatches();
   initChartPanelResize();
@@ -1254,7 +1334,7 @@ function renderMap(){
   const curK=d3.zoomTransform(svgEl.node()).k,zs=1/Math.sqrt(curK);
   d3.select('#countries-layer').selectAll('.cp').attr('fill',function(d){
     const c=countryOfFeature(d),sel=cf.length&&c&&cf.includes(c);
-    if(state.zoneMode==='none')return sel?TH().landSel:TH().land;
+    if(state.zoneMode==='none')return routeTint(c)||(sel?TH().landSel:TH().land);
     if(cf.length&&!sel)return TH().land;
     const zd=getZoneData(d);if(!zd)return TH().land;const val=zd[state.zoneMode];if(val==null||val<=0)return TH().land;return choroColor(val,ZONE_CFG[state.zoneMode]);
   }).attr('opacity',function(d){if(!cf.length)return 1;const c=countryOfFeature(d);return(c&&cf.includes(c))?1:0.4;});
@@ -1265,7 +1345,7 @@ function renderMap(){
   const maxVol=Math.max(...flows.map(f=>f.vol),1);
   const tt=document.getElementById('tooltip');
   if(flowsOn)flows.forEach(f=>{
-    if(!state.flowMats[f.mat]||!inFlowYearRange(f.year))return;
+    if(!state.flowMats[f.mat]||!inFlowYearRange(f.year)||!inRoute(f))return;
     if(cf.length&&!cf.includes(f.from)&&!cf.includes(f.to))return;
     const p1=getCountryPos(f.from),p2=getCountryPos(f.to);if(!p1||!p2)return;
     const [x1,y1]=p1,[x2,y2]=p2,dx=x2-x1,dy=y2-y1,dist=Math.sqrt(dx*dx+dy*dy);
