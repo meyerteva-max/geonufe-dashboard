@@ -1303,6 +1303,8 @@ const FALLBACK_ZONES=[{country:'France',year:2023,natU:null,convU:18,enrU:11,nuc
 function applyZoomScale(k){
   const s=1/Math.sqrt(k);
   d3.selectAll('.cp').attr('stroke-width',0.6/k);
+  d3.select('#link-arrow').attr('markerWidth',10/k).attr('markerHeight',10/k);
+  d3.selectAll('.step-label').each(function(){const t=d3.select(this),dx=(this._r*s+5/k)*this._dir;t.attr('x',this._sx+dx).attr('y',this._sy+3.5/k).attr('font-size',10/k).attr('stroke-width',3/k).style('display',k>=3?null:'none');});
   d3.selectAll('.site-link').attr('stroke-width',1.4/k).attr('stroke-dasharray',`${4/k},${3/k}`);
   d3.selectAll('.site-marker').each(function(){d3.select(this).attr('transform',`translate(${this._cx},${this._cy}) scale(${s})`);});
   d3.selectAll('.site-label').each(function(){d3.select(this).attr('font-size',9*s).attr('stroke-width',3*s).attr('y',this._sy-(this._r+3)*s);});
@@ -1432,7 +1434,9 @@ function renderMap(){
     items.push({site,cfg,status,sx:pos[0],sy:pos[1],rpx:radiusPx(site)});
   });
   items.sort((a,b)=>((a.cfg.stage==='mill')-(b.cfg.stage==='mill'))||(b.rpx-a.rpx));   // large symbols first so small ones stay visible on top
-  items.forEach(a=>{if(!a.site.linkTo)return;const b=items.find(x=>x.site.id===a.site.linkTo);if(b)d3.select('#sites-layer').append('line').attr('class','site-link').attr('x1',a.sx).attr('y1',a.sy).attr('x2',b.sx).attr('y2',b.sy).attr('stroke',document.documentElement.dataset.theme==='dark'?'#fff':'#3b2400').attr('stroke-width',1.4/curK).attr('stroke-dasharray',`${4/curK},${3/curK}`).attr('opacity',.8).style('pointer-events','none');});
+  d3.select('#sites-layer').selectAll('defs').remove();
+  d3.select('#sites-layer').append('defs').append('marker').attr('id','link-arrow').attr('viewBox','0 0 10 10').attr('refX',5).attr('refY',5).attr('orient','auto').attr('markerUnits','userSpaceOnUse').attr('markerWidth',10/curK).attr('markerHeight',10/curK).append('path').attr('d','M1,1 L9,5 L1,9 z').attr('fill',document.documentElement.dataset.theme==='dark'?'#fff':'#3b2400');
+  items.forEach(a=>{if(!a.site.linkTo)return;const b=items.find(x=>x.site.id===a.site.linkTo);if(b)d3.select('#sites-layer').append('path').attr('class','site-link').attr('d',`M${a.sx},${a.sy}L${(a.sx+b.sx)/2},${(a.sy+b.sy)/2}L${b.sx},${b.sy}`).attr('fill','none').attr('marker-mid','url(#link-arrow)').attr('stroke',document.documentElement.dataset.theme==='dark'?'#fff':'#3b2400').attr('stroke-width',1.4/curK).attr('stroke-dasharray',`${4/curK},${3/curK}`).attr('opacity',.8).style('pointer-events','none');});
   items.forEach(({site,cfg,status,sx,sy,rpx})=>{
     lastShown.types.add(site.type);lastShown.statuses.add(status);
     const r=rpx/fitScale;   // map units: appears as rpx screen px at zoom 1
@@ -1442,6 +1446,8 @@ function renderMap(){
     g.append('circle').attr('r',Math.max(r,3.2/fitScale)+1.2/fitScale).attr('fill','transparent').style('pointer-events','all');
     const p=g.append('path').attr('d',shapePath(cfg.shape,r)).attr('fill',st.fill).attr('fill-opacity',st.fo).attr('stroke',st.stroke).attr('stroke-width',st.sw).attr('vector-effect','non-scaling-stroke');
     if(st.dash)p.attr('stroke-dasharray',st.dash);
+    if(site.hollow)p.attr('fill','none').attr('stroke',cfg.color).attr('stroke-width',2);
+    if(site.stepLabel){const dir=site.linkTo?-1:1,sl=d3.select('#labels-layer').append('text').attr('class','step-label').attr('x',sx+(r*zs+5/curK)*dir).attr('y',sy+3.5/curK).attr('text-anchor',dir<0?'end':'start').attr('font-size',10/curK).attr('font-family',"'Hanken Grotesk',system-ui,sans-serif").attr('font-weight','700').attr('fill',cfg.color).attr('paint-order','stroke').attr('stroke','rgba(255,255,255,0.92)').attr('stroke-width',3/curK).style('pointer-events','none').style('display',curK>=3?null:'none').text(site.stepLabel);sl.node()._sx=sx;sl.node()._sy=sy;sl.node()._r=r;sl.node()._dir=dir;}
     const labelEl=d3.select('#labels-layer').append('text').attr('class','site-label').attr('x',sx).attr('y',sy-(r+3)*zs).attr('text-anchor','middle').attr('font-size',9*zs).attr('font-family',"'Hanken Grotesk',system-ui,sans-serif").attr('font-weight','400').attr('fill',TH().label).attr('paint-order','stroke').attr('stroke',TH().labelHalo).attr('stroke-width',3*zs).style('pointer-events','none').style('opacity',0).text(site.name);
     labelEl.node()._sy=sy;labelEl.node()._r=r;
     g.on('mouseover',function(){d3.select(this).attr('opacity',0.8);labelEl.style('opacity',1);})
