@@ -513,7 +513,7 @@ const SITE_TYPES={
   'mine-underground': {label:'Uranium mine — underground',     color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
   'mine-isl':         {label:'Uranium mine — ISL',             color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
   'mine-unspecified': {label:'Uranium mine — method not specified',color:MINE_COLOR,unit:'tU/yr',shape:'circle',stage:'mining',hasCapacity:true},
-  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'triangle', stage:'mill',  hasCapacity:true,fixed:true,fixedR:4.4},
+  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'triangle', stage:'mill',  hasCapacity:true,fixed:true,fixedR:3.4},
   conversion:         {label:'Conversion plant',               color:'#E8820A', unit:'tU/yr',  shape:'diamond', stage:'conversion',hasCapacity:true},
   enrichment:         {label:'Enrichment plant',               color:'#27498C', unit:'tSWU/yr',shape:'diamond', stage:'enrichment',hasCapacity:true},
   'fuelfab-mox':    {label:'MoX',           fullLabel:'Fuel fabrication — MoX',            color:FC.mox,   unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
@@ -601,7 +601,8 @@ function zFrom(cfg){return TH().dark?d3.interpolateRgb(TH().land,cfg.color)(0.16
 function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('geonufeTheme',t);}catch(e){}
   try{d3.selectAll('.cp').attr('stroke',TH().border);renderMap();updateToponyms();updateChartPanel();}catch(e){}}
 const R_MAX_PX=10.5,R_MIN_PX=2.5,R_STD_PX=5.5;
-function radiusPx(site){const cfg=SITE_TYPES[site.type];if(!cfg)return R_STD_PX;if(cfg.fixedR)return cfg.fixedR;if(cfg.fixed||site.fixedSize||!site.capacity)return R_STD_PX;const m=stageMax[cfg.stage];if(!m)return R_STD_PX;return Math.max(R_MIN_PX,R_MAX_PX*Math.sqrt(site.capacity/m));}
+const STAGE_SCALE={mining:1.3};   // mine circles drawn larger than the other symbols
+function radiusPx(site){const cfg=SITE_TYPES[site.type];if(!cfg)return R_STD_PX;if(cfg.fixedR)return cfg.fixedR;const sc=STAGE_SCALE[cfg.stage]||1;if(cfg.fixed||site.fixedSize||!site.capacity)return R_STD_PX*sc;const m=stageMax[cfg.stage];if(!m)return R_STD_PX*sc;return Math.max(R_MIN_PX,R_MAX_PX*Math.sqrt(site.capacity/m))*sc;}
 function niceRound(v){if(v<=0)return 0;let step;if(v<10)step=1;else if(v<100)step=10;else if(v<1000)step=50;else if(v<10000)step=500;else step=1000;return Math.round(v/step)*step||step;}
 function isOp(s){return (s.status||'operating')==='operating';}
 function ownerLocked(){return !!state.ownerFilter;}
@@ -767,7 +768,7 @@ function markerStyle(status,color,haleu){
   else if(status==='planned'){fill=color;fo=0.14;stroke=color;sw=0.9;}
   else if(status==='suspended'){fill=TH().dark?'#4a525b':'#c4c4c0';fo=0.9;stroke=color;sw=1;}
   if(SHOW_HALEU&&haleu&&status==='operating'){stroke='#F2B705';sw=1;}
-  if(status==='operating'&&(color==='#5A2C0C'||color==='#E3C39B')){const dk=document.documentElement.dataset.theme==='dark';fill=dk?'#10151A':'#FFFFFF';stroke=dk?'#E3C39B':'#5A2C0C';sw=1.8;fo=1;}   // uranium mill: contrasting halo so it stands out over mine triangles
+  if(status==='operating'&&(color==='#5A2C0C'||color==='#E3C39B')){const dk=document.documentElement.dataset.theme==='dark';fill=dk?'#10151A':'#FFFFFF';stroke=dk?'#E3C39B':'#5A2C0C';sw=1.4;fo=1;}   // uranium mill: contrasting halo so it stands out over mine triangles
   return {fill,fo,stroke,sw,dash};
 }
 function symbolSVG(shape,color,r,status,haleu){
@@ -1206,7 +1207,7 @@ function updateLegend(){
         const types=ordered.filter(t=>SITE_TYPES[t].stage===stage&&!SITE_TYPES[t].fixed);if(!types.length||!stageMax[stage])return;
         const cols=[...new Set(types.map(t=>SITE_TYPES[t].color))],color=cols.length===1?cols[0]:'#9a9a9a',shape=SITE_TYPES[types[0]].shape,max=stageMax[stage];
         const refs=[0.1,0.4,1].map(f=>Math.max(1,niceRound(max*f)));
-        const sizeItems=refs.map(v=>{const rpx=Math.max(R_MIN_PX,R_MAX_PX*Math.sqrt(v/max))*0.75*Math.min(Math.sqrt(k),1.2);return `<span class="ml-item">${symbolSVG(shape,color,rpx)}${v.toLocaleString('en-US')}</span>`;}).join('');
+        const sizeItems=refs.map(v=>{const rpx=Math.max(R_MIN_PX,R_MAX_PX*Math.sqrt(v/max))*(STAGE_SCALE[stage]||1)*0.75*Math.min(Math.sqrt(k),1.2);return `<span class="ml-item">${symbolSVG(shape,color,rpx)}${v.toLocaleString('en-US')}</span>`;}).join('');
         html+=`<div class="ml-group"><span class="ml-label">Size — ${STAGE_INFO[stage].label} (${STAGE_INFO[stage].unit})</span>${sizeItems}</div>`;
       });
     }
