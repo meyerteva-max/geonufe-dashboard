@@ -1122,7 +1122,7 @@ function initToponyms(path){
     let best=null,ba=-1;polys.forEach(p=>{const a=path.area(p);if(a>ba){ba=a;best=p;}});
     const b=path.bounds(best),c=path.centroid(best),nm=TOPO_ALIAS[f.properties.name]||f.properties.name;
     return{f,name:nm,x:c[0],y:c[1],w:b[1][0]-b[0][0],a:ba,cn:countryOfFeature(f)};
-  }).filter(d=>isFinite(d.x)&&isFinite(d.y)).sort((a,b)=>b.a-a.a);
+  }).filter(d=>isFinite(d.x)&&isFinite(d.y)).sort((a,b)=>b.a-a.a).filter((d,i,arr)=>d.f.id==null||arr.findIndex(e=>e.f.id===d.f.id)===i);   // territories sharing a parent's id (e.g. Ashmore and Cartier Is.) get no name of their own
   g.selectAll('text').data(topoData).join('text').attr('class','topo').attr('x',d=>d.x).attr('y',d=>d.y).attr('text-anchor','middle').attr('dominant-baseline','central').text(d=>d.name).each(function(d){d._el=this;});
   updateToponyms(d3.zoomIdentity);
 }
@@ -1265,7 +1265,7 @@ function applyZoomScale(k){
   d3.selectAll('.site-label').each(function(){d3.select(this).attr('font-size',9*s).attr('stroke-width',3*s).attr('y',this._sy-(this._r+3)*s);});
 }
 async function initMap(){
-  const world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+  let world;try{world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json');_detail=2;}catch(e){world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');}   // 50m by default (more detailed coasts and borders); 110m only as a fallback
   worldFeatures=topojson.feature(world,world.objects.countries).features;
   svgEl=d3.select('#worldMap');const W=MAP_W,H=MAP_H;proj=d3.geoNaturalEarth1().scale(128).translate([W/2,H/2+10]);
   const path=d3.geoPath(proj),mw=document.getElementById('mapwrap');
