@@ -391,7 +391,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
         <div class="rt-grid">
           <div class="rt-col"><div class="rt-title">From</div><input class="rt-search" id="rt-search-from" type="search" placeholder="Search a country" oninput="renderRouteList('from')"><div class="dd-checklist rt-list" id="rt-list-from"></div></div>
           <button class="rt-swap" onclick="swapRoute()" title="Swap From and To" aria-label="Swap From and To">⇄</button>
-          <div class="rt-col"><div class="rt-title">To</div><input class="rt-search" id="rt-search-to" type="search" placeholder="Search a country" oninput="renderRouteList('to')"><div class="dd-checklist rt-list" id="rt-list-to"></div></div>
+          <div class="rt-col"><div class="rt-title">To</div><div id="rt-to-hint" style="display:none;font-size:8.5px;color:var(--t2);line-height:1.3;margin:-2px 0 4px"></div><input class="rt-search" id="rt-search-to" type="search" placeholder="Search a country" oninput="renderRouteList('to')"><div class="dd-checklist rt-list" id="rt-list-to"></div></div>
         </div>
         <div class="dd-clear-row" style="font-size:9px;color:var(--t2);padding:6px 10px">Flows from any selected origin to any selected destination · same-country pairs are excluded</div>
       </div>
@@ -1011,18 +1011,26 @@ function buildRouteLists(){
 }
 function renderRouteList(side){
   const el=document.getElementById('rt-list-'+side),q=(document.getElementById('rt-search-'+side).value||'').trim().toLowerCase(),sel=side==='from'?state.routeFrom:state.routeTo,top=el.scrollTop;
+  if(side==='to'&&state.routeFrom.length&&!routeLists.to.length){el.innerHTML='<div style="padding:10px;font-size:10px;color:var(--t2)">No destination for these origins with the current materials and years.</div>';return;}
   el.innerHTML=`<label class="dd-check-item" style="font-weight:600"><input type="checkbox" data-all="1" ${sel.length?'':'checked'}>All countries</label>`+routeLists[side].filter(c=>!q||c.toLowerCase().includes(q)).map(c=>`<label class="dd-check-item"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" ${sel.includes(c)?'checked':''}>${c}</label>`).join('');
   el.scrollTop=top;
 }
 function syncRouteChecks(){['from','to'].forEach(side=>{const sel=side==='from'?state.routeFrom:state.routeTo;document.querySelectorAll('#rt-list-'+side+' input').forEach(i=>{i.checked=i.dataset.all?!sel.length:sel.includes(i.value);});});}
 function updateRouteBtn(){
-  const wrap=document.getElementById('dd-route');if(!wrap)return;
+  const wrap=document.getElementById('dd-route');if(!wrap)return;refreshRouteTargets();
   wrap.style.display=flowsActive()?'':'none';
   const btn=document.getElementById('dd-route-btn'),lab=document.getElementById('dd-route-label'),on=state.routeFrom.length||state.routeTo.length;
   btn.classList.toggle('has-selection',!!on);lab.textContent=on?routeLabelText():'From → To';
   if(!flowsActive()&&openDropdown==='route')closeAllDropdowns();
 }
-function onRouteChanged(){syncRouteChecks();updateRouteBtn();renderMap();refreshZoom();}
+function refreshRouteTargets(){
+  const all=[...new Set(flows.map(f=>f.to))].sort();let to=all;
+  if(state.routeFrom.length){const s=new Set();flows.forEach(f=>{if(f.from!==f.to&&state.routeFrom.includes(f.from)&&state.flowMats[f.mat]&&inFlowYearRange(f.year))s.add(f.to);});to=all.filter(c=>s.has(c));}
+  routeLists.to=to;state.routeTo=state.routeTo.filter(c=>to.includes(c));
+  const hint=document.getElementById('rt-to-hint');if(hint){hint.style.display=state.routeFrom.length?'':'none';hint.textContent=`Only countries receiving the selected materials from ${state.routeFrom.length===1?state.routeFrom[0]:'the selected countries'} (current filters)`;}
+  if(document.getElementById('rt-list-to'))renderRouteList('to');
+}
+function onRouteChanged(){refreshRouteTargets();syncRouteChecks();updateRouteBtn();renderMap();refreshZoom();}
 function swapRoute(){const a=state.routeFrom;state.routeFrom=state.routeTo;state.routeTo=a;onRouteChanged();}
 function clearRoute(){state.routeFrom=[];state.routeTo=[];onRouteChanged();}
 // zoom: selected countries first; else the countries involved in the filtered route; else back to the world view
