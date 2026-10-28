@@ -1024,11 +1024,13 @@ function updateRouteBtn(){
   if(!flowsActive()&&openDropdown==='route')closeAllDropdowns();
 }
 function refreshRouteTargets(){
+  const fs=new Set(),anyMat=Object.values(state.flowMats).some(Boolean);flows.forEach(f=>{if(f.from!==f.to&&(!anyMat||(state.flowMats[f.mat]&&inFlowYearRange(f.year))))fs.add(f.from);});
+  routeLists.from=[...fs].sort();state.routeFrom=state.routeFrom.filter(c=>fs.has(c));
   const all=[...new Set(flows.map(f=>f.to))].sort();let to=all;
   if(state.routeFrom.length){const s=new Set();flows.forEach(f=>{if(f.from!==f.to&&state.routeFrom.includes(f.from)&&state.flowMats[f.mat]&&inFlowYearRange(f.year))s.add(f.to);});to=all.filter(c=>s.has(c));}
   routeLists.to=to;state.routeTo=state.routeTo.filter(c=>to.includes(c));
   const hint=document.getElementById('rt-to-hint');if(hint){hint.style.display=state.routeFrom.length?'':'none';hint.textContent=`Only countries receiving the selected materials from ${state.routeFrom.length===1?state.routeFrom[0]:'the selected countries'} (current filters)`;}
-  if(document.getElementById('rt-list-to'))renderRouteList('to');
+  if(document.getElementById('rt-list-to')){renderRouteList('from');renderRouteList('to');}
 }
 function onRouteChanged(){refreshRouteTargets();syncRouteChecks();updateRouteBtn();renderMap();refreshZoom();}
 function swapRoute(){const a=state.routeFrom;state.routeFrom=state.routeTo;state.routeTo=a;onRouteChanged();}
