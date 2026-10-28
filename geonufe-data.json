@@ -13,8 +13,9 @@
    "country": "France",
    "capacity": 15000,
    "shareholder": "Orano (100%)",
-   "comment": "Convert UoC to Uf4",
-   "status": "operating"
+   "comment": "Step 1 of 2 of French conversion: uranium ore concentrate (UoC) is purified and converted to UF4 here. The UF4 is then sent to Orano Tricastin (step 2, UF4 → UF6). The two sites form one conversion route with a single capacity, counted once.",
+   "status": "operating",
+   "linkTo": "d39"
   },
   {
    "id": "d7",
@@ -365,10 +366,10 @@
    "lon": 4.73,
    "country": "France",
    "shareholder": "Orano (100%)",
-   "comment": "Converts UF4 to UF6",
+   "comment": "Step 2 of 2 of French conversion: UF4 coming from Malvési is converted to UF6. Malvési and Tricastin form one conversion route, not two separate plants.",
    "status": "operating",
    "fixedSize": true,
-   "capacityNote": "included in Malvési"
+   "capacityNote": "same capacity as Malvési (15,000 tU/yr), counted once"
   },
   {
    "id": "d40",
