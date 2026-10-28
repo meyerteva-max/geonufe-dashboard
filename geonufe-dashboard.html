@@ -1126,16 +1126,26 @@ function initToponyms(path){
   g.selectAll('text').data(topoData).join('text').attr('class','topo').attr('x',d=>d.x).attr('y',d=>d.y).attr('text-anchor','middle').attr('dominant-baseline','central').text(d=>d.name).each(function(d){d._el=this;});
   updateToponyms(d3.zoomIdentity);
 }
+// Importance of a country in the fuel cycle = sum of its shares of world operating capacity (mining, conversion, enrichment, fuel fabrication, reprocessing, NPP), plus a small bonus per stage present; used to decide which names show first.
+let _topoScore=null;
+function topoScores(){
+  if(_topoScore)return _topoScore;if(!sites.length)return {};
+  const tot={},by={};
+  sites.forEach(s=>{const cfg=SITE_TYPES[s.type];if(!cfg||cfg.stage==='mill'||!isOp(s)||!s.country)return;const k=cfg.stage;by[s.country]=by[s.country]||{};by[s.country][k]=by[s.country][k]||{cap:0,n:0};by[s.country][k].n++;if(s.capacity){by[s.country][k].cap+=s.capacity;tot[k]=(tot[k]||0)+s.capacity;}});
+  const sc={};Object.keys(by).forEach(c=>{sc[c]=Object.entries(by[c]).reduce((a,[k,v])=>a+(tot[k]?v.cap/tot[k]*100:0)+0.3,0);});
+  return(_topoScore=sc);
+}
 function updateToponyms(t){
   const g=d3.select('#topo-layer');if(g.empty())return;
   g.style('display',topoOn?null:'none');if(!topoOn)return;
   t=t||d3.zoomTransform(svgEl.node());const k=t.k,fs=5/Math.pow(k,0.7),th=TH();
   const x0=-t.x/k,x1=(MAP_W-t.x)/k,y0=-t.y/k,y1=(MAP_H-t.y)/k,boxes=[],sel=state.countries;
-  const order=topoData.slice().sort((a,b)=>(sel.includes(b.cn)-sel.includes(a.cn))||(b.a-a.a));
+  const sc=topoScores(),rank=Object.keys(sc).sort((a,b)=>sc[b]-sc[a]),topSet=new Set(rank.slice(0,k<1.5?15:k<2.2?24:rank.length));
+  const order=topoData.slice().sort((a,b)=>(sel.includes(b.cn)-sel.includes(a.cn))||((sc[b.cn]||0)-(sc[a.cn]||0))||(b.a-a.a));
   order.forEach(d=>{
-    const isSel=sel.includes(d.cn),w=d.name.length*0.58*fs,h=fs*1.15;let show=d.x>x0+w/4&&d.x<x1-w/4&&d.y>y0&&d.y<y1&&(isSel||d.w>=(k>=2?1.15:1.15+0.95*(2-k))*w);
+    const isSel=sel.includes(d.cn),w=d.name.length*0.58*fs,h=fs*1.15;let show=d.x>x0+w/4&&d.x<x1-w/4&&d.y>y0&&d.y<y1&&(isSel||topSet.has(d.cn)||(k>=3&&d.w>=1.15*w));
     if(show){const b=[d.x-w/2,d.y-h/2,d.x+w/2,d.y+h/2];if(!isSel&&boxes.some(o=>b[0]<o[2]&&b[2]>o[0]&&b[1]<o[3]&&b[3]>o[1]))show=false;else boxes.push(b);}
-    d3.select(d._el).attr('display',show?null:'none').attr('font-size',fs).attr('fill',isSel?th.label:th.tick).attr('stroke',th.land).attr('stroke-width',fs*0.32).attr('paint-order','stroke').attr('stroke-linejoin','round').attr('font-weight',isSel?600:500).attr('letter-spacing',fs*0.05).attr('opacity',isSel?1:0.85);
+    d3.select(d._el).attr('display',show?null:'none').attr('font-size',fs).attr('fill',isSel?th.label:th.tick).attr('stroke',th.land).attr('stroke-width',fs*0.32).attr('paint-order','stroke').attr('stroke-linejoin','round').attr('font-weight',isSel||topSet.has(d.cn)?600:500).attr('letter-spacing',fs*0.05).attr('opacity',isSel?1:0.85);
   });
 }
 function toggleToponyms(){topoOn=!topoOn;try{localStorage.setItem('geonufeLabels',topoOn?'on':'off');}catch(e){}updateToponyms();const b=document.getElementById('topoBtn');if(b)b.style.opacity=topoOn?1:0.45;}
