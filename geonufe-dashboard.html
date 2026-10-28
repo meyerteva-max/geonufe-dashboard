@@ -203,6 +203,14 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .res-sw input{width:96px;accent-color:#6B3FA0;margin:0}
 .res-sw-t{display:flex;gap:7px;font-weight:600}.res-sw-t span.on{color:#6B3FA0;text-decoration:underline}
 .res-sw-u{color:var(--t2)}
+.res-card{position:absolute;left:12px;top:56px;z-index:6;width:218px;background:rgba(255,255,255,.92);border:1px solid #6B3FA0;border-radius:8px;padding:10px 11px;box-shadow:0 2px 10px rgba(0,0,0,.12);pointer-events:auto}
+[data-theme=dark] .res-card{background:rgba(30,34,40,.92)}
+.rc-t{font-size:12px;font-weight:700;color:#6B3FA0;margin-bottom:3px}[data-theme=dark] .rc-t{color:#C4A6EC}
+.rc-s{font-size:9.5px;color:var(--t2);line-height:1.35;margin-bottom:8px}
+.rc-o{display:block;width:100%;text-align:left;font:inherit;font-size:10.5px;padding:6px 8px;margin-bottom:4px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--t1);cursor:pointer}
+.rc-o b{display:block;font-size:11px}.rc-o span{color:var(--t2);font-size:9.5px}
+.rc-o.on{background:#6B3FA0;border-color:#6B3FA0;color:#fff}.rc-o.on span{color:#e6dcf3}
+.rc-f{font-size:8.5px;color:var(--t2);margin-top:4px}
 
 /* ================= RESTYLE LAYER ================= */
 :root{
@@ -309,8 +317,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
   <div class="filterbar2">
     <span class="fb-label" title="Each chip instantly sets up the facility types, flow material, and choropleth zone for that step of the chain. Use it as a fast starting point.">Quick view — jump to a chain step</span>
     <div class="chain-chip" id="cc-resources" onclick="setChainStep('resources',this)"><span class="chain-chip-dot" style="background:#6B3FA0"></span>Uranium resources</div>
-    <span class="res-sw" id="res-sw" style="display:none" title="Cost category of identified recoverable resources (cumulative)"><span class="res-sw-l">Cost</span><input type="range" id="res-range" min="0" max="3" step="1" value="2" oninput="setResCost(this.value)"><span class="res-sw-t" id="res-ticks"><span>&lt;40</span><span>&lt;80</span><span>&lt;130</span><span>&lt;260</span></span><span class="res-sw-u">USD/kgU</span></span>
-    <div class="chain-chip" id="cc-natU" onclick="setChainStep('natU',this)"><span class="chain-chip-dot" style="background:#8B4513"></span>Natural uranium</div>
+    <div class="chain-chip" id="cc-natU" onclick="setChainStep('natU',this)"><span class="chain-chip-dot" style="background:#8B4513"></span>Uranium mining</div>
     <div class="chain-chip" id="cc-convU" onclick="setChainStep('convU',this)"><span class="chain-chip-dot" style="background:#E8820A"></span>Conversion</div>
     <div class="chain-chip" id="cc-enrU" onclick="setChainStep('enrU',this)"><span class="chain-chip-dot" style="background:#27498C"></span>Enrichment</div>
     <div class="chain-chip" id="cc-fuelAsm" onclick="setChainStep('fuelAsm',this)"><span class="chain-chip-dot" style="background:#4C8C4A"></span>Fuel assemblies</div>
@@ -454,6 +461,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
           <button class="zoom-btn zoom-reset" onclick="zoomReset()">FIT</button>
           <button class="zoom-btn" id="topoBtn" onclick="toggleToponyms()" title="Show / hide country names" style="font-size:11px;font-weight:600">Aa</button>
         </div>
+        <div class="res-card" id="res-sw" style="display:none"><div class="rc-t">How costly is it to extract?</div><div class="rc-s">Uranium that can be mined for less than a given price. Higher price limits include more deposits, so the map fills up.</div><div class="rc-opts" id="res-opts"></div><div class="rc-f">Price per kg of uranium (USD/kgU)</div></div>
         <div class="legend-box">
           <div class="map-legend" id="mapLegend"><div class="ml-head" onclick="toggleLegend()" title="Show / hide legend"><span>Legend</span><span class="ml-caret" id="ml-caret">▾</span></div><div class="ml-inner" id="ml-inner"></div></div>
         </div>
@@ -1045,7 +1053,8 @@ function flowTrend(container,m){
 }
 const RES_KEYS=['resCost40','resCost80','resCost130','resCost260'];
 function setResCost(i){state.zoneMode=RES_KEYS[+i];applyStateToUI();renderMap();updateChartPanel();}
-function updateResSwitch(){const on=state.chainStep==='resources',sw=document.getElementById('res-sw');if(!sw)return;sw.style.display=on?'':'none';if(on){const i=Math.max(0,RES_KEYS.indexOf(state.zoneMode));document.getElementById('res-range').value=i;[...document.getElementById('res-ticks').children].forEach((s,k)=>s.classList.toggle('on',k===i));}}
+const RES_OPTS=[['Low cost','< USD 40 per kgU'],['Moderate cost','< USD 80 per kgU'],['Higher cost','< USD 130 per kgU'],['All known deposits','< USD 260 per kgU, incl. very costly ones']];
+function updateResSwitch(){const on=state.chainStep==='resources',sw=document.getElementById('res-sw');if(!sw)return;sw.style.display=on?'':'none';if(on){const i=Math.max(0,RES_KEYS.indexOf(state.zoneMode)),o=document.getElementById('res-opts');o.innerHTML=RES_OPTS.map((x,k)=>`<button class="rc-o${k===i?' on':''}" onclick="setResCost(${k})"><b>${x[0]}</b><span>${x[1]}</span></button>`).join('');}}
 function buildResPanel(body){
   const RC=[['resCost40','< USD 40/kgU'],['resCost80','< USD 80/kgU'],['resCost130','< USD 130/kgU'],['resCost260','< USD 260/kgU']];
   if(!RC.some(x=>x[0]===state.zoneMode))state.zoneMode='resCost130';
@@ -1251,7 +1260,7 @@ function updateLegend(){
       html+=`<div class="ml-group"><span class="ml-label">Flow type</span>${typeItems}<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Volume</span>${strokeItems}${routeLegend()}</div>`;
     }
     if(zoneOn){const cfg=ZONE_CFG[state.zoneMode];
-      html=`<div class="ml-group"><span class="ml-label">${cfg.label}</span><span class="ml-item">0%</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${zTo(cfg)})"></span><span class="ml-item">100%</span></div>`+html;}
+      html=`<div class="ml-group"><span class="ml-label">${/^resCost/.test(state.zoneMode)?'Identified recoverable uranium resources (% of world)':cfg.label}</span>${/^resCost/.test(state.zoneMode)?`<span class="ml-item" style="font-weight:600;color:#6B3FA0">Extraction cost: ${cfg.label.match(/<USD \d+\/kgU/)[0].replace('<','< ').replace('/kgU',' per kgU')}</span>`:''}<span class="ml-item">0%</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${zTo(cfg)})"></span><span class="ml-item">100%</span></div>`+html;}
     inner.innerHTML=html;
   }
 }
@@ -1449,7 +1458,7 @@ function renderMap(){
   updateLegend();updateChartPanel();
   document.getElementById('info-sites').textContent=items.length;document.getElementById('info-flows').textContent=visFlows;document.getElementById('info-zone').textContent=state.zoneMode==='none'?'—':ZONE_CFG[state.zoneMode]?.label||'';
   const banner=document.getElementById('filterBanner'),ia=document.getElementById('info-active');
-  const chainLabels={natU:'Natural uranium',convU:'Conversion',enrU:'Enrichment',fuelAsm:'Fuel assemblies',electricity:'Power Plants',resources:'Uranium resources'};
+  const chainLabels={natU:'Uranium mining',convU:'Conversion',enrU:'Enrichment',fuelAsm:'Fuel assemblies',electricity:'Power Plants',resources:'Uranium resources'};
   let bt='';if(state.chainStep)bt=`Chain step: <strong>${chainLabels[state.chainStep]}</strong>`;
   if(cf.length)bt+=(bt?' · ':'')+`Country: <strong>${cf.length>3?cf.length+' countries':cf.join(', ')}</strong>`;
   if(of)bt+=(bt?' · ':'')+`Owner: <strong>${of}</strong>`;
