@@ -509,11 +509,11 @@ const MINE_KEYS=['mine-openpit','mine-underground','mine-isl','mine-unspecified'
 const FAB_KEYS=['fuelfab-mox','fuelfab-bwrpwr','fuelfab-vver','fuelfab-combo','fuelfab-phwr'];
 const NPP_TYPE_KEYS=['npp-pwr','npp-bwr','npp-vver','npp-gcr','npp-fbr','npp-htgr','npp-phwr'];
 const SITE_TYPES={
-  'mine-openpit':     {label:'Uranium mine — open pit',        color:MINE_COLOR,unit:'tU/yr',  shape:'triangle',stage:'mining',hasCapacity:true},
-  'mine-underground': {label:'Uranium mine — underground',     color:MINE_COLOR,unit:'tU/yr',  shape:'triangle',stage:'mining',hasCapacity:true},
-  'mine-isl':         {label:'Uranium mine — ISL',             color:MINE_COLOR,unit:'tU/yr',  shape:'triangle',stage:'mining',hasCapacity:true},
-  'mine-unspecified': {label:'Uranium mine — method not specified',color:MINE_COLOR,unit:'tU/yr',shape:'triangle',stage:'mining',hasCapacity:true},
-  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'hexagon', stage:'mill',  hasCapacity:true,fixed:true,fixedR:5},
+  'mine-openpit':     {label:'Uranium mine — open pit',        color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
+  'mine-underground': {label:'Uranium mine — underground',     color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
+  'mine-isl':         {label:'Uranium mine — ISL',             color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
+  'mine-unspecified': {label:'Uranium mine — method not specified',color:MINE_COLOR,unit:'tU/yr',shape:'circle',stage:'mining',hasCapacity:true},
+  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'triangle', stage:'mill',  hasCapacity:true,fixed:true,fixedR:4.4},
   conversion:         {label:'Conversion plant',               color:'#E8820A', unit:'tU/yr',  shape:'diamond', stage:'conversion',hasCapacity:true},
   enrichment:         {label:'Enrichment plant',               color:'#27498C', unit:'tSWU/yr',shape:'diamond', stage:'enrichment',hasCapacity:true},
   'fuelfab-mox':    {label:'MoX',           fullLabel:'Fuel fabrication — MoX',            color:FC.mox,   unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
