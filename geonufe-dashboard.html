@@ -329,7 +329,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
     <div class="dd-wrap" id="dd-facilities">
       <button class="dd-btn" id="dd-facilities-btn" onclick="toggleDropdown('facilities')"><span id="dd-facilities-label">Facilities</span><span class="dd-badge" id="dd-facilities-badge" style="display:none"></span><span class="dd-caret">▼</span></button>
       <div class="dd-panel" id="dd-facilities-panel">
-        <div class="dd-panel-header"><span>Facilities</span><button class="dd-select-all" onclick="toggleAllFacilities()">Select all</button></div>
+        <div class="dd-panel-header"><span>Facilities</span><button class="dd-select-all" id="fac-selall" onclick="toggleAllFacilities()">Select all</button></div>
         <div class="dd-section-label"><span>Uranium production</span><button class="dd-section-selectall" onclick="toggleFacilityGroup('mining',event)">Select all</button></div>
         <div class="dd-item" onclick="toggleSiteType('mine-openpit')"><input type="checkbox" id="cb-mine-openpit"><span class="dd-shape" id="shape-mine-openpit"></span>Open pit mines</div>
         <div class="dd-item" onclick="toggleSiteType('mine-underground')"><input type="checkbox" id="cb-mine-underground"><span class="dd-shape" id="shape-mine-underground"></span>Underground mines</div>
@@ -377,7 +377,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
     <div class="dd-wrap" id="dd-flows">
       <button class="dd-btn" id="dd-flows-btn" onclick="toggleDropdown('flows')"><span id="dd-flows-label">Flows</span><span class="dd-badge" id="dd-flows-badge" style="display:none"></span><span class="dd-caret">▼</span></button>
       <div class="dd-panel" id="dd-flows-panel">
-        <div class="dd-panel-header"><span>Flows</span><button class="dd-select-all" onclick="toggleAllFlows()">Select all</button></div>
+        <div class="dd-panel-header"><span>Flows</span><button class="dd-select-all" id="flow-selall" onclick="toggleAllFlows()">Select all</button></div>
         <div class="dd-item" onclick="toggleFlowMat('Natural U')"><input type="checkbox" id="cb-Natural U"><span class="dd-dot" style="background:#8B4513"></span>Natural uranium</div>
         <div class="dd-item" onclick="toggleFlowMat('Converted U')"><input type="checkbox" id="cb-Converted U"><span class="dd-dot" style="background:#E8820A"></span>Converted uranium</div>
         <div class="dd-item" onclick="toggleFlowMat('Enriched U')"><input type="checkbox" id="cb-Enriched U"><span class="dd-dot" style="background:#27498C"></span>Enriched uranium</div>
@@ -399,7 +399,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
     <div class="dd-wrap" id="dd-zone">
       <button class="dd-btn" id="dd-zone-btn" onclick="toggleDropdown('zone')"><span id="dd-zone-label">Production share</span><span class="dd-caret">▼</span></button>
       <div class="dd-panel" id="dd-zone-panel">
-        <div class="dd-panel-header"><span>Production share</span></div>
+        <div class="dd-panel-header"><span>Production share</span><button class="dd-select-all" id="zone-selnone" style="display:none" onclick="setZoneFromDD('none')">Deselect all</button></div>
         <div class="dd-item" onclick="setZoneFromDD('none')"><input type="radio" name="zone-radio" id="zr-none" checked><span style="width:18px;height:5px;flex-shrink:0"></span>None</div>
         <div class="dd-item" onclick="setZoneFromDD('natU')"><input type="radio" name="zone-radio" id="zr-natU"><span class="dd-grad" style="background:linear-gradient(to right,#f5ede8,#8B4513)"></span>Natural uranium production</div>
         <div class="dd-item" onclick="setZoneFromDD('convU')"><input type="radio" name="zone-radio" id="zr-convU"><span class="dd-grad" style="background:linear-gradient(to right,#fdf0e4,#E8820A)"></span>Converted uranium production</div>
@@ -636,7 +636,7 @@ function toggleDropdown(id){
 function closeAllDropdowns(){DD_IDS.forEach(id=>{const p=document.getElementById('dd-'+id+'-panel');const b=document.getElementById('dd-'+id+'-btn');if(p)p.classList.remove('open');if(b)b.classList.remove('open');});openDropdown=null;}
 document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeAllDropdowns();});
 
-function updateFacilitiesBtn(){const active=Object.entries(state.siteTypes).filter(([,v])=>v).length,total=Object.keys(state.siteTypes).length;const btn=document.getElementById('dd-facilities-btn'),badge=document.getElementById('dd-facilities-badge'),lab=document.getElementById('dd-facilities-label');
+function updateFacilitiesBtn(){syncSelAll();const active=Object.entries(state.siteTypes).filter(([,v])=>v).length,total=Object.keys(state.siteTypes).length;const btn=document.getElementById('dd-facilities-btn'),badge=document.getElementById('dd-facilities-badge'),lab=document.getElementById('dd-facilities-label');
   if(state.showAllTypes){btn.classList.remove('has-selection');badge.style.display='none';lab.textContent='Facilities (all)';}
   else if(active===0){btn.classList.remove('has-selection');badge.style.display='none';lab.textContent='Facilities';}
   else if(active===total){btn.classList.remove('has-selection');badge.style.display='none';lab.textContent='Facilities (all)';}
@@ -646,8 +646,8 @@ function updateStatusBtn(){const on=STATUS_LIST.filter(s=>state.statuses[s]);con
   const isDefault=on.length===1&&on[0]==='operating';
   if(isDefault){btn.classList.remove('has-selection');badge.style.display='none';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=on.length;}
   STATUS_LIST.forEach(s=>{const cb=document.getElementById('cb-st-'+s);if(cb)cb.checked=state.statuses[s];});}
-function updateFlowsBtn(){const active=Object.entries(state.flowMats).filter(([,v])=>v).length,total=Object.keys(state.flowMats).length;const btn=document.getElementById('dd-flows-btn'),badge=document.getElementById('dd-flows-badge');if(active===0){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows';}else if(active===total){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows (all)';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=active;document.getElementById('dd-flows-label').textContent='Flows';}Object.entries(state.flowMats).forEach(([k,v])=>{const cb=document.getElementById('cb-'+k);if(cb)cb.checked=v;});updateYearSliderVisibility();;updateRouteBtn();}
-function updateZoneBtn(){const btn=document.getElementById('dd-zone-btn');if(state.zoneMode==='none'){btn.classList.remove('has-selection');}else{btn.classList.add('has-selection');}['none','natU','convU','enrU','nucMix','resCost40','resCost80','resCost130','resCost260'].forEach(m=>{const r=document.getElementById('zr-'+m);if(r)r.checked=(state.zoneMode===m);});}
+function updateFlowsBtn(){syncSelAll();const active=Object.entries(state.flowMats).filter(([,v])=>v).length,total=Object.keys(state.flowMats).length;const btn=document.getElementById('dd-flows-btn'),badge=document.getElementById('dd-flows-badge');if(active===0){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows';}else if(active===total){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows (all)';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=active;document.getElementById('dd-flows-label').textContent='Flows';}Object.entries(state.flowMats).forEach(([k,v])=>{const cb=document.getElementById('cb-'+k);if(cb)cb.checked=v;});updateYearSliderVisibility();;updateRouteBtn();}
+function updateZoneBtn(){syncSelAll();const btn=document.getElementById('dd-zone-btn');if(state.zoneMode==='none'){btn.classList.remove('has-selection');}else{btn.classList.add('has-selection');}['none','natU','convU','enrU','nucMix','resCost40','resCost80','resCost130','resCost260'].forEach(m=>{const r=document.getElementById('zr-'+m);if(r)r.checked=(state.zoneMode===m);});}
 function updateCountryBtn(){const btn=document.getElementById('dd-country-btn'),label=document.getElementById('dd-country-label'),n=state.countries.length;if(n){btn.classList.add('has-selection');label.textContent=n===1?state.countries[0]:`${n} countries`;}else{btn.classList.remove('has-selection');label.textContent='Country';}
   document.querySelectorAll('#country-list input').forEach(cb=>{cb.checked=state.countries.includes(cb.value);});}
 function updateOwnerBtn(){const btn=document.getElementById('dd-owner-btn'),label=document.getElementById('dd-owner-label');if(state.ownerFilter){btn.classList.add('has-selection');label.textContent=state.ownerFilter;}else{btn.classList.remove('has-selection');label.textContent='Owner';}}
@@ -691,6 +691,7 @@ function clearYearFilter(){if(!yearSliderYears.length)return;const lastIdx=yearS
 function inFlowYearRange(y){if(y==null||!state.yearRange)return true;return y>=state.yearRange.min&&y<=state.yearRange.max;}
 function updateHaleuChip(){const cb=document.getElementById('cb-haleu-only');if(cb)cb.checked=state.haleuOnly;}
 function toggleHaleuOnly(event){if(event)event.stopPropagation();state.haleuOnly=!state.haleuOnly;updateHaleuChip();renderMap();}
+function syncSelAll(){const f=document.getElementById('fac-selall'),g=document.getElementById('flow-selall'),z=document.getElementById('zone-selnone');if(f)f.textContent=Object.values(state.siteTypes).some(Boolean)?'Deselect all':'Select all';if(g)g.textContent=Object.values(state.flowMats).some(Boolean)?'Deselect all':'Select all';if(z)z.style.display=state.zoneMode==='none'?'none':'';}
 function leaveQuickView(){state.chainStep='';state.showAllTypes=false;clearChainUI();}
 function toggleAllFacilities(){const anyOn=Object.values(state.siteTypes).some(Boolean);Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=!anyOn;});leaveQuickView();updateFacilitiesBtn();renderMap();}
 const FACILITY_GROUPS={mining:[...MINE_KEYS,'mill'],fuelfab:FAB_KEYS,npp:NPP_TYPE_KEYS};
