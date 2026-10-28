@@ -550,6 +550,7 @@ const CHART_PALETTE=['#4A6FA5','#5A8A6A','#A05C4A','#8A7840','#6A5A8A','#3D7A8A'
 const COUNTRY_COLORS={};['Kazakhstan','Canada','Namibia','Australia','Niger','Russia','Other','USA','France','China','S. Korea','Germany','Netherlands','UK','Japan'].forEach((c,i)=>{COUNTRY_COLORS[c]=CHART_PALETTE[i%CHART_PALETTE.length];});
 function countryColor(name){if(COUNTRY_COLORS[name])return COUNTRY_COLORS[name];let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return CHART_PALETTE[h%CHART_PALETTE.length];}
 // Chart data is computed live from geonufe-data.json (operating sites only, mills excluded).
+const CAPACITY_YEAR=2025;   // reference year shown beside capacity titles in the statistics panel
 const CHART_META={
   natU:{title:'Mining capacity',unit:'tU/yr',types:MINE_KEYS},
   convU:{title:'Conversion capacity',unit:'tU/yr',types:['conversion']},
@@ -1033,7 +1034,7 @@ function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
   if(flowsOnlyMode()){buildFlowPanel(body);return;}
   const meta=mode?CHART_META[mode]:null,of=state.ownerFilter;
-  document.getElementById('cp-title').textContent=meta?meta.title:'Country summary';
+  document.getElementById('cp-title').textContent=meta?`${meta.title} (${CAPACITY_YEAR})`:'Country summary';
   const bits=[];
   if(meta)bits.push('Share of operating capacity');
   if(state.countries.length)bits.push(state.countries.length===1?state.countries[0]:`${state.countries.length} countries`);
@@ -1059,7 +1060,7 @@ function buildPanel(mode){
     const byOwner=computeCapacityByOwner(meta.types),ol=Object.keys(byOwner).sort((a,b)=>byOwner[b]-byOwner[a]);
     if(ol.length>1){
       const totalO=ol.reduce((s,l)=>s+byOwner[l],0);
-      const titleO=document.createElement('div');titleO.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 6px';titleO.textContent='Capacity share by owner';
+      const titleO=document.createElement('div');titleO.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 6px';titleO.textContent=`Capacity share by owner (${CAPACITY_YEAR})`;
       const cwO=document.createElement('div');body.appendChild(titleO);body.appendChild(cwO);
       const noteO=document.createElement('div');noteO.className='cp-note';
       const sO=smallCount(ol.map(l=>byOwner[l]),totalO);noteO.textContent=`${ol.length} owner${ol.length===1?'':'s'}${sO?` · ${sO} of them hold less than 2.5% of capacity each (grouped as “Other”)`:''} · pro rata by stake; unstated stakes split equally among co-owners · names as in the data, not merged into parent groups`;
@@ -1071,7 +1072,7 @@ function buildPanel(mode){
     const byType=computeCapacityByFuelType(meta.types);
     const typeLabels=Object.keys(byType).sort((a,b)=>byType[b]-byType[a]);
     if(typeLabels.length){
-      const title2=document.createElement('div');title2.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 6px';title2.textContent='Capacity share by fuel type';
+      const title2=document.createElement('div');title2.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 6px';title2.textContent=`Capacity share by fuel type (${CAPACITY_YEAR})`;
       const cw2=document.createElement('div');
       body.appendChild(title2);body.appendChild(cw2);
       const total2=typeLabels.reduce((s,l)=>s+byType[l],0);
