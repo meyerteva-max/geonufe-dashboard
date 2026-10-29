@@ -296,6 +296,59 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 .yr-range-input::-moz-range-thumb{border-color:var(--bg1)}
 .load-error{background:var(--glass2)}
 :root[data-theme=dark] .chain-chip.active{color:#0C1014}
+
+.m-bar,.m-sheet-head,.m-backdrop{display:none}
+@media(max-width:700px){
+html,body{height:100%}
+.dash{height:100vh;height:100dvh;border:none}
+.topbar{height:44px;padding:0 10px;gap:8px}
+.logo-img{height:28px}
+.title-main{font-size:13px;margin-left:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.funded-by{display:none}
+.filterbar2{height:auto;padding:7px 10px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.filterbar2::-webkit-scrollbar{display:none}
+.filterbar2 .fb-label{display:none}
+.chain-chip{flex-shrink:0;white-space:nowrap;padding:7px 12px;font-size:12px}
+.m-bar{display:flex;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--bg1);flex-shrink:0}
+.m-bar button{flex:1;font-family:var(--font);font-size:13px;font-weight:600;padding:9px 10px;border:1px solid var(--border2);background:var(--bg1);color:var(--t0);border-radius:6px;cursor:pointer}
+.m-bar button.primary{background:var(--c1);color:#fff;border-color:var(--c1)}
+.filterbar1{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;max-height:82vh;max-height:82dvh;flex-direction:column;align-items:stretch;gap:8px;padding:0 14px 16px;overflow-y:auto;z-index:500;transform:translateY(105%);transition:transform .25s ease;border-top:2px solid var(--c1);box-shadow:0 -6px 24px rgba(0,0,0,.25)}
+body.m-filt .filterbar1{transform:none}
+.m-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:450}
+body.m-filt .m-backdrop{display:block}
+.m-sheet-head{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg1);padding:14px 0 8px;z-index:2;font-size:15px;font-weight:700}
+.m-sheet-head button{font-family:var(--font);font-size:13px;font-weight:600;padding:8px 16px;background:var(--c1);color:#fff;border:none;border-radius:6px;cursor:pointer}
+.filterbar1 .fb-label,.filterbar1 .bar1-sep,#dd-status,#dd-route{display:none!important}
+.dd-wrap{width:100%;position:static}
+.dd-btn{width:100%;display:flex;align-items:center;justify-content:space-between;min-height:44px;font-size:13px;padding:0 12px}
+.dd-panel{position:static;box-shadow:none;max-height:42vh;min-width:0!important;width:100%;margin-top:4px}
+.dd-item{padding:10px;font-size:13px;min-height:42px}
+.dd-section-label,.dd-panel-header{font-size:11px}
+.dd-geo-sel{width:100%;font-size:14px}
+.year-slider-wrap{width:100%}
+.reset-btn{margin:4px 0 0;width:100%;padding:11px;font-size:13px}
+.main-body{flex-direction:column}
+.chart-panel-wrap{width:100%!important;flex-direction:column;height:36px;transition:height .3s ease;flex-shrink:0}
+.chart-panel-wrap.open{height:46vh;height:46dvh}
+.cp-toggle{width:100%;height:36px;border-left:none;border-top:1px solid var(--border);flex-shrink:0}
+.cp-toggle-inner{flex-direction:row;gap:10px}
+.cp-label{writing-mode:horizontal-tb;transform:none;font-size:11px}
+.cp-arrow{transform:rotate(90deg);font-size:14px}
+.chart-panel-wrap.open .cp-arrow{transform:rotate(-90deg)}
+.cp-resize-handle{display:none!important}
+.cp-content{border-left:none;min-height:0}
+.filter-banner{display:none!important}
+.res-card{top:8px;left:8px;width:176px;padding:8px 9px}
+.res-card .rc-s{display:none}
+.legend-box{left:8px;bottom:8px;max-width:calc(100% - 16px)}
+.zoom-controls{top:8px;right:8px}
+.zoom-btn{width:38px;height:38px;font-size:16px}
+.site-popup{position:fixed!important;left:8px!important;right:8px!important;top:auto!important;bottom:48px!important;width:auto!important;max-height:42vh;overflow-y:auto;z-index:600}
+.sp-close{padding:8px 10px;font-size:16px}
+.info-strip .info-item,.info-strip .info-active{display:none}
+.info-strip{padding:3px 10px;justify-content:flex-end}
+.tut-overlay{padding:12px}
+}
 </style>
 </head>
 <body>
@@ -341,7 +394,10 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
     <div class="chain-chip" id="cc-electricity" onclick="setChainStep('electricity',this)"><span class="chain-chip-dot" style="background:#C0392B"></span>Power Plants</div>
     <button class="clear-x" id="chain-clear" onclick="clearChainStep()" style="display:none">✕</button>
   </div>
+  <div class="m-bar"><button class="primary" onclick="mFilters(true)">Filters</button><button onclick="resetAll()">Reset map</button></div>
+  <div class="m-backdrop" onclick="mFilters(false)"></div>
   <div class="filterbar1" id="filterbar1">
+    <div class="m-sheet-head"><span>Filters</span><button onclick="mFilters(false)">Done</button></div>
     <span class="fb-label" title="Fine-tune or build your own view: pick any combination of facility types, status, flow materials, and a choropleth zone. Changing anything here switches out of the quick view above.">Customize</span>
     <div class="dd-wrap" id="dd-facilities">
       <button class="dd-btn" id="dd-facilities-btn" onclick="toggleDropdown('facilities')"><span id="dd-facilities-label">Facilities</span><span class="dd-badge" id="dd-facilities-badge" style="display:none"></span><span class="dd-caret">▼</span></button>
@@ -740,7 +796,7 @@ function ownerWeight(site,ownerName){
   const known=owners.filter(o=>o.pct!=null).reduce((a,o)=>a+o.pct,0),unk=owners.filter(o=>o.pct==null).length;
   return known>=100?1/owners.length:(100-known)/unk/100;
 }
-function buildOwnerList(){const names=new Set();sites.forEach(s=>parseOwners(s.shareholder||'').forEach(o=>{if(o.name)names.add(o.name);}));return [...names].sort((a,b)=>a.localeCompare(b));}
+function buildOwnerList(){const names=new Set();sites.forEach(s=>isMobile()&&(s.status||'operating')!=='operating'?[]:parseOwners(s.shareholder||'').forEach(o=>{if(o.name)names.add(o.name);}));return [...names].sort((a,b)=>a.localeCompare(b));}
 function computeCapacityShares(types){
   const of=state.ownerFilter,totals={};
   sites.forEach(s=>{
@@ -861,6 +917,15 @@ function showSitePopup(site,px,py,mw){
   if(site.comment&&site.comment.trim()){cs.style.display='block';document.getElementById('sp-comment-text').textContent=site.comment;}else cs.style.display='none';
   popup.style.display='block';popup.style.left=Math.min(px+14,mw.clientWidth-250)+'px';popup.style.top=Math.max(Math.min(py-80,mw.clientHeight-popup.scrollHeight-10),10)+'px';
 }
+function isMobile(){return window.matchMedia('(max-width:700px)').matches;}
+function mFilters(o){document.body.classList.toggle('m-filt',o);}
+let _mobInit=false;
+function mobileInit(){if(_mobInit)return;_mobInit=true;
+  try{if(isMobile()&&localStorage.getItem('geonufeLegendCollapsed')===null)toggleLegend();}catch(e){}
+  const mq=window.matchMedia('(max-width:700px)');
+  const refill=()=>{const os=document.getElementById('owner-sel');if(!os)return;const v=os.value;os.innerHTML='<option value="">All owners</option>'+buildOwnerList().map(o=>`<option value="${o.replace(/"/g,'&quot;')}">${o}</option>`).join('');os.value=v;if(!mq.matches)mFilters(false);};
+  if(mq.addEventListener)mq.addEventListener('change',refill);
+}
 const CP_DEFAULT_WIDTH=290,CP_MIN_WIDTH=220;
 let customChartPanelWidth=CP_DEFAULT_WIDTH;
 function applyChartPanelWidth(){const wrap=document.getElementById('chartPanelWrap');wrap.style.width=panelOpen?customChartPanelWidth+'px':'';}
@@ -869,13 +934,13 @@ function closeTutorial(){
   document.getElementById('tutOverlay').classList.remove('show');
   if(document.getElementById('tutDontShow').checked){try{localStorage.setItem('geonufeTutorialSeen','1');}catch(e){}}
 }
-function maybeAutoShowTutorial(){
+function maybeAutoShowTutorial(){mobileInit();
   let seen=false;
   try{seen=localStorage.getItem('geonufeTutorialSeen')==='1';}catch(e){}
   if(!seen)showTutorial();
 }
 function toggleChartPanel(){panelOpen=!panelOpen;document.getElementById('chartPanelWrap').classList.toggle('open',panelOpen);applyChartPanelWidth();}
-function openChartPanel(){panelOpen=true;document.getElementById('chartPanelWrap').classList.add('open');applyChartPanelWidth();}
+function openChartPanel(){if(isMobile())return;panelOpen=true;document.getElementById('chartPanelWrap').classList.add('open');applyChartPanelWidth();}
 function initChartPanelResize(){
   const handle=document.getElementById('cpResizeHandle'),wrap=document.getElementById('chartPanelWrap');
   let dragging=false,startX=0,startWidth=0;
@@ -1303,7 +1368,7 @@ function zoomToCountries(names){
   svgEl.transition().duration(700).call(zoomBehavior.transform,d3.zoomIdentity.translate(MAP_W/2-k*cx,MAP_H/2-k*cy).scale(k));
 }
 function clearCountryFilter(){state.countries=[];onSelectionChanged();}
-function applyOwnerFilter(){state.ownerFilter=document.getElementById('owner-sel').value;closeAllDropdowns();onSelectionChanged();}
+function applyOwnerFilter(){state.ownerFilter=document.getElementById('owner-sel').value;closeAllDropdowns();if(isMobile()){mFilters(false);if(state.ownerFilter){panelOpen=true;document.getElementById('chartPanelWrap').classList.add('open');}}onSelectionChanged();}
 function clearOwnerFilter(){state.ownerFilter='';document.getElementById('owner-sel').value='';onSelectionChanged();}
 function setChainStep(step,btn){
   if(state.chainStep===step){clearChainStep();return;}
@@ -1541,7 +1606,7 @@ function renderMap(){
     const st=markerStyle(status,cfg.color,site.type==='enrichment'&&site.haleu);
     const g=d3.select('#sites-layer').append('g').attr('class','site-marker').attr('transform',`translate(${sx},${sy}) scale(${zs})`).style('cursor','pointer');
     g.node()._cx=sx;g.node()._cy=sy;
-    g.append('circle').attr('r',Math.max(r,3.2/fitScale)+1.2/fitScale).attr('fill','transparent').style('pointer-events','all');
+    g.append('circle').attr('r',Math.max(r,(isMobile()?7:3.2)/fitScale)+1.2/fitScale).attr('fill','transparent').style('pointer-events','all');
     const p=g.append('path').attr('d',shapePath(cfg.shape,r)).attr('fill',st.fill).attr('fill-opacity',st.fo).attr('stroke',st.stroke).attr('stroke-width',st.sw).attr('vector-effect','non-scaling-stroke');
     if(st.dash)p.attr('stroke-dasharray',st.dash);
     if(site.hollow)p.attr('fill','none').attr('stroke',cfg.color).attr('stroke-width',2);
