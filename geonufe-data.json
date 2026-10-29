@@ -17303,7 +17303,7 @@
   {
    "id": "f1597",
    "from": "Russia",
-   "to": "Türkiye",
+   "to": "Turkey",
    "mat": "Fuel asm.",
    "vol": 56.7,
    "year": 2023
@@ -17631,7 +17631,7 @@
   {
    "id": "f1638",
    "from": "Russia",
-   "to": "Türkiye",
+   "to": "Turkey",
    "mat": "Fuel asm.",
    "vol": 122,
    "year": 2024
@@ -18331,7 +18331,7 @@
    "resCost260": 0.727
   },
   {
-   "country": "Türkiye",
+   "country": "Turkey",
    "year": 2024,
    "resCost40": 0,
    "resCost80": 0,
