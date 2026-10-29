@@ -215,6 +215,11 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .ol-row:hover{background:var(--bg2)}.ol-dot{width:7px;height:7px;flex-shrink:0;border-radius:50%}
 .ol-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t0)}
 .ol-c{color:var(--t2);font-size:9px;flex-shrink:0}.ol-s{color:#C7922B;font-size:8.5px;font-weight:700;text-transform:uppercase;flex-shrink:0}.ol-p{width:30px;text-align:right;font-weight:600;flex-shrink:0}
+.ol-intro{font-size:9.5px;color:var(--t2);margin:0 0 6px;line-height:1.4}
+.ol-head{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t0);background:var(--bg2);padding:4px 8px;margin-top:8px;display:flex;justify-content:space-between}.ol-head span{color:var(--t2)}
+.ol-row2{display:flex;gap:8px;padding:6px 6px;border-bottom:1px solid var(--border);cursor:pointer}.ol-row2:hover{background:var(--bg2)}
+.ol-row2 .ol-dot{margin-top:4px}.ol-main{flex:1;min-width:0}.ol-l1{display:flex;justify-content:space-between;gap:8px;font-size:11px}.ol-l1 .ol-n{font-weight:600;white-space:normal}.ol-l1 .ol-p{font-weight:700;color:var(--t0);width:auto}
+.ol-l2{font-size:9.5px;color:var(--t2);line-height:1.4}
 
 /* ================= RESTYLE LAYER ================= */
 :root{
@@ -1095,40 +1100,39 @@ function focusSite(id){
 function buildOwnerSummary(body){
   const of=state.ownerFilter,mine=sites.filter(s=>SITE_TYPES[s.type]&&siteHasOwner(s,of));
   document.getElementById('cp-title').textContent='Owner portfolio';
-  document.getElementById('cp-subtitle').textContent=of+' · all statuses · capacities pro rata by stake';
+  document.getElementById('cp-subtitle').textContent=of+' · '+mine.length+' facilit'+(mine.length===1?'y':'ies')+' in '+new Set(mine.map(s=>s.country)).size+' countr'+(new Set(mine.map(s=>s.country)).size===1?'y':'ies');
   if(!mine.length){body.insertAdjacentHTML('beforeend','<div class="cp-empty">No facility found for this owner.</div>');return;}
-  const fmt=n=>Math.round(n).toLocaleString('en-US'),countries=[...new Set(mine.map(s=>s.country).filter(Boolean))];
+  const fmt=n=>Math.round(n).toLocaleString('en-US'),esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const ST=[['operating','Operating','#4A7A5A'],['under construction','Under construction','#C7922B'],['planned','Planned','#8A8F98'],['suspended','Suspended','#A05C4A']];
   const cnt={};mine.forEach(s=>{const k=s.status||'operating';cnt[k]=(cnt[k]||0)+1;});
-  let html=`<div class="cs-block"><div class="cs-head">${of}</div><div class="cs-row"><span>Facilities</span><b>${mine.length}</b></div><div class="cs-row"><span>Countries</span><b>${countries.length}</b></div>`;
+  // 1. the facilities themselves, grouped by chain step
+  let lh=`<div class="ol-intro">Click a facility to find it on the map. Stake = share held by ${esc(of)}.</div>`;
+  STAGE_ORDER.forEach(st=>{
+    const ms=mine.filter(s=>SITE_TYPES[s.type].stage===st).sort((a,b)=>(a.country||'').localeCompare(b.country||'')||a.name.localeCompare(b.name));if(!ms.length)return;
+    lh+=`<div class="ol-head">${STAGE_INFO[st].label} <span>${ms.length}</span></div>`+ms.map(s=>{const w=ownerWeight(s,of),stt=s.status||'operating',cfg=SITE_TYPES[s.type],sc=(ST.find(x=>x[0]===stt)||ST[0])[2];
+      const capTxt=s.capacity?`${fmt(s.capacity)} ${cfg.unit}`:(s.capacityNote?s.capacityNote:'');
+      return `<div class="ol-row2" onclick="focusSite('${s.id}')" title="Show on the map"><span class="ol-dot" style="background:${cfg.color}"></span><div class="ol-main"><div class="ol-l1"><span class="ol-n">${esc(s.name)}</span><span class="ol-p">${Math.round(w*1000)/10}%</span></div><div class="ol-l2">${esc(cfg.fullLabel||cfg.label)} · ${esc(s.country||'')}${capTxt?' · '+esc(capTxt):''}</div><div class="ol-l2"><span style="color:${sc};font-weight:700">${(ST.find(x=>x[0]===stt)||ST[0])[1]}</span></div></div></div>`;}).join('');
+  });
+  const lw=document.createElement('div');lw.innerHTML=lh;body.appendChild(lw);
+  // 2. summary figures
+  let html=`<div class="cs-block" style="margin-top:14px"><div class="cs-head">Summary</div>`;
   html+=`<div class="cs-sec">Status</div><div style="display:flex;height:9px;margin:4px 10px 2px;border-radius:2px;overflow:hidden">${ST.filter(x=>cnt[x[0]]).map(x=>`<span style="flex:${cnt[x[0]]};background:${x[2]}" title="${x[1]}: ${cnt[x[0]]}"></span>`).join('')}</div>`;
   html+=ST.filter(x=>cnt[x[0]]).map(x=>`<div class="cs-row"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${x[2]};margin-right:6px"></span>${x[1]}</span><b>${cnt[x[0]]}</b></div>`).join('');
-  html+=`<div class="cs-sec">Operating capacity by chain step</div>`;
+  html+=`<div class="cs-sec">Operating capacity (pro rata by stake) and share of world</div>`;
   STAGE_ORDER.forEach(st=>{
     const ms=mine.filter(s=>SITE_TYPES[s.type].stage===st);if(!ms.length)return;
-    const op=ms.filter(isOp&&(s=>isOp(s))),cap=op.reduce((a,s)=>a+(s.capacity||0)*ownerWeight(s,of),0);
-    const world=sites.filter(s=>SITE_TYPES[s.type]&&SITE_TYPES[s.type].stage===st&&isOp(s)).reduce((a,s)=>a+(s.capacity||0),0);
-    const u=STAGE_INFO[st].unit;
-    html+=`<div class="cs-row"><span>${STAGE_INFO[st].label} <span style="color:var(--t3)">(${ms.length})</span></span><b>${cap>0?fmt(cap)+' '+u+(world?' · '+(cap/world*100).toFixed(cap/world<0.1?1:0)+'%':''):'—'}</b></div>`;
+    const cap=ms.filter(s=>isOp(s)).reduce((a,s)=>a+(s.capacity||0)*ownerWeight(s,of),0);
+    const world=sites.filter(s=>SITE_TYPES[s.type]&&SITE_TYPES[s.type].stage===st&&isOp(s)).reduce((a,s)=>a+(s.capacity||0),0),u=STAGE_INFO[st].unit;
+    html+=`<div class="cs-row"><span>${STAGE_INFO[st].label}</span><b>${cap>0?fmt(cap)+' '+u+(world?' · '+(cap/world*100).toFixed(cap/world<0.1?1:0)+'%':''):'—'}</b></div>`;
   });
-  html+=`<div class="cs-foot">Stake-weighted operating capacity; where stakes are not stated, owners are assumed to share equally. Figures in brackets = number of sites (all statuses); % = share of all operating capacity of that step in this dataset.</div></div>`;
+  html+=`<div class="cs-foot">Where stakes are not stated, co-owners are assumed to share equally. % = share of all operating capacity of that step in this dataset.</div></div>`;
   body.insertAdjacentHTML('beforeend',html);
-  // geography
   const byC={};mine.forEach(s=>{if(s.country)byC[s.country]=(byC[s.country]||0)+1;});const cl=Object.keys(byC).sort((a,b)=>byC[b]-byC[a]);
   if(cl.length>1){
     const t=document.createElement('div');t.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:6px 0 6px';t.textContent='Facilities by country';
     const cw=document.createElement('div');body.appendChild(t);body.appendChild(cw);
     activeChartInstances.push(treemapChart(cw,cl,cl.map(c=>byC[c]),'sites',mine.length,'#4A5A6A',null,170));
   }
-  // list
-  const t2=document.createElement('div');t2.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 4px';t2.textContent='Facilities';body.appendChild(t2);
-  let lh='';
-  STAGE_ORDER.forEach(st=>{
-    const ms=mine.filter(s=>SITE_TYPES[s.type].stage===st).sort((a,b)=>(a.country||'').localeCompare(b.country||'')||a.name.localeCompare(b.name));if(!ms.length)return;
-    lh+=`<div class="cs-sec" style="padding-left:0">${STAGE_INFO[st].label}</div>`+ms.map(s=>{const w=ownerWeight(s,of),stt=s.status||'operating',c=SITE_TYPES[s.type].color;
-      return `<div class="ol-row" onclick="focusSite('${s.id}')" title="Show on the map"><span class="ol-dot" style="background:${c}"></span><span class="ol-n">${s.name.replace(/</g,'&lt;')}</span><span class="ol-c">${s.country||''}</span><span class="ol-s">${stt==='operating'?'':stt==='under construction'?'UC':stt}</span><span class="ol-p">${Math.round(w*100)}%</span></div>`;}).join('');
-  });
-  const lw=document.createElement('div');lw.innerHTML=lh;body.appendChild(lw);
 }
 function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
