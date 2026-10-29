@@ -224,6 +224,7 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .ol-types-t{font-size:12px;color:var(--t0);margin-bottom:6px}.ol-types-t b{font-size:15px}
 .ol-chips{display:flex;flex-direction:column;gap:3px}.ol-chip{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--t1)}.ol-chip>span{flex:1}.ol-chip b{color:var(--t0)}
 .tut-intro{font-size:11.5px;line-height:1.6;color:var(--t0);padding-bottom:12px;border-bottom:1px solid var(--border)}.tut-intro a{color:var(--c1);text-decoration:underline}
+.reset-btn{margin-left:auto;font-family:var(--font);font-size:11px;font-weight:600;padding:6px 12px;background:transparent;color:var(--t1);border:1px solid var(--border2);cursor:pointer;flex-shrink:0}.reset-btn:hover{background:var(--bg2);color:var(--t0)}
 
 /* ================= RESTYLE LAYER ================= */
 :root{
@@ -456,6 +457,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
       <span class="year-slider-value" id="year-slider-value">—</span>
       <button class="clear-x" id="year-slider-clear" onclick="clearYearFilter()" style="display:none" title="Back to all years">✕</button>
     </div>
+    <button class="reset-btn" id="reset-btn" onclick="resetAll()" title="Clear every selection and return to a blank world map">Reset map</button>
   </div>
 
   <div class="main-body">
@@ -709,6 +711,16 @@ function inFlowYearRange(y){if(y==null||!state.yearRange)return true;return y>=s
 function updateHaleuChip(){const cb=document.getElementById('cb-haleu-only');if(cb)cb.checked=state.haleuOnly;}
 function toggleHaleuOnly(event){if(event)event.stopPropagation();state.haleuOnly=!state.haleuOnly;updateHaleuChip();renderMap();}
 function syncSelAll(){const f=document.getElementById('fac-selall'),g=document.getElementById('flow-selall'),z=document.getElementById('zone-selnone');if(f)f.textContent=Object.values(state.siteTypes).some(Boolean)?'Deselect all':'Select all';if(g)g.textContent=Object.values(state.flowMats).some(Boolean)?'Deselect all':'Select all';if(z)z.style.display=state.zoneMode==='none'?'none':'';}
+function resetAll(){
+  closeAllDropdowns();closeSitePopup&&closeSitePopup();
+  state.chainStep='';state.showAllTypes=false;state.countries=[];state.ownerFilter='';state.routeFrom=[];state.routeTo=[];state.zoneMode='none';state.haleuOnly=false;
+  Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=false;});Object.keys(state.flowMats).forEach(k=>{state.flowMats[k]=false;});
+  Object.keys(state.statuses).forEach(k=>{state.statuses[k]=(k==='operating');});
+  _prevStatuses=null;_prevSiteTypes=null;selectedSiteId=null;
+  const os=document.getElementById('owner-sel');if(os)os.value='';
+  if(yearSliderYears.length){const l=yearSliderYears.length-1;document.getElementById('year-slider-min').value=0;document.getElementById('year-slider-max').value=l;updateYearRangeVisual();}
+  clearChainUI();applyStateToUI();updateRouteBtn();updateYearSliderVisibility();renderMap();updateToponyms();zoomReset();
+}
 function leaveQuickView(){state.chainStep='';state.showAllTypes=false;clearChainUI();}
 function toggleAllFacilities(){const anyOn=Object.values(state.siteTypes).some(Boolean);Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=!anyOn;});leaveQuickView();updateFacilitiesBtn();renderMap();}
 const FACILITY_GROUPS={mining:MINE_KEYS,fuelfab:FAB_KEYS,npp:NPP_TYPE_KEYS};
