@@ -438,7 +438,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
         <input type="range" class="yr-range-input" id="year-slider-max" min="0" max="0" step="1" value="0" oninput="onYearRangeInput('max')">
       </div>
       <span class="year-slider-value" id="year-slider-value">—</span>
-      <button class="clear-x" id="year-slider-clear" onclick="clearYearFilter()" style="display:none" title="Back to the latest year">✕</button>
+      <button class="clear-x" id="year-slider-clear" onclick="clearYearFilter()" style="display:none" title="Back to all years">✕</button>
     </div>
   </div>
 
@@ -668,7 +668,7 @@ function updateYearRangeVisual(){
   state.yearRange={min:yearSliderYears[minIdx],max:yearSliderYears[maxIdx]};
   const label=document.getElementById('year-slider-value'),clearBtn=document.getElementById('year-slider-clear');
   label.textContent=flowYearLabel()||'—';
-  clearBtn.style.display=(minIdx===lastIdx&&maxIdx===lastIdx)?'none':'';
+  clearBtn.style.display=(minIdx===0&&maxIdx===lastIdx)?'none':'';
   minInp.style.zIndex=minIdx>=maxIdx?3:2;
   maxInp.style.zIndex=2;
 }
@@ -685,10 +685,10 @@ function initYearSlider(){
   const lastIdx=Math.max(yearSliderYears.length-1,0);
   const minInp=document.getElementById('year-slider-min'),maxInp=document.getElementById('year-slider-max');
   minInp.min=0;minInp.max=lastIdx;minInp.step=1;maxInp.min=0;maxInp.max=lastIdx;maxInp.step=1;
-  minInp.value=lastIdx;maxInp.value=lastIdx;   // default: latest year only
+  minInp.value=0;maxInp.value=lastIdx;   // default: all years
   updateYearRangeVisual();
 }
-function clearYearFilter(){if(!yearSliderYears.length)return;const lastIdx=yearSliderYears.length-1;document.getElementById('year-slider-min').value=lastIdx;document.getElementById('year-slider-max').value=lastIdx;updateYearRangeVisual();renderMap();}
+function clearYearFilter(){if(!yearSliderYears.length)return;const lastIdx=yearSliderYears.length-1;document.getElementById('year-slider-min').value=0;document.getElementById('year-slider-max').value=lastIdx;updateYearRangeVisual();renderMap();}
 function inFlowYearRange(y){if(y==null||!state.yearRange)return true;return y>=state.yearRange.min&&y<=state.yearRange.max;}
 function updateHaleuChip(){const cb=document.getElementById('cb-haleu-only');if(cb)cb.checked=state.haleuOnly;}
 function toggleHaleuOnly(event){if(event)event.stopPropagation();state.haleuOnly=!state.haleuOnly;updateHaleuChip();renderMap();}
