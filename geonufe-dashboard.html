@@ -220,6 +220,9 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .ol-row2{display:flex;gap:8px;padding:6px 6px;border-bottom:1px solid var(--border);cursor:pointer}.ol-row2:hover{background:var(--bg2)}
 .ol-row2 .ol-dot{margin-top:4px}.ol-main{flex:1;min-width:0}.ol-l1{display:flex;justify-content:space-between;gap:8px;font-size:11px}.ol-l1 .ol-n{font-weight:600;white-space:normal}.ol-l1 .ol-p{font-weight:700;color:var(--t0);width:auto}
 .ol-l2{font-size:9.5px;color:var(--t2);line-height:1.4}
+.ol-types{margin:0 0 10px;padding:8px 10px;border:1px solid var(--border);background:var(--bg2)}
+.ol-types-t{font-size:12px;color:var(--t0);margin-bottom:6px}.ol-types-t b{font-size:15px}
+.ol-chips{display:flex;flex-direction:column;gap:3px}.ol-chip{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--t1)}.ol-chip>span{flex:1}.ol-chip b{color:var(--t0)}
 
 /* ================= RESTYLE LAYER ================= */
 :root{
@@ -1105,6 +1108,12 @@ function buildOwnerSummary(body){
   const fmt=n=>Math.round(n).toLocaleString('en-US'),esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const ST=[['operating','Operating','#4A7A5A'],['under construction','Under construction','#C7922B'],['planned','Planned','#8A8F98'],['suspended','Suspended','#A05C4A']];
   const cnt={};mine.forEach(s=>{const k=s.status||'operating';cnt[k]=(cnt[k]||0)+1;});
+  // 0. which kinds of facilities the owner has
+  const byT={};mine.forEach(s=>{byT[s.type]=(byT[s.type]||0)+1;});
+  const tl=Object.keys(SITE_TYPES).filter(t=>byT[t]);
+  const th=document.createElement('div');th.className='ol-types';
+  th.innerHTML=`<div class="ol-types-t"><b>${mine.length}</b> facilit${mine.length===1?'y':'ies'}</div><div class="ol-chips">${tl.map(t=>{const c=SITE_TYPES[t];return `<span class="ol-chip">${symbolSVG(c.shape,c.color,3.6)}<span>${esc(c.fullLabel||c.label)}</span><b>${byT[t]}</b></span>`;}).join('')}</div>`;
+  body.appendChild(th);
   // 1. the facilities themselves, grouped by chain step
   let lh=`<div class="ol-intro">Click a facility to find it on the map. Stake = share held by ${esc(of)}.</div>`;
   STAGE_ORDER.forEach(st=>{
