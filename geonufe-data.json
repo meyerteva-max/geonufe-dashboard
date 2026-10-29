@@ -1409,50 +1409,6 @@
    "status": "operating"
   },
   {
-   "id": "d130",
-   "name": "White Mesa Mill",
-   "type": "mill",
-   "lat": 37.468,
-   "lon": -109.471,
-   "country": "USA",
-   "capacity": 3400,
-   "shareholder": "Energy Fuels Inc (100%)",
-   "status": "operating"
-  },
-  {
-   "id": "d131",
-   "name": "Key Lake",
-   "type": "mill",
-   "lat": 57.207,
-   "lon": -105.659,
-   "country": "Canada",
-   "capacity": 7100,
-   "shareholder": "Cameco (83.33%) / Orano (16.67%)",
-   "status": "operating"
-  },
-  {
-   "id": "d132",
-   "name": "McClean Lake",
-   "type": "mill",
-   "lat": 58.261,
-   "lon": -103.803,
-   "country": "Canada",
-   "capacity": 7600,
-   "shareholder": "Orano (77.5%) / Denison Mines (22.5%)",
-   "status": "operating"
-  },
-  {
-   "id": "d133",
-   "name": "Beverley",
-   "type": "mill",
-   "lat": -30.193,
-   "lon": 139.598,
-   "country": "Australia",
-   "capacity": 1700,
-   "shareholder": "General Atomics (100%)",
-   "status": "operating"
-  },
-  {
    "id": "d134",
    "name": "Caetité",
    "type": "mine-openpit",

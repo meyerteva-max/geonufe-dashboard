@@ -335,7 +335,6 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
         <div class="dd-item" onclick="toggleSiteType('mine-underground')"><input type="checkbox" id="cb-mine-underground"><span class="dd-shape" id="shape-mine-underground"></span>Underground mines</div>
         <div class="dd-item" onclick="toggleSiteType('mine-isl')"><input type="checkbox" id="cb-mine-isl"><span class="dd-shape" id="shape-mine-isl"></span>ISL mines</div>
         <div class="dd-item" onclick="toggleSiteType('mine-unspecified')"><input type="checkbox" id="cb-mine-unspecified"><span class="dd-shape" id="shape-mine-unspecified"></span>Mines — method not specified</div>
-        <div class="dd-item" onclick="toggleSiteType('mill')"><input type="checkbox" id="cb-mill"><span class="dd-shape" id="shape-mill"></span>Uranium mills</div>
         <div class="dd-section-label">Conversion</div>
         <div class="dd-item" onclick="toggleSiteType('conversion')"><input type="checkbox" id="cb-conversion"><span class="dd-shape" id="shape-conversion"></span>Conversion plants</div>
         <div class="dd-section-label">Enrichment</div>
@@ -532,7 +531,6 @@ const SITE_TYPES={
   'mine-underground': {label:'Uranium mine — underground',     color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
   'mine-isl':         {label:'Uranium mine — ISL',             color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
   'mine-unspecified': {label:'Uranium mine — method not specified',color:MINE_COLOR,unit:'tU/yr',shape:'circle',stage:'mining',hasCapacity:true},
-  mill:               {label:'Uranium mill',                   color:'#5A2C0C',unit:'tU/yr',  shape:'triangle', stage:'mill',  hasCapacity:true,fixed:true,fixedR:3.4},
   conversion:         {label:'Conversion plant',               color:'#E8820A', unit:'tU/yr',  shape:'diamond', stage:'conversion',hasCapacity:true},
   enrichment:         {label:'Enrichment plant',               color:'#27498C', unit:'tSWU/yr',shape:'diamond', stage:'enrichment',hasCapacity:true},
   'fuelfab-mox':    {label:'MoX',           fullLabel:'Fuel fabrication — MoX',            color:FC.mox,   unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
@@ -557,7 +555,7 @@ const MINE_METHOD={'mine-isl':'ISL','mine-underground':'Underground','mine-openp
 const MAT={'Natural U':{label:'Natural uranium',color:'#8B4513'},'Converted U':{label:'Converted uranium',color:'#E8820A'},'Enriched U':{label:'Enriched uranium',color:'#27498C'},'Fuel asm.':{label:'Fuel assemblies',color:'#4C8C4A'}};
 const ZONE_CFG={natU:{label:'Natural uranium production share (%)',color:'#8B4513',from:'#f5ede8'},convU:{label:'Converted uranium production share (%)',color:'#E8820A',from:'#fdf0e4'},enrU:{label:'Enriched uranium production share (%)',color:'#27498C',from:'#e8eef8'},nucMix:{label:'Nuclear share in electricity mix (%)',color:'#3A4756',from:'#eef0f3',dark:'#B9C6D6'},resCost40:{label:'Uranium identified recoverable resources — <USD 40/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost80:{label:'Uranium identified recoverable resources — <USD 80/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost130:{label:'Uranium identified recoverable resources — <USD 130/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost260:{label:'Uranium identified recoverable resources — <USD 260/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'}};
 const CHAIN_MAP={
-  natU:{sites:[...MINE_KEYS,'mill'],flows:[],zone:'natU'},
+  natU:{sites:MINE_KEYS,flows:[],zone:'natU'},
   convU:{sites:['conversion'],flows:[],zone:'convU'},
   enrU:{sites:['enrichment'],flows:[],zone:'enrU'},
   fuelAsm:{sites:FAB_KEYS,flows:[],zone:null},
@@ -694,7 +692,7 @@ function toggleHaleuOnly(event){if(event)event.stopPropagation();state.haleuOnly
 function syncSelAll(){const f=document.getElementById('fac-selall'),g=document.getElementById('flow-selall'),z=document.getElementById('zone-selnone');if(f)f.textContent=Object.values(state.siteTypes).some(Boolean)?'Deselect all':'Select all';if(g)g.textContent=Object.values(state.flowMats).some(Boolean)?'Deselect all':'Select all';if(z)z.style.display=state.zoneMode==='none'?'none':'';}
 function leaveQuickView(){state.chainStep='';state.showAllTypes=false;clearChainUI();}
 function toggleAllFacilities(){const anyOn=Object.values(state.siteTypes).some(Boolean);Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=!anyOn;});leaveQuickView();updateFacilitiesBtn();renderMap();}
-const FACILITY_GROUPS={mining:[...MINE_KEYS,'mill'],fuelfab:FAB_KEYS,npp:NPP_TYPE_KEYS};
+const FACILITY_GROUPS={mining:MINE_KEYS,fuelfab:FAB_KEYS,npp:NPP_TYPE_KEYS};
 function toggleFacilityGroup(key,event){if(event)event.stopPropagation();const types=FACILITY_GROUPS[key];if(!types)return;const anyOn=types.some(t=>state.siteTypes[t]);types.forEach(t=>{state.siteTypes[t]=!anyOn;});leaveQuickView();updateFacilitiesBtn();renderMap();}
 function toggleSiteType(t){event.stopPropagation();state.siteTypes[t]=!state.siteTypes[t];leaveQuickView();updateFacilitiesBtn();renderMap();}
 function toggleStatus(s){event.stopPropagation();state.statuses[s]=!state.statuses[s];updateStatusBtn();renderMap();}
@@ -867,7 +865,7 @@ function initChartPanelResize(){
 }
 function detectChartMode(){
   if(state.chainStep)return state.chainStep;
-  const sM={natU:[...MINE_KEYS,'mill'],convU:['conversion'],enrU:['enrichment'],fuelAsm:FAB_KEYS,electricity:NPP_TYPE_KEYS};
+  const sM={natU:MINE_KEYS,convU:['conversion'],enrU:['enrichment'],fuelAsm:FAB_KEYS,electricity:NPP_TYPE_KEYS};
   const fM={natU:'Natural U',convU:'Converted U',enrU:'Enriched U',fuelAsm:'Fuel asm.'};
   const zM={natU:'natU',convU:'convU',enrU:'enrU',electricity:'nucMix'};
   for(const p of['natU','convU','enrU','fuelAsm','electricity']){
@@ -1094,7 +1092,7 @@ function buildPanel(mode){
   document.getElementById('cp-subtitle').textContent=bits.join(' · ');
   if(state.countries.length&&flowsActive()&&!of){document.getElementById('cp-title').textContent='Country summary';document.getElementById('cp-subtitle').textContent=(state.countries.length===1?state.countries[0]:state.countries.length+' countries')+(flowYearLabel()?' · Flow year: '+flowYearLabel():'');}
   if(state.countries.length){
-    body.insertAdjacentHTML('beforeend',[...state.countries].sort().map(buildCountrySummary).join('')+`<div class="cs-foot" style="padding:0 0 10px">Capacity shares are computed from operating sites in this dataset (mills excluded).</div>`);
+    body.insertAdjacentHTML('beforeend',[...state.countries].sort().map(buildCountrySummary).join('')+`<div class="cs-foot" style="padding:0 0 10px">Capacity shares are computed from operating sites in this dataset.</div>`);
     if(flowsActive())buildCountryFlowSections(body);
   }
   if(!meta)return;
