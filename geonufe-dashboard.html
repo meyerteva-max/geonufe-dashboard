@@ -223,6 +223,7 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .ol-types{margin:0 0 10px;padding:8px 10px;border:1px solid var(--border);background:var(--bg2)}
 .ol-types-t{font-size:12px;color:var(--t0);margin-bottom:6px}.ol-types-t b{font-size:15px}
 .ol-chips{display:flex;flex-direction:column;gap:3px}.ol-chip{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--t1)}.ol-chip>span{flex:1}.ol-chip b{color:var(--t0)}
+.tut-intro{font-size:11.5px;line-height:1.6;color:var(--t0);padding-bottom:12px;border-bottom:1px solid var(--border)}.tut-intro a{color:var(--c1);text-decoration:underline}
 
 /* ================= RESTYLE LAYER ================= */
 :root{
@@ -313,6 +314,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
         <button class="tut-close" onclick="closeTutorial()">✕</button>
       </div>
       <div class="tut-body">
+        <div class="tut-intro">Welcome to the Observatory of Nuclear Fuel Supplies, a tool developed within the <a href="https://geonufe.eu/" target="_blank" rel="noopener">GeoNuFE</a> project, funded by the <a href="https://erc.europa.eu/" target="_blank" rel="noopener">European Research Council</a>. It maps the facilities, trade flows and national shares of the global nuclear fuel cycle, from uranium mining to power plants.</div>
         <div class="tut-item"><div><strong>Start with the map.</strong> Click any facility to see who owns it, its status, its capacity and our notes. Within each step of the fuel cycle, the size of a symbol follows capacity, so a large circle or square is a large plant.</div></div>
         <div class="tut-item"><div><strong>The Quick view row</strong> is the fastest way in: one click sets the map up for a step of the chain (uranium resources, mining, conversion, enrichment, fuel fabrication or power plants). Click the chip again, or the cross next to the chips, to go back to the full map.</div></div>
         <div class="tut-item"><div><strong>Customize</strong> lets you build your own view. By default only operating facilities are shown; Status adds suspended, under construction and planned ones. Flows draws the trade in uranium products between countries, and Production share shades countries by their weight in a step of the cycle.</div></div>
@@ -882,6 +884,7 @@ function initChartPanelResize(){
 }
 function detectChartMode(){
   if(state.chainStep)return state.chainStep;
+  if((state.ownerFilter||state.countries.length)&&Object.values(state.siteTypes).every(Boolean))return null;
   const sM={natU:MINE_KEYS,convU:['conversion'],enrU:['enrichment'],fuelAsm:FAB_KEYS,electricity:NPP_TYPE_KEYS};
   const fM={natU:'Natural U',convU:'Converted U',enrU:'Enriched U',fuelAsm:'Fuel asm.'};
   const zM={natU:'natU',convU:'convU',enrU:'enrU',electricity:'nucMix'};
@@ -1212,13 +1215,14 @@ function buildCountryList(allC){
   el.addEventListener('change',()=>{state.countries=[...el.querySelectorAll('input:checked')].map(i=>i.value);onSelectionChanged();});
 }
 // Selecting a country or an owner leaves the quick view and shows every facility type for that selection.
-let _prevStatuses=null;
+let _prevStatuses=null,_prevSiteTypes=null;
 function onSelectionChanged(){
   if(state.ownerFilter){if(!_prevStatuses)_prevStatuses={...state.statuses};STATUS_LIST.forEach(s=>{state.statuses[s]=true;});}
   else if(_prevStatuses){if(STATUS_LIST.every(s=>state.statuses[s]))state.statuses=_prevStatuses;_prevStatuses=null;}
+  state.showAllTypes=false;
   if(state.countries.length||state.ownerFilter){
-    state.chainStep='';clearChainUI();Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=false;});state.showAllTypes=true;
-  }else state.showAllTypes=false;
+    if(!_prevSiteTypes||state.chainStep){if(!_prevSiteTypes)_prevSiteTypes={...state.siteTypes};state.chainStep='';clearChainUI();Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=true;});}
+  }else if(_prevSiteTypes){state.siteTypes=_prevSiteTypes;_prevSiteTypes=null;}
   if(state.ownerFilter){Object.keys(state.flowMats).forEach(k=>{state.flowMats[k]=false;});state.zoneMode='none';}
   applyStateToUI();renderMap();updateToponyms();refreshZoom();
 }
