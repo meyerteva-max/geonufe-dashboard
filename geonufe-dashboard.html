@@ -211,6 +211,10 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .rc-o b{display:block;font-size:11px}.rc-o span{color:var(--t2);font-size:9.5px}
 .rc-o.on{background:#6B3FA0;border-color:#6B3FA0;color:#fff}.rc-o.on span{color:#e6dcf3}
 .rc-f{font-size:8.5px;color:var(--t2);margin-top:4px}
+.ol-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:10px;color:var(--t1);cursor:pointer;border-bottom:1px solid var(--border)}
+.ol-row:hover{background:var(--bg2)}.ol-dot{width:7px;height:7px;flex-shrink:0;border-radius:50%}
+.ol-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t0)}
+.ol-c{color:var(--t2);font-size:9px;flex-shrink:0}.ol-s{color:#C7922B;font-size:8.5px;font-weight:700;text-transform:uppercase;flex-shrink:0}.ol-p{width:30px;text-align:right;font-weight:600;flex-shrink:0}
 
 /* ================= RESTYLE LAYER ================= */
 :root{
@@ -1082,6 +1086,50 @@ function buildResPanel(body){
   body.appendChild(cw);body.appendChild(note);
   activeChartInstances.push(treemapChart(cw,labels,labels.map(l=>d[l]),'%',total,'#6B3FA0',null,260));
 }
+function focusSite(id){
+  const s=sites.find(x=>x.id===id);if(!s||!svgEl)return;const pos=proj([s.lon,s.lat]);if(!pos)return;
+  const mw=document.getElementById('mapwrap'),k=7;selectedSiteId=id;
+  svgEl.transition().duration(700).call(zoomBehavior.transform,d3.zoomIdentity.translate(MAP_W/2-k*pos[0],MAP_H/2-k*pos[1]).scale(k));
+  setTimeout(()=>{const r=mw.getBoundingClientRect(),t=d3.zoomTransform(svgEl.node());const bb=svgEl.node().getBoundingClientRect();const [px,py]=t.apply(pos);showSitePopup(s,(px-0)*fitScale+(bb.left-r.left),py*fitScale+(bb.top-r.top),mw);},780);
+}
+function buildOwnerSummary(body){
+  const of=state.ownerFilter,mine=sites.filter(s=>SITE_TYPES[s.type]&&siteHasOwner(s,of));
+  document.getElementById('cp-title').textContent='Owner portfolio';
+  document.getElementById('cp-subtitle').textContent=of+' · all statuses · capacities pro rata by stake';
+  if(!mine.length){body.insertAdjacentHTML('beforeend','<div class="cp-empty">No facility found for this owner.</div>');return;}
+  const fmt=n=>Math.round(n).toLocaleString('en-US'),countries=[...new Set(mine.map(s=>s.country).filter(Boolean))];
+  const ST=[['operating','Operating','#4A7A5A'],['under construction','Under construction','#C7922B'],['planned','Planned','#8A8F98'],['suspended','Suspended','#A05C4A']];
+  const cnt={};mine.forEach(s=>{const k=s.status||'operating';cnt[k]=(cnt[k]||0)+1;});
+  let html=`<div class="cs-block"><div class="cs-head">${of}</div><div class="cs-row"><span>Facilities</span><b>${mine.length}</b></div><div class="cs-row"><span>Countries</span><b>${countries.length}</b></div>`;
+  html+=`<div class="cs-sec">Status</div><div style="display:flex;height:9px;margin:4px 10px 2px;border-radius:2px;overflow:hidden">${ST.filter(x=>cnt[x[0]]).map(x=>`<span style="flex:${cnt[x[0]]};background:${x[2]}" title="${x[1]}: ${cnt[x[0]]}"></span>`).join('')}</div>`;
+  html+=ST.filter(x=>cnt[x[0]]).map(x=>`<div class="cs-row"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${x[2]};margin-right:6px"></span>${x[1]}</span><b>${cnt[x[0]]}</b></div>`).join('');
+  html+=`<div class="cs-sec">Operating capacity by chain step</div>`;
+  STAGE_ORDER.forEach(st=>{
+    const ms=mine.filter(s=>SITE_TYPES[s.type].stage===st);if(!ms.length)return;
+    const op=ms.filter(isOp&&(s=>isOp(s))),cap=op.reduce((a,s)=>a+(s.capacity||0)*ownerWeight(s,of),0);
+    const world=sites.filter(s=>SITE_TYPES[s.type]&&SITE_TYPES[s.type].stage===st&&isOp(s)).reduce((a,s)=>a+(s.capacity||0),0);
+    const u=STAGE_INFO[st].unit;
+    html+=`<div class="cs-row"><span>${STAGE_INFO[st].label} <span style="color:var(--t3)">(${ms.length})</span></span><b>${cap>0?fmt(cap)+' '+u+(world?' · '+(cap/world*100).toFixed(cap/world<0.1?1:0)+'%':''):'—'}</b></div>`;
+  });
+  html+=`<div class="cs-foot">Stake-weighted operating capacity; where stakes are not stated, owners are assumed to share equally. Figures in brackets = number of sites (all statuses); % = share of all operating capacity of that step in this dataset.</div></div>`;
+  body.insertAdjacentHTML('beforeend',html);
+  // geography
+  const byC={};mine.forEach(s=>{if(s.country)byC[s.country]=(byC[s.country]||0)+1;});const cl=Object.keys(byC).sort((a,b)=>byC[b]-byC[a]);
+  if(cl.length>1){
+    const t=document.createElement('div');t.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:6px 0 6px';t.textContent='Facilities by country';
+    const cw=document.createElement('div');body.appendChild(t);body.appendChild(cw);
+    activeChartInstances.push(treemapChart(cw,cl,cl.map(c=>byC[c]),'sites',mine.length,'#4A5A6A',null,170));
+  }
+  // list
+  const t2=document.createElement('div');t2.style.cssText='font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin:16px 0 4px';t2.textContent='Facilities';body.appendChild(t2);
+  let lh='';
+  STAGE_ORDER.forEach(st=>{
+    const ms=mine.filter(s=>SITE_TYPES[s.type].stage===st).sort((a,b)=>(a.country||'').localeCompare(b.country||'')||a.name.localeCompare(b.name));if(!ms.length)return;
+    lh+=`<div class="cs-sec" style="padding-left:0">${STAGE_INFO[st].label}</div>`+ms.map(s=>{const w=ownerWeight(s,of),stt=s.status||'operating',c=SITE_TYPES[s.type].color;
+      return `<div class="ol-row" onclick="focusSite('${s.id}')" title="Show on the map"><span class="ol-dot" style="background:${c}"></span><span class="ol-n">${s.name.replace(/</g,'&lt;')}</span><span class="ol-c">${s.country||''}</span><span class="ol-s">${stt==='operating'?'':stt==='under construction'?'UC':stt}</span><span class="ol-p">${Math.round(w*100)}%</span></div>`;}).join('');
+  });
+  const lw=document.createElement('div');lw.innerHTML=lh;body.appendChild(lw);
+}
 function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
   if(mode==='resources'){buildResPanel(body);return;}
@@ -1093,6 +1141,7 @@ function buildPanel(mode){
   if(state.countries.length)bits.push(state.countries.length===1?state.countries[0]:`${state.countries.length} countries`);
   if(of)bits.push(`Owner: ${of} (pro rata by stake)`);
   document.getElementById('cp-subtitle').textContent=bits.join(' · ');
+  if(of)buildOwnerSummary(body);
   if(state.countries.length&&flowsActive()&&!of){document.getElementById('cp-title').textContent='Country summary';document.getElementById('cp-subtitle').textContent=(state.countries.length===1?state.countries[0]:state.countries.length+' countries')+(flowYearLabel()?' · Flow year: '+flowYearLabel():'');}
   if(state.countries.length){
     body.insertAdjacentHTML('beforeend',[...state.countries].sort().map(buildCountrySummary).join('')+`<div class="cs-foot" style="padding:0 0 10px">Capacity shares are computed from operating sites in this dataset.</div>`);
@@ -1138,7 +1187,7 @@ function buildPanel(mode){
   }
 }
 function updateChartPanel(){
-  const mode=detectChartMode(),active=!!(mode||state.countries.length);const dot=document.getElementById('cpDot');
+  const mode=detectChartMode(),active=!!(mode||state.countries.length||state.ownerFilter);const dot=document.getElementById('cpDot');
   if(active){dot.classList.add('visible');buildPanel(mode);if(!panelWasActive)openChartPanel();panelWasActive=true;}
   else{dot.classList.remove('visible');panelWasActive=false;destroyCharts();document.getElementById('cp-body').innerHTML=`<div class="cp-empty"><div class="cp-empty-icon">📊</div>Activate a chain step or select a country to see statistics.</div>`;document.getElementById('cp-title').textContent='Statistics';document.getElementById('cp-subtitle').textContent='';}
 }
@@ -1148,7 +1197,10 @@ function buildCountryList(allC){
   el.addEventListener('change',()=>{state.countries=[...el.querySelectorAll('input:checked')].map(i=>i.value);onSelectionChanged();});
 }
 // Selecting a country or an owner leaves the quick view and shows every facility type for that selection.
+let _prevStatuses=null;
 function onSelectionChanged(){
+  if(state.ownerFilter){if(!_prevStatuses)_prevStatuses={...state.statuses};STATUS_LIST.forEach(s=>{state.statuses[s]=true;});}
+  else if(_prevStatuses){if(STATUS_LIST.every(s=>state.statuses[s]))state.statuses=_prevStatuses;_prevStatuses=null;}
   if(state.countries.length||state.ownerFilter){
     state.chainStep='';clearChainUI();Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=false;});state.showAllTypes=true;
   }else state.showAllTypes=false;
