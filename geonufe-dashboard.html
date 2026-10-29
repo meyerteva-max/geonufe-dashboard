@@ -309,16 +309,18 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
   <div class="tut-overlay" id="tutOverlay" onclick="if(event.target===this)closeTutorial()">
     <div class="tut-modal">
       <div class="tut-header">
-        <div class="tut-title">Getting started with GeoNuFE</div>
+        <div class="tut-title">Getting started</div>
         <button class="tut-close" onclick="closeTutorial()">✕</button>
       </div>
       <div class="tut-body">
-        <div class="tut-item"><div class="tut-icon">📍</div><div><strong>Click any site</strong> on the map to see its owner(s), status, capacity, and any notes. Symbol area is proportional to capacity within each stage of the chain.</div></div>
-        <div class="tut-item"><div class="tut-icon">⚡</div><div><strong>Quick view</strong> — the top row of chips jumps straight to a full stage of the fuel chain (mining, conversion, enrichment, fuel fabrication, or power plants).</div></div>
-        <div class="tut-item"><div class="tut-icon">🎛️</div><div><strong>Customize</strong> — combine facility types, status (operating, suspended, under construction, planned), flow materials and a production-share overlay, plus filter by country or owner.</div></div>
-        <div class="tut-item"><div class="tut-icon">➡️</div><div><strong>Flow arrows</strong> point from the exporting country to the importing country's center — thicker arrows mean larger volumes. Use the year slider to change the flow year.</div></div>
-        <div class="tut-item"><div class="tut-icon">📊</div><div><strong>Statistics panel</strong> — click the tab on the right edge to see capacity shares (operating sites only) and, when a country is selected, a country summary; drag its edge to resize.</div></div>
-        <div class="tut-item"><div class="tut-icon">🔍</div><div>Drag the map to pan, use the +/− buttons or scroll to zoom, and FIT to reset the view.</div></div>
+        <div class="tut-item"><div><strong>Start with the map.</strong> Click any facility to see who owns it, its status, its capacity and our notes. Within each step of the fuel cycle, the size of a symbol follows capacity, so a large circle or square is a large plant.</div></div>
+        <div class="tut-item"><div><strong>The Quick view row</strong> is the fastest way in: one click sets the map up for a step of the chain (uranium resources, mining, conversion, enrichment, fuel fabrication or power plants). Click the chip again, or the cross next to the chips, to go back to the full map.</div></div>
+        <div class="tut-item"><div><strong>Customize</strong> lets you build your own view. By default only operating facilities are shown; Status adds suspended, under construction and planned ones. Flows draws the trade in uranium products between countries, and Production share shades countries by their weight in a step of the cycle.</div></div>
+        <div class="tut-item"><div><strong>Flows</strong> run from the exporting to the importing country, and thicker lines mean larger volumes. Once flows are on, the year slider (all years by default) and the From/To menu let you narrow down to a period or to a route.</div></div>
+        <div class="tut-item"><div><strong>Country and Owner</strong> filters zoom the map in and open a summary in the statistics panel. Choosing an owner lists all of its facilities, whatever their status, with the share it holds in each.</div></div>
+        <div class="tut-item"><div><strong>The Statistics panel</strong> (tab on the right edge) follows whatever you have on the map. Capacities count operating facilities only. You can drag its edge to make it wider.</div></div>
+        <div class="tut-item"><div>Drag to move the map, scroll or use +/− to zoom, FIT to start over, and Aa to show or hide country names. The legend at the bottom left explains the symbols currently on the map.</div></div>
+        <div class="tut-item"><div><strong>About the data.</strong> The database is a work in progress and gets updated regularly; the date of the last update is at the bottom right of the map.</div></div>
       </div>
       <div class="tut-footer">
         <label class="tut-dontshow"><input type="checkbox" id="tutDontShow"> Don't show this again</label>
