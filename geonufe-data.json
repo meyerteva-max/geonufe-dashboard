@@ -128,13 +128,14 @@
   {
    "id": "d20",
    "name": "Westinghouse Springfields",
-   "type": "fuelfab-bwrpwr",
+   "type": "fuelfab-agr",
    "lat": 53.77,
    "lon": -2.76,
    "country": "UK",
    "capacity": 1000,
    "shareholder": "Westinghouse (100%)",
-   "status": "operating"
+   "status": "operating",
+   "comment": "Sole supplier of fuel for the UK's AGR fleet (Heysham 1 and 2, Hartlepool, Torness): Westinghouse's contract with EDF was extended in 2023 to the end of plant life. The plant also makes PWR fuel for Europe and Asia. No public split of the capacity between AGR and PWR fuel."
   },
   {
    "id": "d14",

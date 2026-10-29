@@ -349,6 +349,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
         <div class="dd-item" onclick="toggleSiteType('fuelfab-bwrpwr')"><input type="checkbox" id="cb-fuelfab-bwrpwr"><span class="dd-shape" id="shape-fuelfab-bwrpwr"></span>Fuel fab. — BWR/PWR</div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-vver')"><input type="checkbox" id="cb-fuelfab-vver"><span class="dd-shape" id="shape-fuelfab-vver"></span>Fuel fab. — VVER</div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-combo')"><input type="checkbox" id="cb-fuelfab-combo"><span class="dd-shape" id="shape-fuelfab-combo"></span>Fuel fab. — BWR/PWR + VVER</div>
+        <div class="dd-item" onclick="toggleSiteType('fuelfab-agr')"><input type="checkbox" id="cb-fuelfab-agr"><span class="dd-shape" id="shape-fuelfab-agr"></span>Fuel fab. — AGR/GCR + BWR/PWR</div>
         <div class="dd-item" onclick="toggleSiteType('fuelfab-phwr')"><input type="checkbox" id="cb-fuelfab-phwr"><span class="dd-shape" id="shape-fuelfab-phwr"></span>Fuel fab. — PHWR</div>
         <div class="dd-section-label"><span>Nuclear power plants — by reactor type</span><button class="dd-section-selectall" onclick="toggleFacilityGroup('npp',event)">Select all</button></div>
         <div class="dd-item" onclick="toggleSiteType('npp-pwr')"><input type="checkbox" id="cb-npp-pwr"><span class="dd-shape" id="shape-npp-pwr"></span>PWR</div>
@@ -522,9 +523,9 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 <script>
 const MINE_COLOR='#8B4513';
 const RC={pwr:'#0072B2',bwr:'#56B4E9',vver:'#D55E00',phwr:'#009E73',gcr:'#8C8C8C',fbr:'#CC79A7',htgr:'#F0C000'};
-const FC={mox:'#7B3294',bwrpwr:'#332288',combo:'#882255'};
+const FC={mox:'#DDAA33',bwrpwr:'#332288',combo:'#882255',agr:'#117733'};
 const MINE_KEYS=['mine-openpit','mine-underground','mine-isl','mine-unspecified'];
-const FAB_KEYS=['fuelfab-mox','fuelfab-bwrpwr','fuelfab-vver','fuelfab-combo','fuelfab-phwr'];
+const FAB_KEYS=['fuelfab-mox','fuelfab-bwrpwr','fuelfab-vver','fuelfab-combo','fuelfab-phwr','fuelfab-agr'];
 const NPP_TYPE_KEYS=['npp-pwr','npp-bwr','npp-vver','npp-gcr','npp-fbr','npp-htgr','npp-phwr'];
 const SITE_TYPES={
   'mine-openpit':     {label:'Uranium mine — open pit',        color:MINE_COLOR,unit:'tU/yr',  shape:'circle',stage:'mining',hasCapacity:true},
@@ -537,6 +538,7 @@ const SITE_TYPES={
   'fuelfab-bwrpwr': {label:'BWR/PWR',       fullLabel:'Fuel fabrication — BWR/PWR',        color:FC.bwrpwr,unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
   'fuelfab-vver':   {label:'VVER',          fullLabel:'Fuel fabrication — VVER',           color:RC.vver,  unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
   'fuelfab-combo':  {label:'BWR/PWR + VVER',fullLabel:'Fuel fabrication — BWR/PWR + VVER', color:FC.combo, unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
+  'fuelfab-agr':    {label:'AGR/GCR + BWR/PWR',fullLabel:'Fuel fabrication — AGR/GCR + BWR/PWR',color:FC.agr,unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
   'fuelfab-phwr':   {label:'PHWR',          fullLabel:'Fuel fabrication — PHWR',           color:RC.phwr,  unit:'t/yr',shape:'square',stage:'fuelfab',hasCapacity:true},
   'npp-pwr':  {label:'PWR',  fullLabel:'Nuclear power plant — PWR',  color:RC.pwr, unit:'MWe',shape:'circle',stage:'npp',hasCapacity:true,isNPP:true},
   'npp-bwr':  {label:'BWR',  fullLabel:'Nuclear power plant — BWR',  color:RC.bwr, unit:'MWe',shape:'circle',stage:'npp',hasCapacity:true,isNPP:true},
