@@ -27,7 +27,8 @@
    "country": "USA",
    "capacity": 10000,
    "shareholder": "Solstice Advanced Materials (100%)",
-   "status": "operating"
+   "status": "operating",
+   "comment": "Metropolis plant, with output marketed by ConverDyn, a partnership between Solstice and General Atomics. Production is expected above 10,000 t UF6 in 2026, and Solstice announced a 20% output expansion in February 2026."
   },
   {
    "id": "d8",
@@ -50,7 +51,7 @@
    "capacity": 7500,
    "shareholder": "Orano (100%)",
    "haleu": true,
-   "comment": "Capacity to be increased to 10 000 tSWU/yr by 2030",
+   "comment": "Extension under way: four new modules add 2.5 million SWU per year, with first production in 2028 and full commissioning in 2030, bringing the plant to 10,000 tSWU per year.",
    "status": "operating"
   },
   {
@@ -75,7 +76,7 @@
    "capacity": 3400,
    "shareholder": "Urenco (100%)",
    "haleu": false,
-   "comment": "Capacity to be increased to 3700 tSWU/year by the end of 2027",
+   "comment": "Expansion of about 300 tSWU per year is under construction, targeting 3,700 tSWU per year by 2027.",
    "status": "operating"
   },
   {
@@ -85,10 +86,10 @@
    "lat": 32.46,
    "lon": -103.16,
    "country": "USA",
-   "capacity": 5000,
+   "capacity": 4650,
    "shareholder": "Urenco (100%)",
-   "haleu": true,
-   "comment": "Hosts a HALEU demonstration cascade alongside standard LEU production. Capacities to be extended to 7100 tSWU/yr",
+   "haleu": false,
+   "comment": "Output of about 4,650 tSWU per year after the first cascades of the expansion started in 2025-2026. The expansion completes in 2027, taking the plant to about 5,000, and a new 2,100 tSWU per year facility is planned from 2032 for 7,100 in total. The plant has produced LEU+ (up to about 10% U-235), not HALEU.",
    "status": "operating"
   },
   {
@@ -217,10 +218,10 @@
    "lat": 52.401,
    "lon": 6.622,
    "country": "Netherlands",
-   "capacity": 4999,
+   "capacity": 5100,
    "shareholder": "Urenco (100%)",
    "haleu": false,
-   "comment": "Capacity to be upgraded to 6600 tSWU/yr by 2030",
+   "comment": "A new cascade hall is under construction. Capacity is set to reach about 6,600 tSWU per year by 2030.",
    "status": "operating"
   },
   {
@@ -233,7 +234,7 @@
    "capacity": 4500,
    "shareholder": "Urenco (100%)",
    "haleu": true,
-   "comment": "HALEU capacities to be available by 2030",
+   "comment": "A new HALEU line of up to 27 tonnes per year is planned, with construction from 2028 and first production in the early 2030s. Not yet producing HALEU.",
    "status": "operating"
   },
   {
@@ -320,7 +321,7 @@
    "capacity": 1,
    "shareholder": "Centrus (100%)",
    "haleu": true,
-   "comment": "The full facility layout at Piketon is designed and licensed by the NRC to house enough cascades to reach an initial target of 3,800 tSWU per year",
+   "comment": "The 16-centrifuge cascade produces HALEU (about 900 kg per year) and moved from the DOE demonstration contract to commercial operation in July 2026. A US$900 million DOE contract funds 12 tonnes per year of new HALEU capacity, with first new capacity expected by 2029. The capacity shown is a placeholder, not a SWU figure.",
    "status": "operating"
   },
   {
