@@ -123,7 +123,7 @@
    "capacity": 195,
    "country": "France",
    "shareholder": "Orano (100%)",
-   "comment": "MOX fuel fabrication plant, co-located with the Marcoule site.",
+   "comment": "MOX fuel fabrication plant, co-located with the Marcoule site. The capacity shown is the licensed figure. Orano is running a modernisation project of about 300 million euros to extend the plant's life.",
    "status": "operating"
   },
   {
@@ -451,7 +451,7 @@
    "country": "Germany",
    "capacity": 648,
    "shareholder": "Framatome (100%)",
-   "comment": "Potential production line for VVER in discussion",
+   "comment": "Approved in July 2026 to produce VVER-1000 fuel under a TVEL licence, with security conditions including a ban on Rosatom staff entering the site. The approval is contested.",
    "status": "operating"
   },
   {
@@ -463,7 +463,8 @@
    "country": "USA",
    "capacity": 1198,
    "shareholder": "Framatome (100%)",
-   "status": "operating"
+   "status": "operating",
+   "comment": "Licensed by the NRC in May 2026 to fabricate fuel enriched above 5% U-235 (LEU+), with manufacturing scheduled to begin in 2027."
   },
   {
    "id": "d48",
@@ -525,7 +526,7 @@
    "name": "KEPCO Nuclear Fuel",
    "type": "fuelfab-bwrpwr",
    "lat": 36.35,
-   "lon": 126.38,
+   "lon": 127.38,
    "country": "South Korea",
    "capacity": 696,
    "shareholder": "KEPCO (100%)",
@@ -635,7 +636,7 @@
    "name": "Nuclear Fuel Complex",
    "type": "fuelfab-phwr",
    "lat": 17.48,
-   "lon": 77.55,
+   "lon": 78.57,
    "country": "India",
    "capacity": 300,
    "shareholder": "Government of India (100%)",
@@ -646,7 +647,7 @@
    "name": "CONUAR",
    "type": "fuelfab-phwr",
    "lat": -34.82,
-   "lon": -59.53,
+   "lon": -58.53,
    "country": "Argentina",
    "capacity": 160,
    "shareholder": "Argentine government (100%)",
@@ -668,7 +669,7 @@
    "name": "CNNFC Baotou",
    "type": "fuelfab-phwr",
    "lat": 40.657,
-   "lon": 101.84,
+   "lon": 109.84,
    "country": "China",
    "capacity": 199,
    "shareholder": "CNNC (100%)",
