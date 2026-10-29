@@ -1448,7 +1448,7 @@
    "country": "Armenia",
    "capacity": 416,
    "shareholder": "Government of Armenia (100%)",
-   "reactorCount": 0,
+   "reactorCount": 1,
    "status": "operating"
   },
   {
@@ -1686,10 +1686,11 @@
    "lat": 48.264,
    "lon": 18.457,
    "country": "Slovakia",
-   "capacity": 1410,
+   "capacity": 1881,
    "shareholder": "Slovenské elektrárne (100%)",
-   "reactorCount": 3,
-   "status": "operating"
+   "reactorCount": 4,
+   "status": "operating",
+   "comment": "Unit 4 connected to the grid on 15 October 2026."
   },
   {
    "id": "d159",
@@ -1750,7 +1751,7 @@
    "reactorCount": 6,
    "capacity": 5700,
    "status": "suspended",
-   "comment": "All six units in cold shutdown"
+   "comment": "Held by Russian forces since March 2022 and run de facto by Rosatom, while Ukraine claims ownership. All six units are in cold shutdown, with no generation since September 2022 and repeated losses of off-site power."
   },
   {
    "id": "d164",
@@ -1869,7 +1870,7 @@
    "country": "China",
    "capacity": 1456,
    "shareholder": "CNNC (100%)",
-   "reactorCount": 0,
+   "reactorCount": 2,
    "status": "operating"
   },
   {
@@ -1915,10 +1916,11 @@
    "lat": 34.687,
    "lon": 119.46,
    "country": "China",
-   "capacity": 4100,
+   "capacity": 5200,
    "shareholder": "CNNC (50%) / SPIC (30%) / Jiangsu Guoxin Group (20%)",
-   "reactorCount": 4,
-   "status": "operating"
+   "reactorCount": 5,
+   "status": "operating",
+   "comment": "Unit 7 (VVER-1200) connected to the grid on 8 October 2026."
   },
   {
    "id": "d178",
@@ -2095,10 +2097,11 @@
    "lat": 35.32,
    "lon": 129.29,
    "country": "South Korea",
-   "capacity": 2800,
+   "capacity": 4200,
    "shareholder": "KHNP (100%)",
-   "reactorCount": 2,
-   "status": "operating"
+   "reactorCount": 3,
+   "status": "operating",
+   "comment": "Unit 3 reached first criticality in April 2026, with full commercial operation expected in the second half of 2026."
   },
   {
    "id": "d193",
@@ -2194,7 +2197,7 @@
    "country": "India",
    "capacity": 1840,
    "shareholder": "Government of India (100%)",
-   "reactorCount": 3,
+   "reactorCount": 4,
    "status": "operating"
   },
   {
@@ -4368,7 +4371,7 @@
    "shareholder": "Atomic Energy Organization of Iran (100%)",
    "reactorCount": 1,
    "status": "under construction",
-   "comment": "Unit 2"
+   "comment": "Unit 2. Work was reported halted in 2026 after Russian staff were withdrawn following strikes near the site."
   },
   {
    "id": "d384",
@@ -4443,7 +4446,7 @@
    "lat": 14.865,
    "lon": 74.44,
    "country": "India",
-   "capacity": 1260,
+   "capacity": 1400,
    "shareholder": "Government of India (100%)",
    "reactorCount": 2,
    "status": "under construction",
@@ -4456,7 +4459,7 @@
    "lat": 24.872,
    "lon": 75.614,
    "country": "India",
-   "capacity": 630,
+   "capacity": 700,
    "shareholder": "Government of India (100%)",
    "reactorCount": 1,
    "status": "under construction",
@@ -4469,7 +4472,7 @@
    "lat": 8.169,
    "lon": 77.713,
    "country": "India",
-   "capacity": 3668,
+   "capacity": 4000,
    "shareholder": "Government of India (100%)",
    "reactorCount": 4,
    "status": "under construction",
@@ -4482,11 +4485,11 @@
    "lat": 12.558,
    "lon": 80.175,
    "country": "India",
-   "capacity": 470,
+   "capacity": 500,
    "shareholder": "Government of India (100%)",
    "reactorCount": 1,
    "status": "under construction",
-   "comment": "Prototype Fast Breeder Reactor"
+   "comment": "Prototype Fast Breeder Reactor. First criticality on 6 April 2026, not yet connected to the grid."
   },
   {
    "id": "d393",
@@ -4547,11 +4550,11 @@
    "lat": 35.32,
    "lon": 129.29,
    "country": "South Korea",
-   "capacity": 2680,
+   "capacity": 1340,
    "shareholder": "KHNP (100%)",
-   "reactorCount": 2,
+   "reactorCount": 1,
    "status": "under construction",
-   "comment": "Units 3–4 (APR-1400)"
+   "comment": "Unit 4 (APR-1400)"
   },
   {
    "id": "d398",
