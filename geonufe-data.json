@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": 2,
-  "lastUpdated": "2026-10-18"
+  "lastUpdated": "2026-10-29"
  },
  "sites": [
   {
@@ -803,7 +803,8 @@
    "country": "Australia",
    "capacity": 3173,
    "shareholder": "BHP (100%)",
-   "status": "operating"
+   "status": "operating",
+   "comment": "Uranium is a by-product of copper. Payable U3O8 was 817 t in the September 2026 quarter. A first block-cave resource was declared in October 2026, with no development timeline. The 3,173 tU per year figure is nameplate; the September 2026 quarter ran at about 2,770 tU per year."
   },
   {
    "id": "d79",
@@ -814,7 +815,8 @@
    "country": "Canada",
    "capacity": 6900,
    "shareholder": "Cameco (57.418%) / Orano (42.582%)",
-   "status": "operating"
+   "status": "operating",
+   "comment": "Ore is milled at Orano's McClean Lake mill. Mining was suspended for about two weeks in July 2026 after repairs at the mill's acid plant. Cameco bought TEPCO's 5% in mid-2026. 2026 guidance is 17.5 to 18.0 Mlb U3O8 (100%)."
   },
   {
    "id": "d80",
@@ -825,7 +827,8 @@
    "country": "Canada",
    "capacity": 7100,
    "shareholder": "Cameco (69.805%) / Orano (30.195%)",
-   "status": "operating"
+   "status": "operating",
+   "comment": "Flooding in May 2026 cut a supply bridge and reduced mining for about two weeks. Ore is slurried about 80 km to the Key Lake mill, which has a longer maintenance outage in 2026. Licensed to 2043. The 7,100 tU per year figure is licensed capacity; 2026 guidance is 14.0 to 16.5 Mlb U3O8, about 5,400 to 6,350 tU."
   },
   {
    "id": "d81",
@@ -1377,16 +1380,6 @@
    "estimated": true
   },
   {
-   "id": "d127",
-   "name": "Mkuju River",
-   "type": "mine-openpit",
-   "lat": -10.3,
-   "lon": 36.5,
-   "country": "Tanzania",
-   "shareholder": "Rosatom (100%)",
-   "status": "operating"
-  },
-  {
    "id": "d128",
    "name": "Kayelekera",
    "type": "mine-openpit",
@@ -1395,7 +1388,7 @@
    "country": "Malawi",
    "capacity": 900,
    "shareholder": "Lotus Resources Ltd (85%) / Government of Malawi (15%)",
-   "comment": "Restarted August 2025 after 11 years on care-and-maintenance",
+   "comment": "Restarted in 2025 after 11 years on care and maintenance. Output has been intermittent because of sulphuric acid supply. Exports are routed by road through Zambia to Walvis Bay, and the first shipment awaits a Namibian transport permit. The 900 tU per year figure is the target of about 2.4 Mlb U3O8 per year, not current output.",
    "status": "operating"
   },
   {
@@ -1406,8 +1399,8 @@
    "lon": 7.37,
    "country": "Niger",
    "shareholder": "Niger state (100%)",
-   "comment": "Operating status uncertain: likely producing at some level under Niger's own operational control",
-   "status": "operating"
+   "comment": "Nationalised in June 2025 after Orano suspended operations in October 2024. No confirmed production since. About 1,500 tU of stockpile was removed in December 2025 despite an ICSID order, and its sale is unresolved.",
+   "status": "suspended"
   },
   {
    "id": "d134",
@@ -3651,13 +3644,15 @@
   {
    "id": "d323",
    "name": "Etango",
-   "type": "mine-isl",
+   "type": "mine-openpit",
    "country": "Namibia",
    "lat": -22.85,
    "lon": 15.15,
-   "shareholder": "Bannerman Energy Ltd",
-   "status": "planned",
-   "coordConfidence": "Low"
+   "shareholder": "Bannerman Energy (55%) / CNNC (45%)",
+   "status": "under construction",
+   "coordConfidence": "Low",
+   "capacity": 1346,
+   "comment": "Final investment decision taken 23 October 2026. Joint venture held 55% by Bannerman and 45% by CNNC Overseas; the venture owns 95% of the project and a Namibian foundation holds the remaining 5%. Base case 3.5 Mlb U3O8 per year, first production targeted for 2028. Pre-production capex about US$353 million. The capacity shown is the planned base case."
   },
   {
    "id": "d324",
@@ -3668,7 +3663,9 @@
    "country": "Mongolia",
    "shareholder": "Orano (66%) / MonAtom (34%)",
    "status": "under construction",
-   "coordConfidence": "Moderate"
+   "coordConfidence": "Moderate",
+   "capacity": 2500,
+   "comment": "Construction started in June 2026. Nominal output about 2,500 tU per year over a 30-year life, with first production expected around 2030. The Mongolian state receives more than half of the direct benefits. The capacity shown is the planned nominal output."
   },
   {
    "id": "d325",
@@ -3722,7 +3719,8 @@
    "country": "Tanzania",
    "shareholder": "Rosatom (100%)",
    "status": "planned",
-   "coordConfidence": "Low"
+   "coordConfidence": "Low",
+   "comment": "Only a pilot processing plant has been commissioned (July 2025). Commercial mining is targeted for around 2029."
   },
   {
    "id": "d330",
@@ -3854,7 +3852,8 @@
    "lon": -109.25,
    "shareholder": "Anfield Energy Corp",
    "status": "under construction",
-   "coordConfidence": "Moderate"
+   "coordConfidence": "Moderate",
+   "comment": "First underground blast in about 40 years in August 2026, with decline rehabilitation and dewatering under way. No production date or capacity published. Ore would go to the Shootaring Canyon mill, which is on care and maintenance."
   },
   {
    "id": "d342",
@@ -3887,7 +3886,8 @@
    "country": "Niger",
    "shareholder": "Global Atomic Corporation",
    "status": "planned",
-   "coordConfidence": "Low-Moderate"
+   "coordConfidence": "Low-Moderate",
+   "comment": "Financing of up to US$414 million approved by the US DFC in September 2026, conditional on securing a yellowcake export route and extended permits."
   },
   {
    "id": "d345",
@@ -4577,6 +4577,42 @@
    "status": "under construction",
    "comment": "Lead-cooled fast reactor",
    "coordConfidence": "Moderate"
+  },
+  {
+   "id": "d400",
+   "name": "Rook I",
+   "type": "mine-underground",
+   "lat": 58.49,
+   "lon": -109.53,
+   "country": "Canada",
+   "shareholder": "NexGen Energy (100%)",
+   "status": "under construction",
+   "coordConfidence": "Low-Moderate",
+   "comment": "Construction started in August 2026 after federal approval in March, with a build of about four years. Permitted for up to 30 Mlb U3O8 per year."
+  },
+  {
+   "id": "d401",
+   "name": "Phoenix (Wheeler River)",
+   "type": "mine-isl",
+   "lat": 57.5,
+   "lon": -104.6,
+   "country": "Canada",
+   "shareholder": "Denison Mines (90%) / JCU (10%)",
+   "status": "under construction",
+   "coordConfidence": "Low",
+   "comment": "Investment decision taken in February 2026 and full-scale construction launched in July. First production is targeted for mid-2028 using in-situ recovery."
+  },
+  {
+   "id": "d402",
+   "name": "Tumas",
+   "type": "mine-openpit",
+   "lat": -22.88,
+   "lon": 15.0,
+   "country": "Namibia",
+   "shareholder": "Deep Yellow Ltd",
+   "status": "planned",
+   "coordConfidence": "Low",
+   "comment": "The investment decision targeted for Q4 2026 was withdrawn in October 2026 because of weak equity markets, with no new date."
   }
  ],
  "flows": [
