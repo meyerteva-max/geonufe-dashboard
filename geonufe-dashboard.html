@@ -523,7 +523,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 <script>
 const MINE_COLOR='#8B4513';
 const RC={pwr:'#0072B2',bwr:'#56B4E9',vver:'#D55E00',phwr:'#009E73',gcr:'#8C8C8C',fbr:'#CC79A7',htgr:'#F0C000'};
-const FC={mox:'#DDAA33',bwrpwr:'#332288',combo:'#882255',agr:'#117733'};
+const FC={mox:'#DDAA33',bwrpwr:'#332288',combo:'#882255',agr:'#33BBEE'};
 const MINE_KEYS=['mine-openpit','mine-underground','mine-isl','mine-unspecified'];
 const FAB_KEYS=['fuelfab-mox','fuelfab-bwrpwr','fuelfab-vver','fuelfab-combo','fuelfab-phwr','fuelfab-agr'];
 const NPP_TYPE_KEYS=['npp-pwr','npp-bwr','npp-vver','npp-gcr','npp-fbr','npp-htgr','npp-phwr'];
@@ -1247,8 +1247,10 @@ function updateLegend(){
     let html='';
     if(shownTypes.length){
       const ordered=Object.keys(SITE_TYPES).filter(t=>lastShown.types.has(t));
-      const items=ordered.map(t=>{const cfg=SITE_TYPES[t];return `<span class="ml-item">${symbolSVG(cfg.shape,cfg.color,3.4)}${cfg.label}</span>`;}).join('');
-      html+=`<div class="ml-group"><span class="ml-label">Facilities</span>${items}</div>`;
+      const itm=ts=>ts.map(t=>{const cfg=SITE_TYPES[t];return `<span class="ml-item">${symbolSVG(cfg.shape,cfg.color,3.4)}${cfg.label}</span>`;}).join('');
+      const nonFab=ordered.filter(t=>!FAB_KEYS.includes(t)),fab=ordered.filter(t=>FAB_KEYS.includes(t));
+      if(nonFab.length)html+=`<div class="ml-group"><span class="ml-label">Facilities</span>${itm(nonFab)}</div>`;
+      if(fab.length)html+=`<div class="ml-group"><span class="ml-label">Fuel type</span>${itm(fab)}</div>`;
       if(SHOW_HALEU&&lastShown.types.has('enrichment')){html+=`<span class="ml-item" style="margin-left:6px"><span class="ml-dot" style="background:#27498C;border:1.5px solid #F2B705;box-sizing:border-box"></span>HALEU-capable</span>`;}
       const stsShown=STATUS_LIST.filter(s=>lastShown.statuses.has(s));
       if(stsShown.length>1||(stsShown.length===1&&stsShown[0]!=='operating')){
