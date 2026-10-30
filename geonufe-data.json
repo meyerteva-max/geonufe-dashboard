@@ -17930,7 +17930,11 @@
    "natU": null,
    "convU": 24.2,
    "enrU": 12,
-   "nucMix": 68
+   "nucMix": 68,
+   "duYear": 2021,
+   "duNote": "324,000 t of depleted uranium in the Andra national inventory at end of 2021, in tonnes of heavy metal.",
+   "duConf": "Medium-high",
+   "resDU": 324
   },
   {
    "country": "Russia",
@@ -17942,7 +17946,11 @@
    "resCost40": 0,
    "resCost80": 1.722,
    "resCost130": 8.043,
-   "resCost260": 8.224
+   "resCost260": 8.224,
+   "duYear": 2021,
+   "duNote": "More than 1 million t of UF6 cited by the IAEA (snapshot of 31 December 2021), converted here at 0.676 U per UF6. An older estimate based on a 1996 source gave 460,000 tU. The figure could not be verified independently.",
+   "duConf": "Low",
+   "resDU": 676
   },
   {
    "country": "USA",
@@ -17954,7 +17962,11 @@
    "resCost40": 0,
    "resCost80": 0,
    "resCost130": 1.144,
-   "resCost260": 1.53
+   "resCost260": 1.53,
+   "duYear": 2020,
+   "duNote": "About 800,000 t of depleted UF6 held by the DOE at Portsmouth and Paducah (over 67,000 cylinders in 2026), converted here at 0.676 U per UF6. Part is leased for re-enrichment and part is planned for disposal as oxide.",
+   "duConf": "Medium",
+   "resDU": 541
   },
   {
    "country": "Namibia",
@@ -18078,7 +18090,11 @@
    "natU": null,
    "convU": null,
    "enrU": 7.2,
-   "nucMix": 11
+   "nucMix": 11,
+   "duYear": 2022,
+   "duNote": "About 110,000 tHM at 1 April 2022 (UF6 tails and Magnox depleted uranium), excluding Ministry of Defence material. The 2016 derived inventory, which includes it, totals about 177,000 tU.",
+   "duConf": "Medium",
+   "resDU": 110
   },
   {
    "country": "Germany",
@@ -18090,7 +18106,11 @@
    "resCost40": 0,
    "resCost80": 0,
    "resCost130": 0,
-   "resCost260": 0.088
+   "resCost260": 0.088,
+   "duYear": 2017,
+   "duNote": "20,870 t of UF6 stored at Gronau on 31 March 2017, converted here at 0.676 U per UF6. About 10,100 t of oxide from Urenco tails is held in France and is not counted here.",
+   "duConf": "Medium (old)",
+   "resDU": 14
   },
   {
    "country": "Japan",

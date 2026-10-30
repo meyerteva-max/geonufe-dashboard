@@ -488,6 +488,7 @@ body.m-filt .m-backdrop{display:block}
         <div class="dd-item" onclick="setZoneFromDD('resCost80')"><input type="radio" name="zone-radio" id="zr-resCost80"><span class="dd-grad" style="background:linear-gradient(to right,#f1e9f7,#6B3FA0)"></span>&lt; USD 80/kgU</div>
         <div class="dd-item" onclick="setZoneFromDD('resCost130')"><input type="radio" name="zone-radio" id="zr-resCost130"><span class="dd-grad" style="background:linear-gradient(to right,#f1e9f7,#6B3FA0)"></span>&lt; USD 130/kgU</div>
         <div class="dd-item" onclick="setZoneFromDD('resCost260')"><input type="radio" name="zone-radio" id="zr-resCost260"><span class="dd-grad" style="background:linear-gradient(to right,#f1e9f7,#6B3FA0)"></span>&lt; USD 260/kgU</div>
+        <div class="dd-item" onclick="setZoneFromDD('resDU')"><input type="radio" name="zone-radio" id="zr-resDU"><span class="dd-grad" style="background:linear-gradient(to right,#ece6f3,#4B2E83)"></span>Depleted uranium stock</div>
       </div>
     </div>
     <div class="bar1-sep"></div>
@@ -639,7 +640,7 @@ const STATUS_LIST=['operating','suspended','under construction','planned'];
 const STATUS_LABEL={operating:'Operating',suspended:'Suspended','under construction':'Under construction',planned:'Planned'};
 const MINE_METHOD={'mine-isl':'ISL','mine-underground':'Underground','mine-openpit':'Open pit'};
 const MAT={'Natural U':{label:'Natural uranium',color:'#8B4513'},'Converted U':{label:'Converted uranium',color:'#E8820A'},'Enriched U':{label:'Enriched uranium',color:'#27498C'},'Fuel asm.':{label:'Fuel assemblies',color:'#4C8C4A'}};
-const ZONE_CFG={natU:{label:'Natural uranium production share (%)',color:'#8B4513',from:'#f5ede8'},convU:{label:'Converted uranium production share (%)',color:'#E8820A',from:'#fdf0e4'},enrU:{label:'Enriched uranium production share (%)',color:'#27498C',from:'#e8eef8'},nucMix:{label:'Nuclear share in electricity mix (%)',color:'#3A4756',from:'#eef0f3',dark:'#B9C6D6'},resCost40:{label:'Uranium identified recoverable resources — <USD 40/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost80:{label:'Uranium identified recoverable resources — <USD 80/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost130:{label:'Uranium identified recoverable resources — <USD 130/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost260:{label:'Uranium identified recoverable resources — <USD 260/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'}};
+const ZONE_CFG={natU:{label:'Natural uranium production share (%)',color:'#8B4513',from:'#f5ede8'},convU:{label:'Converted uranium production share (%)',color:'#E8820A',from:'#fdf0e4'},enrU:{label:'Enriched uranium production share (%)',color:'#27498C',from:'#e8eef8'},nucMix:{label:'Nuclear share in electricity mix (%)',color:'#3A4756',from:'#eef0f3',dark:'#B9C6D6'},resCost40:{label:'Uranium identified recoverable resources — <USD 40/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost80:{label:'Uranium identified recoverable resources — <USD 80/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost130:{label:'Uranium identified recoverable resources — <USD 130/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost260:{label:'Uranium identified recoverable resources — <USD 260/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resDU:{label:'Depleted uranium stock (thousand tonnes U)',color:'#4B2E83',from:'#ece6f3',max:700,unit:' kt U'}};
 const CHAIN_MAP={
   natU:{sites:MINE_KEYS,flows:[],zone:'natU'},
   convU:{sites:['conversion'],flows:[],zone:'convU'},
@@ -733,7 +734,7 @@ function updateStatusBtn(){const on=STATUS_LIST.filter(s=>state.statuses[s]);con
   if(isDefault){btn.classList.remove('has-selection');badge.style.display='none';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=on.length;}
   STATUS_LIST.forEach(s=>{const cb=document.getElementById('cb-st-'+s);if(cb)cb.checked=state.statuses[s];});}
 function updateFlowsBtn(){syncSelAll();const active=Object.entries(state.flowMats).filter(([,v])=>v).length,total=Object.keys(state.flowMats).length;const btn=document.getElementById('dd-flows-btn'),badge=document.getElementById('dd-flows-badge');if(active===0){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows';}else if(active===total){btn.classList.remove('has-selection');badge.style.display='none';document.getElementById('dd-flows-label').textContent='Flows (all)';}else{btn.classList.add('has-selection');badge.style.display='inline-flex';badge.textContent=active;document.getElementById('dd-flows-label').textContent='Flows';}Object.entries(state.flowMats).forEach(([k,v])=>{const cb=document.getElementById('cb-'+k);if(cb)cb.checked=v;});updateYearSliderVisibility();;updateRouteBtn();}
-function updateZoneBtn(){syncSelAll();const btn=document.getElementById('dd-zone-btn');if(state.zoneMode==='none'){btn.classList.remove('has-selection');}else{btn.classList.add('has-selection');}['none','natU','convU','enrU','nucMix','resCost40','resCost80','resCost130','resCost260'].forEach(m=>{const r=document.getElementById('zr-'+m);if(r)r.checked=(state.zoneMode===m);});}
+function updateZoneBtn(){syncSelAll();const btn=document.getElementById('dd-zone-btn');if(state.zoneMode==='none'){btn.classList.remove('has-selection');}else{btn.classList.add('has-selection');}['none','natU','convU','enrU','nucMix','resCost40','resCost80','resCost130','resCost260','resDU'].forEach(m=>{const r=document.getElementById('zr-'+m);if(r)r.checked=(state.zoneMode===m);});}
 function updateCountryBtn(){const btn=document.getElementById('dd-country-btn'),label=document.getElementById('dd-country-label'),n=state.countries.length;if(n){btn.classList.add('has-selection');label.textContent=n===1?state.countries[0]:`${n} countries`;}else{btn.classList.remove('has-selection');label.textContent='Country';}
   document.querySelectorAll('#country-list input').forEach(cb=>{cb.checked=state.countries.includes(cb.value);});}
 function updateOwnerBtn(){const btn=document.getElementById('dd-owner-btn'),label=document.getElementById('dd-owner-label');if(state.ownerFilter){btn.classList.add('has-selection');label.textContent=state.ownerFilter;}else{btn.classList.remove('has-selection');label.textContent='Owner';}}
@@ -863,7 +864,8 @@ function buildCountrySummary(country){
   [['natU','Natural uranium'],['convU','Converted uranium'],['enrU','Enriched uranium']].forEach(([k,lab])=>{const v=zoneVal(country,k);if(v!=null)prod.push([lab,v+'%']);});
   const res=[];
   [['resCost40','< USD 40/kgU'],['resCost80','< USD 80/kgU'],['resCost130','< USD 130/kgU'],['resCost260','< USD 260/kgU']].forEach(([k,lab])=>{const v=zoneVal(country,k);if(v!=null)res.push([lab,v+'%']);});
-  const body=sec('Nuclear power',nuc)+sec('Share of world capacity',cap)+sec('Share of world production',prod)+sec('Identified recoverable resources (% of world)',res);
+  {const v=zoneVal(country,'resDU');if(v!=null)res.push(['Depleted uranium stock',v+' kt U']);}
+  const body=sec('Nuclear power',nuc)+sec('Share of world capacity',cap)+sec('Share of world production',prod)+sec('Identified recoverable resources and depleted uranium',res);
   return `<div class="cs-block"><div class="cs-head">${country}</div>${body||'<div class="cs-foot">No data for this country in the dataset.</div>'}</div>`;
 }
 function buildCentroids(features){const idToNames={};Object.entries(nameToId).forEach(([name,id])=>{if(!idToNames[id])idToNames[id]=[];idToNames[id].push(name);});features.forEach(f=>{const id=+f.id;if(!idToNames[id])return;let geo;if(f.geometry&&f.geometry.type==='MultiPolygon'){let best=null,bestArea=-1;f.geometry.coordinates.forEach(polyCoords=>{const feat={type:'Feature',geometry:{type:'Polygon',coordinates:polyCoords}};const area=Math.abs(d3.geoArea(feat));if(area>bestArea){bestArea=area;best=feat;}});geo=best?d3.geoCentroid(best):d3.geoCentroid(f);}else{geo=d3.geoCentroid(f);}const pt=proj(geo);if(!pt||isNaN(pt[0]))return;idToNames[id].forEach(name=>{centroids[name]=pt;});});}
@@ -1172,10 +1174,10 @@ function flowTrend(container,m){
   });
   return {destroy(){const r=tip();if(r)r.style.display='none';}};
 }
-const RES_KEYS=['resCost40','resCost80','resCost130','resCost260'];
+const RES_KEYS=['resCost40','resCost80','resCost130','resCost260','resDU'];
 function setResCost(i){state.zoneMode=RES_KEYS[+i];applyStateToUI();renderMap();updateChartPanel();}
-const RES_OPTS=[['Low cost','< USD 40 per kgU'],['Moderate cost','< USD 80 per kgU'],['Higher cost','< USD 130 per kgU'],['All known deposits','< USD 260 per kgU, incl. very costly ones']];
-function updateResSwitch(){const on=state.chainStep==='resources',sw=document.getElementById('res-sw');if(!sw)return;sw.style.display=on?'':'none';if(on){const i=Math.max(0,RES_KEYS.indexOf(state.zoneMode)),o=document.getElementById('res-opts');o.innerHTML=RES_OPTS.map((x,k)=>`<button class="rc-o${k===i?' on':''}" onclick="setResCost(${k})"><b>${x[0]}</b><span>${x[1]}</span></button>`).join('');}}
+const RES_OPTS=[['Low cost','< USD 40 per kgU'],['Moderate cost','< USD 80 per kgU'],['Higher cost','< USD 130 per kgU'],['All known deposits','< USD 260 per kgU, incl. very costly ones'],['Depleted uranium stock','Tails held by country, thousand tonnes of uranium']];
+function updateResSwitch(){const on=state.chainStep==='resources',sw=document.getElementById('res-sw');if(!sw)return;const rt=sw.querySelector('.rc-t');if(rt)rt.textContent=state.zoneMode==='resDU'?'Resources above ground':'How costly is it to extract?';const rf=sw.querySelector('.rc-f');if(rf){if(!rf.dataset.o)rf.dataset.o=rf.innerHTML;rf.innerHTML=state.zoneMode==='resDU'?'Sources: DOE, Andra, NDA, IAEA and the German Bundestag, with reference years from 2017 to 2022 (see the statistics panel). Converted to tonnes of uranium. Grey countries have no recent public figure.':rf.dataset.o;}sw.style.display=on?'':'none';if(on){const i=Math.max(0,RES_KEYS.indexOf(state.zoneMode)),o=document.getElementById('res-opts');o.innerHTML=RES_OPTS.map((x,k)=>`<button class="rc-o${k===i?' on':''}" onclick="setResCost(${k})"><b>${x[0]}</b><span>${x[1]}</span></button>`).join('');}}
 function buildAdvPanel(body){
   const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const list=sites.filter(s=>s.adv&&inC(s.country)&&(!state.ownerFilter||siteHasOwner(s,state.ownerFilter)));
@@ -1197,7 +1199,18 @@ function buildAdvPanel(body){
   body.insertAdjacentHTML('beforeend',h);
 }
 function updateAdvCard(){const c=document.getElementById('adv-card');if(c)c.style.display=state.chainStep==='advFuel'?'':'none';}
+function buildDuPanel(body){
+  const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  document.getElementById('cp-title').textContent='Depleted uranium stocks';
+  document.getElementById('cp-subtitle').textContent='Thousand tonnes of uranium · latest value per country';
+  const rows=zones.filter(z=>z.resDU!=null).sort((a,b)=>b.resDU-a.resDU);
+  let h=`<div class="cs-foot" style="padding:0 0 8px;font-style:normal">Depleted uranium (tails) is a possible feedstock for re-enrichment and advanced fuels, and in some countries it is also classed as waste. Figures differ in year, form and source, so they are indicative only. Countries not listed have no recent public figure.</div>`;
+  rows.forEach(z=>{h+=`<div class="ol-row2" style="cursor:default"><div class="ol-main"><div class="ol-l1"><span class="ol-n">${esc(z.country)}</span><span class="ol-p">${z.resDU.toLocaleString('en-US')} kt U</span></div><div class="cs-foot" style="padding:1px 0 0;font-style:normal">${z.duYear} · confidence: ${esc(z.duConf)}<br>${esc(z.duNote)}</div></div></div>`;});
+  h+=`<div class="cs-foot" style="padding:8px 0 0">For comparison, the World Nuclear Association gives nearly 1,600 kt worldwide, growing by more than 50 kt per year. Published world and national figures do not reconcile, mainly because of the Russian estimate.</div>`;
+  body.insertAdjacentHTML('beforeend',h);
+}
 function buildResPanel(body){
+  if(state.zoneMode==='resDU'){buildDuPanel(body);return;}
   const RC=[['resCost40','< USD 40/kgU'],['resCost80','< USD 80/kgU'],['resCost130','< USD 130/kgU'],['resCost260','< USD 260/kgU']];
   if(!RC.some(x=>x[0]===state.zoneMode))state.zoneMode='resCost130';
   const key=state.zoneMode,lab=RC.find(x=>x[0]===key)[1];
@@ -1462,7 +1475,7 @@ function updateLegend(){
       html+=`<div class="ml-group"><span class="ml-label">Flow type</span>${typeItems}<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Volume</span>${strokeItems}${routeLegend()}</div>`;
     }
     if(zoneOn){const cfg=ZONE_CFG[state.zoneMode];
-      html=`<div class="ml-group"><span class="ml-label">${/^resCost/.test(state.zoneMode)?'Identified recoverable uranium resources (% of world)':cfg.label}</span>${/^resCost/.test(state.zoneMode)?`<span class="ml-item" style="font-weight:600;color:#6B3FA0">Extraction cost: ${cfg.label.match(/<USD \d+\/kgU/)[0].replace('<','< ').replace('/kgU',' per kgU')}</span>`:''}<span class="ml-item">0%</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${zTo(cfg)})"></span><span class="ml-item">100%</span></div>`+html;}
+      html=`<div class="ml-group"><span class="ml-label">${/^resCost/.test(state.zoneMode)?'Identified recoverable uranium resources (% of world)':cfg.label}</span>${/^resCost/.test(state.zoneMode)?`<span class="ml-item" style="font-weight:600;color:#6B3FA0">Extraction cost: ${cfg.label.match(/<USD \d+\/kgU/)[0].replace('<','< ').replace('/kgU',' per kgU')}</span>`:''}<span class="ml-item">0${cfg.unit||'%'}</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${zTo(cfg)})"></span><span class="ml-item">${cfg.max||100}${cfg.unit||'%'}</span></div>`+html;}
     inner.innerHTML=html;
   }
 }
@@ -1521,7 +1534,7 @@ async function initMap(){
   zoomBehavior=d3.zoom().scaleExtent([1,12]).translateExtent([[0,0],[W,H]]).on('zoom',event=>{d3.select('#zoomable').attr('transform',event.transform);applyZoomScale(event.transform.k);updateToponyms(event.transform);maybeLoadDetail(event.transform.k);closeSitePopup();}).on('end',()=>updateLegend());
   svgEl.call(zoomBehavior).on('dblclick.zoom',null);
   d3.select('#countries-layer').selectAll('path').data(worldFeatures).join('path').attr('class','cp').attr('d',path).attr('fill',TH().land).attr('stroke',TH().border).attr('stroke-width',0.6).each(function(d){this._id=d.id;})
-    .on('mousemove',function(event,d){if(state.zoneMode==='none')return;const zd=getZoneData(d);if(!zd)return;const r=mw.getBoundingClientRect(),cfg=ZONE_CFG[state.zoneMode],val=zd[state.zoneMode];document.getElementById('ttc').textContent=zd.country;document.getElementById('ttr').textContent=cfg?`${cfg.label}: ${val!=null?val+'%':'no data'}`:'';const tt=document.getElementById('tooltip');tt.style.display='block';tt.style.left=Math.min(event.clientX-r.left+14,360)+'px';tt.style.top=Math.min(event.clientY-r.top-10,340)+'px';})
+    .on('mousemove',function(event,d){if(state.zoneMode==='none')return;const zd=getZoneData(d);if(!zd)return;const r=mw.getBoundingClientRect(),cfg=ZONE_CFG[state.zoneMode],val=zd[state.zoneMode];document.getElementById('ttc').textContent=zd.country;document.getElementById('ttr').textContent=cfg?`${cfg.label}: ${val!=null?val+(cfg.unit||'%'):'no data'}`+(state.zoneMode==='resDU'&&zd.duYear?` (${zd.duYear}, ${zd.duConf})`:''):'';const tt=document.getElementById('tooltip');tt.style.display='block';tt.style.left=Math.min(event.clientX-r.left+14,360)+'px';tt.style.top=Math.min(event.clientY-r.top-10,340)+'px';})
     .on('mouseleave',()=>document.getElementById('tooltip').style.display='none').on('click',()=>closeSitePopup());
   svgEl.on('click',()=>closeSitePopup());
   let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(renderMap,150);});
@@ -1539,7 +1552,7 @@ function getZoneData(feature){
   if(withVal.length)return withVal[0];
   return candidates.slice().sort((a,b)=>b.year-a.year)[0];
 }
-function choroColor(val,cfg){return d3.interpolateRgb(zFrom(cfg),zTo(cfg))(Math.sqrt(Math.min(val/100,1)));}
+function choroColor(val,cfg){return d3.interpolateRgb(zFrom(cfg),zTo(cfg))(Math.sqrt(Math.min(val/(cfg.max||100),1)));}
 function buildArrowRibbonPath(x1,y1,mx,my,x2,y2,halfWidth,arrowLen,arrowHalfWidth){
   const N=14,pts=[];
   for(let i=0;i<=N;i++){const t=i/N,o=1-t;pts.push([o*o*x1+2*o*t*mx+t*t*x2,o*o*y1+2*o*t*my+t*t*y2]);}
