@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": 2,
-  "lastUpdated": "2026-10-29"
+  "lastUpdated": "2026-10-30"
  },
  "sites": [
   {
@@ -90,7 +90,12 @@
    "shareholder": "Urenco (100%)",
    "haleu": false,
    "comment": "Output of about 4,650 tSWU per year after the first cascades of the expansion started in 2025-2026. The expansion completes in 2027, taking the plant to about 5,000, and a new 2,100 tSWU per year facility is planned from 2032 for 7,100 in total. The plant has produced LEU+ (up to about 10% U-235), not HALEU.",
-   "status": "operating"
+   "status": "operating",
+   "adv": true,
+   "advStage": "enrichment",
+   "advProduct": "LEU+",
+   "advMaxEnrich": "About 10% (first 8.5% produced in December 2025)",
+   "advCapacity": "Not published"
   },
   {
    "id": "d12",
@@ -235,7 +240,12 @@
    "shareholder": "Urenco (100%)",
    "haleu": true,
    "comment": "A new HALEU line of up to 27 tonnes per year is planned, with construction from 2028 and first production in the early 2030s. Not yet producing HALEU.",
-   "status": "operating"
+   "status": "operating",
+   "adv": true,
+   "advStage": "enrichment",
+   "advProduct": "HALEU (planned, early 2030s)",
+   "advMaxEnrich": "Up to 19.75%",
+   "advCapacity": "Up to 27 t HALEU per year (planned)"
   },
   {
    "id": "d29",
@@ -322,7 +332,12 @@
    "shareholder": "Centrus (100%)",
    "haleu": true,
    "comment": "The 16-centrifuge cascade produces HALEU (about 900 kg per year) and moved from the DOE demonstration contract to commercial operation in July 2026. A US$900 million DOE contract funds 12 tonnes per year of new HALEU capacity, with first new capacity expected by 2029. The capacity shown is a placeholder, not a SWU figure.",
-   "status": "operating"
+   "status": "operating",
+   "adv": true,
+   "advStage": "enrichment",
+   "advProduct": "HALEU",
+   "advMaxEnrich": "19.75%",
+   "advCapacity": "About 0.9 t HALEU per year (12 t per year planned, by 2029)"
   },
   {
    "id": "d36",
@@ -464,7 +479,12 @@
    "capacity": 1198,
    "shareholder": "Framatome (100%)",
    "status": "operating",
-   "comment": "Licensed by the NRC in May 2026 to fabricate fuel enriched above 5% U-235 (LEU+), with manufacturing scheduled to begin in 2027."
+   "comment": "Licensed by the NRC in May 2026 to fabricate fuel enriched above 5% U-235 (LEU+), with manufacturing scheduled to begin in 2027.",
+   "adv": true,
+   "advStage": "fabrication",
+   "advProduct": "LEU+ fuel; HALEU metal (pilot line)",
+   "advMaxEnrich": "Above 5% (LEU+ licence)",
+   "advCapacity": "Not published"
   },
   {
    "id": "d48",
@@ -4618,6 +4638,143 @@
    "status": "planned",
    "coordConfidence": "Low",
    "comment": "The investment decision targeted for Q4 2026 was withdrawn in October 2026 because of weak equity markets, with no new date."
+  },
+  {
+   "id": "d403",
+   "name": "Orano Oak Ridge (Project IKE)",
+   "type": "enrichment",
+   "lat": 35.93,
+   "lon": -84.31,
+   "country": "USA",
+   "shareholder": "Orano (100%)",
+   "status": "planned",
+   "capacity": 7400,
+   "coordConfidence": "Low-Moderate",
+   "comment": "Centrifuge plant for which Orano filed an NRC licence application in March 2026. A US$900 million DOE award supports the project, estimated at nearly US$5 billion.",
+   "adv": true,
+   "advStage": "enrichment",
+   "advProduct": "LEU and LEU+",
+   "advMaxEnrich": "Not stated",
+   "advCapacity": "7,400 tSWU per year planned"
+  },
+  {
+   "id": "d404",
+   "name": "General Matter Paducah",
+   "type": "enrichment",
+   "lat": 37.12,
+   "lon": -88.81,
+   "country": "USA",
+   "shareholder": "General Matter",
+   "status": "planned",
+   "coordConfidence": "Low-Moderate",
+   "comment": "HALEU enrichment plant on land leased from the DOE. Licence application submitted in September 2026, with operations planned for 2034. A US$900 million DOE award supports the project. The technology is undisclosed.",
+   "adv": true,
+   "advStage": "enrichment",
+   "advProduct": "HALEU",
+   "advMaxEnrich": "19.75%",
+   "advCapacity": "Not disclosed"
+  },
+  {
+   "id": "d405",
+   "name": "Paducah Laser Enrichment Facility",
+   "type": "enrichment",
+   "lat": 37.12,
+   "lon": -88.78,
+   "country": "USA",
+   "shareholder": "Global Laser Enrichment",
+   "status": "planned",
+   "coordConfidence": "Low-Moderate",
+   "comment": "Laser enrichment plant using DOE depleted uranium tails. The final environmental statement was issued in October 2026. A DOE agreement requires operation by the end of 2030.",
+   "adv": true,
+   "advStage": "enrichment",
+   "advProduct": "LEU+ (laser enrichment)",
+   "advMaxEnrich": "Up to 8%",
+   "advCapacity": "Not disclosed"
+  },
+  {
+   "id": "d406",
+   "name": "Framatome Richland (HALEU metallisation pilot)",
+   "type": "adv-conversion",
+   "lat": 46.28,
+   "lon": -119.28,
+   "country": "USA",
+   "shareholder": "Framatome (100%)",
+   "status": "operating",
+   "coordConfidence": "Moderate",
+   "comment": "Pilot line developed with TerraPower to turn enriched uranium into metal for the Natrium reactor. The pilot uses natural or depleted uranium, and a full-scale HALEU metal plant depends on a DOE contract.",
+   "adv": true,
+   "advStage": "conversion",
+   "advProduct": "HALEU metal",
+   "advMaxEnrich": "Pilot uses natural or depleted uranium",
+   "advCapacity": "Pilot scale"
+  },
+  {
+   "id": "d407",
+   "name": "BWXT Lynchburg",
+   "type": "adv-fabrication",
+   "lat": 37.37,
+   "lon": -79.19,
+   "country": "USA",
+   "shareholder": "BWX Technologies (100%)",
+   "status": "operating",
+   "coordConfidence": "Moderate",
+   "comment": "TRISO production began in December 2022 for the Project Pele microreactor. A furnace for the Advanced Reactor Demonstration Program was completed in 2025.",
+   "adv": true,
+   "advStage": "fabrication",
+   "advProduct": "TRISO fuel",
+   "advMaxEnrich": "HALEU",
+   "advCapacity": "Not published"
+  },
+  {
+   "id": "d408",
+   "name": "Standard Nuclear Oak Ridge",
+   "type": "adv-fabrication",
+   "lat": 35.95,
+   "lon": -84.3,
+   "country": "USA",
+   "shareholder": "Standard Nuclear",
+   "status": "operating",
+   "coordConfidence": "Low-Moderate",
+   "comment": "TRISO fuel plant that received its first HALEU feedstock in December 2025 and supports the start-up of the Radiant reactor.",
+   "adv": true,
+   "advStage": "fabrication",
+   "advProduct": "TRISO fuel",
+   "advMaxEnrich": "HALEU",
+   "advCapacity": "Not published"
+  },
+  {
+   "id": "d409",
+   "name": "TRISO-X TX-1",
+   "type": "adv-fabrication",
+   "lat": 35.92,
+   "lon": -84.39,
+   "country": "USA",
+   "shareholder": "X-energy (100%)",
+   "status": "under construction",
+   "coordConfidence": "Low-Moderate",
+   "comment": "Commercial TRISO plant at the Horizon Center in Oak Ridge, under construction since November 2025. The NRC issued the licence in February 2026 for a 40-year term, and final inspections are needed before HALEU is received.",
+   "adv": true,
+   "advStage": "fabrication",
+   "advProduct": "TRISO fuel",
+   "advMaxEnrich": "HALEU",
+   "advCapacity": "Not published"
+  },
+  {
+   "id": "d410",
+   "name": "CNNC Baotou HTR-PM fuel plant",
+   "type": "adv-fabrication",
+   "lat": 40.657,
+   "lon": 109.84,
+   "country": "China",
+   "shareholder": "CNNC (100%)",
+   "status": "operating",
+   "coordConfidence": "Moderate",
+   "comment": "Produces the spherical TRISO fuel elements for the HTR-PM reactors at Shidao Bay. Enrichment and capacity figures come from earlier published descriptions and have not been rechecked.",
+   "adv": true,
+   "advStage": "fabrication",
+   "advProduct": "HTR-PM pebble fuel (TRISO)",
+   "advMaxEnrich": "About 8.5%",
+   "advCapacity": "About 300,000 pebbles per year"
   }
  ],
  "flows": [

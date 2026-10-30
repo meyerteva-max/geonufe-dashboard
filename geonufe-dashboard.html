@@ -340,6 +340,7 @@ body.m-filt .m-backdrop{display:block}
 .filter-banner{display:none!important}
 .res-card{top:8px;left:8px;width:176px;padding:8px 9px}
 .res-card .rc-s{display:none}
+#adv-card .rc-s{display:block;font-size:10px;line-height:1.4}
 .legend-box{left:8px;bottom:8px;max-width:calc(100% - 16px)}
 .zoom-controls{top:8px;right:8px}
 .zoom-btn{width:38px;height:38px;font-size:16px}
@@ -392,6 +393,7 @@ body.m-filt .m-backdrop{display:block}
     <div class="chain-chip" id="cc-enrU" onclick="setChainStep('enrU',this)"><span class="chain-chip-dot" style="background:#27498C"></span>Enrichment</div>
     <div class="chain-chip" id="cc-fuelAsm" onclick="setChainStep('fuelAsm',this)"><span class="chain-chip-dot" style="background:#4C8C4A"></span>Fuel assemblies</div>
     <div class="chain-chip" id="cc-electricity" onclick="setChainStep('electricity',this)"><span class="chain-chip-dot" style="background:#C0392B"></span>Power Plants</div>
+    <div class="chain-chip" id="cc-advFuel" onclick="setChainStep('advFuel',this)"><span class="chain-chip-dot" style="background:#AA4499"></span>Advanced fuels</div>
     <button class="clear-x" id="chain-clear" onclick="clearChainStep()" style="display:none">✕</button>
   </div>
   <div class="m-bar"><button class="primary" onclick="mFilters(true)">Filters</button><button onclick="resetAll()">Reset map</button></div>
@@ -432,6 +434,9 @@ body.m-filt .m-backdrop{display:block}
         <div class="dd-item" onclick="toggleSiteType('npp-fbr')"><input type="checkbox" id="cb-npp-fbr"><span class="dd-shape" id="shape-npp-fbr"></span>FBR</div>
         <div class="dd-item" onclick="toggleSiteType('npp-htgr')"><input type="checkbox" id="cb-npp-htgr"><span class="dd-shape" id="shape-npp-htgr"></span>HTGR</div>
         <div class="dd-item" onclick="toggleSiteType('npp-phwr')"><input type="checkbox" id="cb-npp-phwr"><span class="dd-shape" id="shape-npp-phwr"></span>PHWR</div>
+        <div class="dd-section-label"><span>Advanced fuels</span><button class="dd-section-selectall" onclick="toggleFacilityGroup('advfuel',event)">Select all</button></div>
+        <div class="dd-item" onclick="toggleSiteType('adv-conversion')"><input type="checkbox" id="cb-adv-conversion"><span class="dd-shape" id="shape-adv-conversion"></span>HALEU conversion / metallisation</div>
+        <div class="dd-item" onclick="toggleSiteType('adv-fabrication')"><input type="checkbox" id="cb-adv-fabrication"><span class="dd-shape" id="shape-adv-fabrication"></span>Advanced fuel fabrication (TRISO, metallic)</div>
         <div class="dd-section-label">Reprocessing</div>
         <div class="dd-item" onclick="toggleSiteType('reprocessing')"><input type="checkbox" id="cb-reprocessing"><span class="dd-shape" id="shape-reprocessing"></span>Reprocessing</div>
       </div>
@@ -535,6 +540,7 @@ body.m-filt .m-backdrop{display:block}
           <button class="zoom-btn zoom-reset" onclick="zoomReset()">FIT</button>
           <button class="zoom-btn" id="topoBtn" onclick="toggleToponyms()" title="Show / hide country names" style="font-size:11px;font-weight:600">Aa</button>
         </div>
+        <div class="res-card" id="adv-card" style="display:none;border-color:#AA4499"><div class="rc-t">Advanced fuels</div><div class="rc-s">HALEU is uranium enriched to between 5% and 20% U-235, LEU+ to between 5% and 10%. Many new reactor designs need them. Hollow symbols are projects not yet operating.</div></div>
         <div class="res-card" id="res-sw" style="display:none"><div class="rc-t">How costly is it to extract?</div><div class="rc-s">Uranium that can be mined for less than a given price. Higher price limits include more deposits, so the map fills up.</div><div class="rc-opts" id="res-opts"></div><div class="rc-f">Price per kg of uranium (USD/kgU). Grey countries reported no resources in this category, which does not always mean there are none. Source: OECD-NEA/IAEA, Uranium 2024 (Red Book), identified recoverable resources as of 1 January 2023.</div></div>
         <div class="legend-box">
           <div class="map-legend" id="mapLegend"><div class="ml-head" onclick="toggleLegend()" title="Show / hide legend"><span>Legend</span><span class="ml-caret" id="ml-caret">▾</span></div><div class="ml-inner" id="ml-inner"></div></div>
@@ -554,6 +560,8 @@ body.m-filt .m-backdrop{display:block}
             <div class="sp-row"><span class="sp-key">Host country</span><span class="sp-val" id="sp-ctry"></span></div>
             <div class="sp-row" id="sp-status-row" style="display:none"><span class="sp-key">Status</span><span class="sp-val" id="sp-status"></span></div>
             <div class="sp-row" id="sp-method-row" style="display:none"><span class="sp-key">Mining method</span><span class="sp-val" id="sp-method"></span></div>
+            <div class="sp-row" id="sp-adv1-row" style="display:none"><span class="sp-key">Fuel product</span><span class="sp-val" id="sp-adv1" style="white-space:normal;text-align:right"></span></div>
+            <div class="sp-row" id="sp-adv2-row" style="display:none"><span class="sp-key">Max. enrichment</span><span class="sp-val" id="sp-adv2" style="white-space:normal;text-align:right"></span></div>
             <div class="sp-row" id="sp-cap-row"><span class="sp-key">Capacity</span><span class="sp-val" id="sp-cap"></span></div>
             <div class="sp-row" id="sp-reactors-row" style="display:none"><span class="sp-key">Reactors</span><span class="sp-val" id="sp-reactors"></span></div>
             <div class="sp-row" id="sp-loc-row" style="display:none"><span class="sp-key">Location</span><span class="sp-val" id="sp-loc"></span></div>
@@ -622,9 +630,11 @@ const SITE_TYPES={
   'npp-htgr': {label:'HTGR', fullLabel:'Nuclear power plant — HTGR', color:RC.htgr,unit:'MWe',shape:'circle',stage:'npp',hasCapacity:true,isNPP:true},
   'npp-phwr': {label:'PHWR', fullLabel:'Nuclear power plant — PHWR', color:RC.phwr,unit:'MWe',shape:'circle',stage:'npp',hasCapacity:true,isNPP:true},
   reprocessing:{label:'Reprocessing',                   color:'#69BFB7', unit:'t/yr',   shape:'diamond', stage:'reprocessing',hasCapacity:true},
+  'adv-conversion':{label:'HALEU conversion / metallisation',color:'#AA4499',unit:'t/yr',shape:'diamond',stage:'advfuel',hasCapacity:true},
+  'adv-fabrication':{label:'Advanced fuel fabrication',fullLabel:'Advanced fuel fabrication (TRISO, metallic)',color:'#AA4499',unit:'t/yr',shape:'square',stage:'advfuel',hasCapacity:true},
 };
-const STAGE_INFO={mining:{label:'Mining',unit:'tU/yr'},conversion:{label:'Conversion',unit:'tU/yr'},enrichment:{label:'Enrichment',unit:'tSWU/yr'},fuelfab:{label:'Fuel fabrication',unit:'t/yr'},npp:{label:'Power plants',unit:'MWe'},reprocessing:{label:'Reprocessing',unit:'t/yr'}};
-const STAGE_ORDER=['mining','conversion','enrichment','fuelfab','npp','reprocessing'];
+const STAGE_INFO={advfuel:{label:'Advanced fuels',unit:'t/yr'},mining:{label:'Mining',unit:'tU/yr'},conversion:{label:'Conversion',unit:'tU/yr'},enrichment:{label:'Enrichment',unit:'tSWU/yr'},fuelfab:{label:'Fuel fabrication',unit:'t/yr'},npp:{label:'Power plants',unit:'MWe'},reprocessing:{label:'Reprocessing',unit:'t/yr'}};
+const STAGE_ORDER=['mining','conversion','enrichment','fuelfab','npp','reprocessing','advfuel'];
 const STATUS_LIST=['operating','suspended','under construction','planned'];
 const STATUS_LABEL={operating:'Operating',suspended:'Suspended','under construction':'Under construction',planned:'Planned'};
 const MINE_METHOD={'mine-isl':'ISL','mine-underground':'Underground','mine-openpit':'Open pit'};
@@ -636,9 +646,10 @@ const CHAIN_MAP={
   enrU:{sites:['enrichment'],flows:[],zone:'enrU'},
   fuelAsm:{sites:FAB_KEYS,flows:[],zone:null},
   electricity:{sites:NPP_TYPE_KEYS,flows:[],zone:'nucMix'},
-  resources:{sites:[],flows:[],zone:'resCost130'}
+  resources:{sites:[],flows:[],zone:'resCost130'},
+  advFuel:{sites:['adv-conversion','adv-fabrication'],flows:[],zone:null}
 };
-const CHAIN_COLORS={natU:'#8B4513',convU:'#E8820A',enrU:'#27498C',fuelAsm:'#4C8C4A',electricity:'#C0392B',resources:'#6B3FA0'};
+const CHAIN_COLORS={natU:'#8B4513',convU:'#E8820A',enrU:'#27498C',fuelAsm:'#4C8C4A',electricity:'#C0392B',resources:'#6B3FA0',advFuel:'#AA4499'};
 const nameToId={'Afghanistan':4,'Albania':8,'Algeria':12,'Angola':24,'Argentina':32,'Armenia':51,'Australia':36,'Austria':40,'Azerbaijan':31,'Bangladesh':50,'Belarus':112,'Belgium':56,'Bolivia':68,'Botswana':72,'Brazil':76,'Bulgaria':100,'Cambodia':116,'Cameroon':120,'Canada':124,'Central African Republic':140,'Chad':148,'Chile':152,'China':156,'Colombia':170,'Congo, Dem. Rep.':180,'Croatia':191,'Czech Republic':203,'Denmark':208,'Ecuador':218,'Egypt':818,'Finland':246,'France':250,'Gabon':266,'Georgia':268,'Germany':276,'Greece':300,'Guyana':328,'Hungary':348,'India':356,'Indonesia':360,'Iran':364,'Iraq':368,'Ireland':372,'Israel':376,'Italy':380,'Japan':392,'Jordan':400,'Kazakhstan':398,'Kenya':404,'Kyrgyzstan':417,'South Korea':410,'Latvia':428,'Libya':434,'Lithuania':440,'Malawi':454,'Malaysia':458,'Mali':466,'Mauritania':478,'Mexico':484,'Mongolia':496,'Morocco':504,'Namibia':516,'Netherlands':528,'Niger':562,'Nigeria':566,'Norway':578,'Pakistan':586,'Paraguay':600,'Peru':604,'Philippines':608,'Poland':616,'Portugal':620,'Romania':642,'Russia':643,'Saudi Arabia':682,'Senegal':686,'Serbia':688,'Slovakia':703,'Slovenia':705,'Somalia':706,'South Africa':710,'Spain':724,'Sweden':752,'Switzerland':756,'Tanzania':834,'Turkey':792,'Türkiye':792,'Ukraine':804,'United Arab Emirates':784,'UK':826,'USA':840,'Uzbekistan':860,'Vietnam':704,'Zambia':894,'Zimbabwe':716};
 const CHART_PALETTE=['#4A6FA5','#5A8A6A','#A05C4A','#8A7840','#6A5A8A','#3D7A8A','#8A4A68','#4A7A5A','#8A6A3A','#3A6A7A','#6A4A8A','#7A5A3A'];
 const COUNTRY_COLORS={};['Kazakhstan','Canada','Namibia','Australia','Niger','Russia','Other','USA','France','China','S. Korea','Germany','Netherlands','UK','Japan'].forEach((c,i)=>{COUNTRY_COLORS[c]=CHART_PALETTE[i%CHART_PALETTE.length];});
@@ -779,7 +790,7 @@ function resetAll(){
 }
 function leaveQuickView(){state.chainStep='';state.showAllTypes=false;clearChainUI();}
 function toggleAllFacilities(){const anyOn=Object.values(state.siteTypes).some(Boolean);Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=!anyOn;});leaveQuickView();updateFacilitiesBtn();renderMap();}
-const FACILITY_GROUPS={mining:MINE_KEYS,fuelfab:FAB_KEYS,npp:NPP_TYPE_KEYS};
+const FACILITY_GROUPS={mining:MINE_KEYS,fuelfab:FAB_KEYS,npp:NPP_TYPE_KEYS,advfuel:['adv-conversion','adv-fabrication']};
 function toggleFacilityGroup(key,event){if(event)event.stopPropagation();const types=FACILITY_GROUPS[key];if(!types)return;const anyOn=types.some(t=>state.siteTypes[t]);types.forEach(t=>{state.siteTypes[t]=!anyOn;});leaveQuickView();updateFacilitiesBtn();renderMap();}
 function toggleSiteType(t){event.stopPropagation();state.siteTypes[t]=!state.siteTypes[t];leaveQuickView();updateFacilitiesBtn();renderMap();}
 function toggleStatus(s){event.stopPropagation();state.statuses[s]=!state.statuses[s];updateStatusBtn();renderMap();}
@@ -906,6 +917,10 @@ function showSitePopup(site,px,py,mw){
   else if(site.capacityNote){capRow.style.display='flex';capEl.textContent=site.capacityNote.charAt(0).toUpperCase()+site.capacityNote.slice(1);}
   else if(cfg.fixed&&site.capacity){capRow.style.display='flex';capEl.textContent=`${Number(site.capacity).toLocaleString('en-US')} ${cfg.unit}`;}
   else capRow.style.display='none';
+  const a1=document.getElementById('sp-adv1-row'),a2=document.getElementById('sp-adv2-row');
+  if(site.adv){a1.style.display='flex';document.getElementById('sp-adv1').textContent=site.advProduct||'';a2.style.display='flex';document.getElementById('sp-adv2').textContent=site.advMaxEnrich||'';
+    if(site.advCapacity){capRow.style.display='flex';capEl.style.whiteSpace='normal';capEl.style.textAlign='right';capEl.textContent=site.advCapacity;}}
+  else{a1.style.display='none';a2.style.display='none';}
   const reactorsRow=document.getElementById('sp-reactors-row');
   if(cfg.isNPP&&site.reactorCount){reactorsRow.style.display='flex';document.getElementById('sp-reactors').textContent=`${site.reactorCount} unit${site.reactorCount>1?'s':''}`;}
   else{reactorsRow.style.display='none';}
@@ -1161,6 +1176,27 @@ const RES_KEYS=['resCost40','resCost80','resCost130','resCost260'];
 function setResCost(i){state.zoneMode=RES_KEYS[+i];applyStateToUI();renderMap();updateChartPanel();}
 const RES_OPTS=[['Low cost','< USD 40 per kgU'],['Moderate cost','< USD 80 per kgU'],['Higher cost','< USD 130 per kgU'],['All known deposits','< USD 260 per kgU, incl. very costly ones']];
 function updateResSwitch(){const on=state.chainStep==='resources',sw=document.getElementById('res-sw');if(!sw)return;sw.style.display=on?'':'none';if(on){const i=Math.max(0,RES_KEYS.indexOf(state.zoneMode)),o=document.getElementById('res-opts');o.innerHTML=RES_OPTS.map((x,k)=>`<button class="rc-o${k===i?' on':''}" onclick="setResCost(${k})"><b>${x[0]}</b><span>${x[1]}</span></button>`).join('');}}
+function buildAdvPanel(body){
+  const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const list=sites.filter(s=>s.adv&&inC(s.country)&&(!state.ownerFilter||siteHasOwner(s,state.ownerFilter)));
+  document.getElementById('cp-title').textContent='Advanced fuels';
+  document.getElementById('cp-subtitle').textContent=list.length+' facilit'+(list.length===1?'y':'ies')+' (all statuses)';
+  const ST={'operating':['Operating','#4A7A5A'],'under construction':['Under construction','#C7922B'],'planned':['Planned','#8A8F98'],'suspended':['Suspended','#A05C4A']};
+  const cnt={};list.forEach(s=>{const k=s.status||'operating';cnt[k]=(cnt[k]||0)+1;});
+  let h=`<div class="cs-foot" style="padding:0 0 8px;font-style:normal">HALEU is uranium enriched between 5% and 20% U-235 and LEU+ between 5% and 10%. Click a line to locate the facility.</div>`;
+  h+=`<div style="margin-bottom:8px;font-size:10px;color:var(--t1);line-height:1.7">${Object.keys(ST).filter(k=>cnt[k]).map(k=>`<span style="display:inline-block;margin-right:10px"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${ST[k][1]};margin-right:4px"></span>${ST[k][0]} <b>${cnt[k]}</b></span>`).join('')}</div>`;
+  const groups=[['enrichment','Enrichment'],['conversion','Conversion and metallisation'],['fabrication','Fuel fabrication']];
+  groups.forEach(([g,lab])=>{
+    const gs=list.filter(s=>s.advStage===g).sort((a,b)=>{const o=['operating','under construction','planned','suspended'];return o.indexOf(a.status||'operating')-o.indexOf(b.status||'operating')||a.name.localeCompare(b.name);});
+    if(!gs.length)return;
+    h+=`<div class="cs-foot" style="padding:6px 0 2px;font-style:normal;font-weight:700;color:var(--t1)">${lab}</div>`;
+    gs.forEach(s=>{const st=ST[s.status||'operating']||ST.operating;
+      h+=`<div class="ol-row2" onclick="focusSite('${s.id}')"><span class="ol-dot" style="background:${st[1]}"></span><div class="ol-main"><div class="ol-l1"><span class="ol-n">${esc(s.name)}</span></div><div class="cs-foot" style="padding:1px 0 0;font-style:normal">${esc(s.country)} · ${esc(s.advProduct)} · ${esc(s.advMaxEnrich)} · ${st[0]}</div></div></div>`;});
+  });
+  if(!list.length)h+='<div class="cp-empty">No advanced fuel facility for this selection.</div>';
+  body.insertAdjacentHTML('beforeend',h);
+}
+function updateAdvCard(){const c=document.getElementById('adv-card');if(c)c.style.display=state.chainStep==='advFuel'?'':'none';}
 function buildResPanel(body){
   const RC=[['resCost40','< USD 40/kgU'],['resCost80','< USD 80/kgU'],['resCost130','< USD 130/kgU'],['resCost260','< USD 260/kgU']];
   if(!RC.some(x=>x[0]===state.zoneMode))state.zoneMode='resCost130';
@@ -1228,6 +1264,7 @@ function buildOwnerSummary(body){
 function buildPanel(mode){
   destroyCharts();const body=document.getElementById('cp-body');body.innerHTML='';
   if(mode==='resources'){buildResPanel(body);return;}
+  if(mode==='advFuel'){buildAdvPanel(body);return;}
   if(flowsOnlyMode()){buildFlowPanel(body);return;}
   const meta=mode?CHART_META[mode]:null,of=state.ownerFilter;
   document.getElementById('cp-title').textContent=meta?`${meta.title} (${CAPACITY_YEAR})`:'Country summary';
@@ -1372,6 +1409,8 @@ function applyOwnerFilter(){state.ownerFilter=document.getElementById('owner-sel
 function clearOwnerFilter(){state.ownerFilter='';document.getElementById('owner-sel').value='';onSelectionChanged();}
 function setChainStep(step,btn){
   if(state.chainStep===step){clearChainStep();return;}
+  if(state.chainStep==='advFuel'&&step!=='advFuel'&&_prevStatuses&&!state.ownerFilter){state.statuses=_prevStatuses;_prevStatuses=null;}
+  if(step==='advFuel'){if(!_prevStatuses)_prevStatuses={...state.statuses};STATUS_LIST.forEach(s=>{state.statuses[s]=true;});}
   state.chainStep=step;state.showAllTypes=false;clearChainUI();btn.classList.add('active');btn.style.background=CHAIN_COLORS[step];btn.style.color='#fff';btn.style.borderColor='transparent';document.getElementById('chain-clear').style.display='';
   const m=CHAIN_MAP[step];
   Object.keys(state.siteTypes).forEach(t=>{state.siteTypes[t]=m.sites.includes(t);});
@@ -1380,8 +1419,8 @@ function setChainStep(step,btn){
   applyStateToUI();renderMap();
 }
 function clearChainUI(){document.querySelectorAll('.chain-chip').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';b.style.borderColor='';});document.getElementById('chain-clear').style.display='none';}
-function clearChainStep(){state.chainStep='';clearChainUI();renderMap();}
-function applyStateToUI(){updateResSwitch();updateFacilitiesBtn();updateStatusBtn();updateFlowsBtn();updateZoneBtn();updateCountryBtn();updateOwnerBtn();updateLockUI();updateHaleuChip();if(state.chainStep){const btn=document.getElementById('cc-'+state.chainStep);if(btn){btn.classList.add('active');btn.style.background=CHAIN_COLORS[state.chainStep];btn.style.color='#fff';btn.style.borderColor='transparent';}document.getElementById('chain-clear').style.display='';}}
+function clearChainStep(){if(state.chainStep==='advFuel'&&_prevStatuses&&!state.ownerFilter){state.statuses=_prevStatuses;_prevStatuses=null;}state.chainStep='';clearChainUI();renderMap();}
+function applyStateToUI(){updateResSwitch();updateAdvCard();updateFacilitiesBtn();updateStatusBtn();updateFlowsBtn();updateZoneBtn();updateCountryBtn();updateOwnerBtn();updateLockUI();updateHaleuChip();if(state.chainStep){const btn=document.getElementById('cc-'+state.chainStep);if(btn){btn.classList.add('active');btn.style.background=CHAIN_COLORS[state.chainStep];btn.style.color='#fff';btn.style.borderColor='transparent';}document.getElementById('chain-clear').style.display='';}}
 
 function toggleLegend(){const el=document.getElementById('mapLegend'),c=el.classList.toggle('collapsed');document.getElementById('ml-caret').textContent=c?'▸':'▾';try{localStorage.setItem('geonufeLegendCollapsed',c?'1':'0');}catch(e){}}
 (function(){try{if(localStorage.getItem('geonufeLegendCollapsed')==='1'){const el=document.getElementById('mapLegend');el.classList.add('collapsed');document.getElementById('ml-caret').textContent='▸';}}catch(e){}})();
@@ -1588,7 +1627,7 @@ function renderMap(){
   sites.forEach(site=>{
     const cfg=SITE_TYPES[site.type];if(!cfg)return;
     const status=site.status||'operating';
-    if(!state.showAllTypes&&!state.siteTypes[site.type])return;
+    if(state.chainStep==='advFuel'){if(!site.adv)return;}else if(!state.showAllTypes&&!state.siteTypes[site.type])return;
     if(!state.statuses[status])return;
     if(!inC(site.country))return;
     if(of&&!siteHasOwner(site,of))return;
@@ -1629,7 +1668,7 @@ function renderMap(){
   updateLegend();updateChartPanel();
   document.getElementById('info-sites').textContent=items.length;document.getElementById('info-flows').textContent=visFlows;document.getElementById('info-zone').textContent=state.zoneMode==='none'?'—':ZONE_CFG[state.zoneMode]?.label||'';
   const banner=document.getElementById('filterBanner'),ia=document.getElementById('info-active');
-  const chainLabels={natU:'Uranium mining',convU:'Conversion',enrU:'Enrichment',fuelAsm:'Fuel assemblies',electricity:'Power Plants',resources:'Uranium resources'};
+  const chainLabels={natU:'Uranium mining',convU:'Conversion',enrU:'Enrichment',fuelAsm:'Fuel assemblies',electricity:'Power Plants',resources:'Uranium resources',advFuel:'Advanced fuels'};
   let bt='';if(state.chainStep)bt=`Chain step: <strong>${chainLabels[state.chainStep]}</strong>`;
   if(cf.length)bt+=(bt?' · ':'')+`Country: <strong>${cf.length>3?cf.length+' countries':cf.join(', ')}</strong>`;
   if(of)bt+=(bt?' · ':'')+`Owner: <strong>${of}</strong>`;
