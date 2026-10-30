@@ -541,6 +541,7 @@ body.m-filt .m-backdrop{display:block}
           <button class="zoom-btn zoom-reset" onclick="zoomReset()">FIT</button>
           <button class="zoom-btn" id="topoBtn" onclick="toggleToponyms()" title="Show / hide country names" style="font-size:11px;font-weight:600">Aa</button>
         </div>
+        <div class="res-card" id="by-card" style="display:none;border-color:#8B4513"><div class="rc-t">By-product uranium</div><div class="rc-s">In some mines uranium is recovered as a by-product of another main metal or of phosphate.</div><div class="rc-opts"><button class="rc-o" id="by-btn" onclick="toggleByOnly()"><b>Show only mines where uranium is a by-product</b></button></div><div class="rc-f" id="by-f" style="display:none">Mines not shown are treated as primary uranium producers.</div></div>
         <div class="res-card" id="rec-card" style="display:none;border-color:#1B8A7A"><div class="rc-t">Recycled fuel</div><div class="rc-s">MOX is fuel containing plutonium recovered from used fuel. Some plants can also load fuel made from reprocessed uranium.</div><div class="rc-opts"><button class="rc-o" id="rec-btn" onclick="toggleRecOnly()"><b>Show only plants authorised to use recycled fuel</b></button></div><div class="rc-f" id="rec-f" style="display:none">A solid ring means the fuel is actually in use. A hollow ring means it is licensed or was used in the past but is not loaded now.</div></div>
         <div class="res-card" id="adv-card" style="display:none;border-color:#AA4499"><div class="rc-t">Advanced fuels</div><div class="rc-s">HALEU is uranium enriched to between 5% and 20% U-235, LEU+ to between 5% and 10%. Many new reactor designs need them. Hollow symbols are projects not yet operating.</div></div>
         <div class="res-card" id="res-sw" style="display:none"><div class="rc-t">How costly is it to extract?</div><div class="rc-s">Uranium that can be mined for less than a given price. Higher price limits include more deposits, so the map fills up.</div><div class="rc-opts" id="res-opts"></div><div class="rc-f">Price per kg of uranium (USD/kgU). Grey countries reported no resources in this category, which does not always mean there are none. Source: OECD-NEA/IAEA, Uranium 2024 (Red Book), identified recoverable resources as of 1 January 2023.</div></div>
@@ -564,6 +565,7 @@ body.m-filt .m-backdrop{display:block}
             <div class="sp-row" id="sp-method-row" style="display:none"><span class="sp-key">Mining method</span><span class="sp-val" id="sp-method"></span></div>
             <div class="sp-row" id="sp-adv1-row" style="display:none"><span class="sp-key">Fuel product</span><span class="sp-val" id="sp-adv1" style="white-space:normal;text-align:right"></span></div>
             <div class="sp-row" id="sp-adv2-row" style="display:none"><span class="sp-key">Max. enrichment</span><span class="sp-val" id="sp-adv2" style="white-space:normal;text-align:right"></span></div>
+            <div class="sp-row" id="sp-role-row" style="display:none"><span class="sp-key">Uranium</span><span class="sp-val" id="sp-role" style="white-space:normal;text-align:right"></span></div>
             <div class="sp-row" id="sp-mox-row" style="display:none"><span class="sp-key">MOX fuel</span><span class="sp-val" id="sp-mox" style="white-space:normal;text-align:right"></span></div>
             <div class="sp-row" id="sp-repu-row" style="display:none"><span class="sp-key">Reprocessed uranium</span><span class="sp-val" id="sp-repu" style="white-space:normal;text-align:right"></span></div>
             <div class="sp-row" id="sp-cap-row"><span class="sp-key">Capacity</span><span class="sp-val" id="sp-cap"></span></div>
@@ -692,7 +694,7 @@ let state={
   statuses:{operating:true,suspended:false,'under construction':false,planned:false},
   flowMats:{'Natural U':false,'Converted U':false,'Enriched U':false,'Fuel asm.':false},
   yearRange:null,zoneMode:'none',chainStep:'',countries:[],ownerFilter:'',routeFrom:[],routeTo:[],
-  showAllTypes:false,haleuOnly:false,recOnly:false
+  showAllTypes:false,haleuOnly:false,recOnly:false,byOnly:false
 };
 Object.keys(SITE_TYPES).forEach(k=>{state.siteTypes[k]=false;});
 let sites=[],flows=[],zones=[],meta={},worldFeatures,proj,svgEl,zoomBehavior;
@@ -784,7 +786,7 @@ function toggleHaleuOnly(event){if(event)event.stopPropagation();state.haleuOnly
 function syncSelAll(){const f=document.getElementById('fac-selall'),g=document.getElementById('flow-selall'),z=document.getElementById('zone-selnone');if(f)f.textContent=Object.values(state.siteTypes).some(Boolean)?'Deselect all':'Select all';if(g)g.textContent=Object.values(state.flowMats).some(Boolean)?'Deselect all':'Select all';if(z)z.style.display=state.zoneMode==='none'?'none':'';}
 function resetAll(){
   closeAllDropdowns();closeSitePopup&&closeSitePopup();
-  state.chainStep='';state.showAllTypes=false;state.countries=[];state.ownerFilter='';state.routeFrom=[];state.routeTo=[];state.zoneMode='none';state.haleuOnly=false;state.recOnly=false;
+  state.chainStep='';state.showAllTypes=false;state.countries=[];state.ownerFilter='';state.routeFrom=[];state.routeTo=[];state.zoneMode='none';state.haleuOnly=false;state.recOnly=false;state.byOnly=false;
   Object.keys(state.siteTypes).forEach(k=>{state.siteTypes[k]=false;});Object.keys(state.flowMats).forEach(k=>{state.flowMats[k]=false;});
   Object.keys(state.statuses).forEach(k=>{state.statuses[k]=(k==='operating');});
   _prevStatuses=null;_prevSiteTypes=null;selectedSiteId=null;
@@ -929,6 +931,7 @@ function showSitePopup(site,px,py,mw){
   if(site.adv){a1.style.display='flex';document.getElementById('sp-adv1').textContent=site.advProduct||'';a2.style.display='flex';document.getElementById('sp-adv2').textContent=site.advMaxEnrich||'';
     if(site.advCapacity){capRow.style.display='flex';capEl.style.whiteSpace='normal';capEl.style.textAlign='right';capEl.textContent=site.advCapacity;}}
   else{a1.style.display='none';a2.style.display='none';}
+  {const rr=document.getElementById('sp-role-row');if(site.uRole==='by-product'){rr.style.display='flex';document.getElementById('sp-role').textContent='By-product of '+(site.uHost||'another product');}else rr.style.display='none';}
   [['mox','sp-mox'],['repu','sp-repu']].forEach(([k,id])=>{const row=document.getElementById(id+'-row'),t=recText(site,k);if(t){row.style.display='flex';document.getElementById(id).textContent=t;}else row.style.display='none';});
   const reactorsRow=document.getElementById('sp-reactors-row');
   if(cfg.isNPP&&site.reactorCount){reactorsRow.style.display='flex';document.getElementById('sp-reactors').textContent=`${site.reactorCount} unit${site.reactorCount>1?'s':''}`;}
@@ -1221,6 +1224,20 @@ function buildRecPanel(body){
   if(!list.length)h+='<div class="cp-empty">No plant for this selection.</div>';
   body.insertAdjacentHTML('beforeend',h);
 }
+function byOn(){return state.byOnly&&state.chainStep==='natU';}
+function toggleByOnly(){state.byOnly=!state.byOnly;applyStateToUI();renderMap();updateChartPanel();}
+function updateByCard(){const c=document.getElementById('by-card');if(!c)return;c.style.display=state.chainStep==='natU'?'':'none';const b=document.getElementById('by-btn'),f=document.getElementById('by-f');if(b)b.classList.toggle('on',byOn());if(f)f.style.display=byOn()?'':'none';}
+function buildByPanel(body){
+  const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const list=sites.filter(s=>s.uRole==='by-product'&&state.statuses[s.status||'operating']&&inC(s.country)&&(!state.ownerFilter||siteHasOwner(s,state.ownerFilter)));
+  document.getElementById('cp-title').textContent='By-product uranium';
+  document.getElementById('cp-subtitle').textContent=list.length+' mine'+(list.length===1?'':'s')+' where uranium is recovered as a by-product';
+  let h=`<div class="cs-foot" style="padding:0 0 8px;font-style:normal">Mines not listed are treated as primary uranium producers. Uranium output is often not published separately for by-product mines. Click a line to locate the mine.</div>`;
+  list.sort((a,b)=>a.country.localeCompare(b.country)||a.name.localeCompare(b.name)).forEach(s=>{
+    h+=`<div class="ol-row2" onclick="focusSite('${s.id}')"><span class="ol-dot" style="background:#3A4756"></span><div class="ol-main"><div class="ol-l1"><span class="ol-n">${esc(s.name)}</span></div><div class="cs-foot" style="padding:1px 0 0;font-style:normal">${esc(s.country)} · by-product of ${esc(s.uHost)}${(s.status||'operating')!=='operating'?' · '+esc(s.status):''}</div></div></div>`;});
+  if(!list.length)h+='<div class="cp-empty">No mine for this selection and status filter.</div>';
+  body.insertAdjacentHTML('beforeend',h);
+}
 function recOn(){return state.recOnly&&state.chainStep==='electricity';}
 function toggleRecOnly(){state.recOnly=!state.recOnly;applyStateToUI();renderMap();updateChartPanel();}
 function updateRecCard(){const c=document.getElementById('rec-card');if(!c)return;c.style.display=state.chainStep==='electricity'?'':'none';const b=document.getElementById('rec-btn'),f=document.getElementById('rec-f');if(b)b.classList.toggle('on',recOn());if(f)f.style.display=recOn()?'':'none';}
@@ -1305,6 +1322,7 @@ function buildPanel(mode){
   if(mode==='resources'){buildResPanel(body);return;}
   if(mode==='advFuel'){buildAdvPanel(body);return;}
   if(mode==='electricity'&&recOn()){buildRecPanel(body);return;}
+  if(mode==='natU'&&byOn()){buildByPanel(body);return;}
   if(flowsOnlyMode()){buildFlowPanel(body);return;}
   const meta=mode?CHART_META[mode]:null,of=state.ownerFilter;
   document.getElementById('cp-title').textContent=meta?`${meta.title} (${CAPACITY_YEAR})`:'Country summary';
@@ -1451,7 +1469,7 @@ function setChainStep(step,btn){
   if(state.chainStep===step){clearChainStep();return;}
   if(state.chainStep==='advFuel'&&step!=='advFuel'&&_prevStatuses&&!state.ownerFilter){state.statuses=_prevStatuses;_prevStatuses=null;}
   if(step==='advFuel'){if(!_prevStatuses)_prevStatuses={...state.statuses};STATUS_LIST.forEach(s=>{state.statuses[s]=true;});}
-  state.recOnly=false;state.chainStep=step;state.showAllTypes=false;clearChainUI();btn.classList.add('active');btn.style.background=CHAIN_COLORS[step];btn.style.color='#fff';btn.style.borderColor='transparent';document.getElementById('chain-clear').style.display='';
+  state.recOnly=false;state.byOnly=false;state.chainStep=step;state.showAllTypes=false;clearChainUI();btn.classList.add('active');btn.style.background=CHAIN_COLORS[step];btn.style.color='#fff';btn.style.borderColor='transparent';document.getElementById('chain-clear').style.display='';
   const m=CHAIN_MAP[step];
   Object.keys(state.siteTypes).forEach(t=>{state.siteTypes[t]=m.sites.includes(t);});
   Object.keys(state.flowMats).forEach(f=>{state.flowMats[f]=m.flows.includes(f)&&!ownerLocked();});
@@ -1459,8 +1477,8 @@ function setChainStep(step,btn){
   applyStateToUI();renderMap();
 }
 function clearChainUI(){document.querySelectorAll('.chain-chip').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';b.style.borderColor='';});document.getElementById('chain-clear').style.display='none';}
-function clearChainStep(){state.recOnly=false;if(state.chainStep==='advFuel'&&_prevStatuses&&!state.ownerFilter){state.statuses=_prevStatuses;_prevStatuses=null;}state.chainStep='';clearChainUI();renderMap();}
-function applyStateToUI(){updateResSwitch();updateAdvCard();updateRecCard();updateFacilitiesBtn();updateStatusBtn();updateFlowsBtn();updateZoneBtn();updateCountryBtn();updateOwnerBtn();updateLockUI();updateHaleuChip();if(state.chainStep){const btn=document.getElementById('cc-'+state.chainStep);if(btn){btn.classList.add('active');btn.style.background=CHAIN_COLORS[state.chainStep];btn.style.color='#fff';btn.style.borderColor='transparent';}document.getElementById('chain-clear').style.display='';}}
+function clearChainStep(){state.recOnly=false;state.byOnly=false;if(state.chainStep==='advFuel'&&_prevStatuses&&!state.ownerFilter){state.statuses=_prevStatuses;_prevStatuses=null;}state.chainStep='';clearChainUI();renderMap();}
+function applyStateToUI(){updateResSwitch();updateAdvCard();updateRecCard();updateByCard();updateFacilitiesBtn();updateStatusBtn();updateFlowsBtn();updateZoneBtn();updateCountryBtn();updateOwnerBtn();updateLockUI();updateHaleuChip();if(state.chainStep){const btn=document.getElementById('cc-'+state.chainStep);if(btn){btn.classList.add('active');btn.style.background=CHAIN_COLORS[state.chainStep];btn.style.color='#fff';btn.style.borderColor='transparent';}document.getElementById('chain-clear').style.display='';}}
 
 function toggleLegend(){const el=document.getElementById('mapLegend'),c=el.classList.toggle('collapsed');document.getElementById('ml-caret').textContent=c?'▸':'▾';try{localStorage.setItem('geonufeLegendCollapsed',c?'1':'0');}catch(e){}}
 (function(){try{if(localStorage.getItem('geonufeLegendCollapsed')==='1'){const el=document.getElementById('mapLegend');el.classList.add('collapsed');document.getElementById('ml-caret').textContent='▸';}}catch(e){}})();
@@ -1669,6 +1687,7 @@ function renderMap(){
     const status=site.status||'operating';
     if(state.chainStep==='advFuel'){if(!site.adv)return;}else if(!state.showAllTypes&&!state.siteTypes[site.type])return;
     if(recOn()&&!site.rec)return;
+    if(byOn()&&site.uRole!=='by-product')return;
     if(!state.statuses[status])return;
     if(!inC(site.country))return;
     if(of&&!siteHasOwner(site,of))return;
@@ -1690,6 +1709,7 @@ function renderMap(){
     const p=g.append('path').attr('d',shapePath(cfg.shape,r)).attr('fill',st.fill).attr('fill-opacity',st.fo).attr('stroke',st.stroke).attr('stroke-width',st.sw).attr('vector-effect','non-scaling-stroke');
     if(st.dash)p.attr('stroke-dasharray',st.dash);
     if(site.hollow)p.attr('fill','none').attr('stroke',cfg.color).attr('stroke-width',2);
+    if(byOn()&&site.uRole==='by-product')p.attr('stroke','#3A4756').attr('stroke-width',2.4);
     if(recOn()&&site.rec){const on=site.moxUse==='loading'||site.repuUse==='loading';p.attr('stroke','#1B8A7A').attr('stroke-width',2.4);if(!on)p.attr('fill','none');}
     if(site.stepLabel){const dir=site.linkTo?-1:1,sl=d3.select('#labels-layer').append('text').attr('class','step-label').attr('x',sx+(r*zs+5/curK)*dir).attr('y',sy+3.5/curK).attr('text-anchor',dir<0?'end':'start').attr('font-size',10/curK).attr('font-family',"'Hanken Grotesk',system-ui,sans-serif").attr('font-weight','700').attr('fill',cfg.color).attr('paint-order','stroke').attr('stroke','rgba(255,255,255,0.92)').attr('stroke-width',3/curK).style('pointer-events','none').style('display',curK>=3?null:'none').text(site.stepLabel);sl.node()._sx=sx;sl.node()._sy=sy;sl.node()._r=r;sl.node()._dir=dir;}
     const labelEl=d3.select('#labels-layer').append('text').attr('class','site-label').attr('x',sx).attr('y',sy-(r+3)*zs).attr('text-anchor','middle').attr('font-size',9*zs).attr('font-family',"'Hanken Grotesk',system-ui,sans-serif").attr('font-weight','400').attr('fill',TH().label).attr('paint-order','stroke').attr('stroke',TH().labelHalo).attr('stroke-width',3*zs).style('pointer-events','none').style('opacity',0).text(site.name);

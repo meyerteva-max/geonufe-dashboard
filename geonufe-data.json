@@ -826,7 +826,9 @@
    "capacity": 3173,
    "shareholder": "BHP (100%)",
    "status": "operating",
-   "comment": "Uranium is a by-product of copper. Payable U3O8 was 817 t in the September 2026 quarter. A first block-cave resource was declared in October 2026, with no development timeline. The 3,173 tU per year figure is nameplate; the September 2026 quarter ran at about 2,770 tU per year."
+   "comment": "Uranium is a by-product of copper. Payable U3O8 was 817 t in the September 2026 quarter. A first block-cave resource was declared in October 2026, with no development timeline. The 3,173 tU per year figure is nameplate; the September 2026 quarter ran at about 2,770 tU per year.",
+   "uRole": "by-product",
+   "uHost": "copper, with gold and silver"
   },
   {
    "id": "d79",
@@ -1255,8 +1257,10 @@
    "country": "South Africa",
    "capacity": 200,
    "shareholder": "Harmony Gold Mining Company (100%)",
-   "comment": "By-product of gold mining",
-   "status": "operating"
+   "comment": "Uranium is a by-product of gold. Harmony reported about 308,000 lb of uranium in a six-month period to December, from two plants at the mine (Miningmx, year not rechecked).",
+   "status": "operating",
+   "uRole": "by-product",
+   "uHost": "gold"
   },
   {
    "id": "d116",
@@ -1444,8 +1448,10 @@
    "country": "Finland",
    "capacity": 200,
    "shareholder": "Finnish Minerals Group (72%) / Trafigura (28%)",
-   "comment": "Byproduct of Terrafame's main nickel/zinc/cobalt operation",
-   "status": "operating"
+   "comment": "Uranium is a by-product of Terrafame's nickel, zinc, copper and cobalt operation. Recovery started on 18 June 2024 and is ramping up toward about 200 t per year at full capacity, expected in 2026.",
+   "status": "operating",
+   "uRole": "by-product",
+   "uHost": "nickel, zinc, copper and cobalt"
   },
   {
    "id": "d136",
@@ -4079,7 +4085,10 @@
    "country": "Brazil",
    "shareholder": "Indústrias Nucleares do Brasil",
    "status": "planned",
-   "coordConfidence": "Low"
+   "coordConfidence": "Low",
+   "uRole": "by-product",
+   "uHost": "phosphate",
+   "comment": "Planned uranium-phosphate project of INB and Galvani, designed to recover about 2,300 t of uranium concentrate per year as a by-product of 240,000 t of P2O5. Environmental licensing was under review in 2022, and the current status was not rechecked."
   },
   {
    "id": "d353",
