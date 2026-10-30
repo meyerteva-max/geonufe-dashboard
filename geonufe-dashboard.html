@@ -202,6 +202,10 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .res-sw-l{font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B3FA0}
 .res-sw input{width:96px;accent-color:#6B3FA0;margin:0}
 .res-sw-t{display:flex;gap:7px;font-weight:600}.res-sw-t span.on{color:#6B3FA0;text-decoration:underline}
+.res-card.mini-card{top:auto;bottom:132px;width:172px;padding:5px;border-radius:7px}
+.res-card.mini-card .rc-o{padding:5px 8px;font-size:10px;margin:0}
+.res-card.mini-card .rc-o b{font-size:10px;font-weight:600}
+.res-card.mini-card .rc-f{font-size:9px;line-height:1.35;margin:4px 3px 1px}
 .res-sw-u{color:var(--t2)}
 .res-card{position:absolute;left:12px;top:56px;z-index:6;width:218px;background:rgba(255,255,255,.92);border:1px solid #6B3FA0;border-radius:8px;padding:10px 11px;box-shadow:0 2px 10px rgba(0,0,0,.12);pointer-events:auto}
 [data-theme=dark] .res-card{background:rgba(30,34,40,.92)}
@@ -340,6 +344,7 @@ body.m-filt .m-backdrop{display:block}
 .filter-banner{display:none!important}
 .res-card{top:8px;left:8px;width:176px;padding:8px 9px}
 .res-card .rc-s{display:none}
+.res-card.mini-card{top:auto!important;bottom:52px!important;left:8px;width:160px;padding:5px}
 #adv-card .rc-s{display:block;font-size:10px;line-height:1.4}
 .legend-box{left:8px;bottom:8px;max-width:calc(100% - 16px)}
 .zoom-controls{top:8px;right:8px}
@@ -541,8 +546,8 @@ body.m-filt .m-backdrop{display:block}
           <button class="zoom-btn zoom-reset" onclick="zoomReset()">FIT</button>
           <button class="zoom-btn" id="topoBtn" onclick="toggleToponyms()" title="Show / hide country names" style="font-size:11px;font-weight:600">Aa</button>
         </div>
-        <div class="res-card" id="by-card" style="display:none;border-color:#8B4513"><div class="rc-t">By-product uranium</div><div class="rc-s">In some mines uranium is recovered as a by-product of another main metal or of phosphate.</div><div class="rc-opts"><button class="rc-o" id="by-btn" onclick="toggleByOnly()"><b>Show only mines where uranium is a by-product</b></button></div><div class="rc-f" id="by-f" style="display:none">Mines not shown are treated as primary uranium producers.</div></div>
-        <div class="res-card" id="rec-card" style="display:none;border-color:#1B8A7A"><div class="rc-t">Recycled fuel</div><div class="rc-s">MOX is fuel containing plutonium recovered from used fuel. Some plants can also load fuel made from reprocessed uranium.</div><div class="rc-opts"><button class="rc-o" id="rec-btn" onclick="toggleRecOnly()"><b>Show only plants authorised to use recycled fuel</b></button></div><div class="rc-f" id="rec-f" style="display:none">A solid ring means the fuel is actually in use. A hollow ring means it is licensed or was used in the past but is not loaded now.</div></div>
+        <div class="res-card mini-card" id="by-card" style="display:none;border-color:#8B4513" title="In some mines uranium is recovered as a by-product of another main metal or of phosphate."><button class="rc-o" id="by-btn" onclick="toggleByOnly()"><b>Only mines with by-product uranium</b></button><div class="rc-f" id="by-f" style="display:none">Other mines are treated as primary uranium producers.</div></div>
+        <div class="res-card mini-card" id="rec-card" style="display:none;border-color:#1B8A7A" title="MOX is fuel containing plutonium recovered from used fuel. Some plants can also load fuel made from reprocessed uranium."><button class="rc-o" id="rec-btn" onclick="toggleRecOnly()"><b>Only plants authorised to use recycled fuel</b></button><div class="rc-f" id="rec-f" style="display:none">Solid ring: fuel in use. Hollow ring: licensed or used in the past, not loaded now.</div></div>
         <div class="res-card" id="adv-card" style="display:none;border-color:#AA4499"><div class="rc-t">Advanced fuels</div><div class="rc-s">HALEU is uranium enriched to between 5% and 20% U-235, LEU+ to between 5% and 10%. Many new reactor designs need them. Hollow symbols are projects not yet operating.</div></div>
         <div class="res-card" id="res-sw" style="display:none"><div class="rc-t">How costly is it to extract?</div><div class="rc-s">Uranium that can be mined for less than a given price. Higher price limits include more deposits, so the map fills up.</div><div class="rc-opts" id="res-opts"></div><div class="rc-f">Price per kg of uranium (USD/kgU). Grey countries reported no resources in this category, which does not always mean there are none. Source: OECD-NEA/IAEA, Uranium 2024 (Red Book), identified recoverable resources as of 1 January 2023.</div></div>
         <div class="legend-box">
