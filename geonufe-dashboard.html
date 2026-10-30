@@ -202,7 +202,10 @@ body{font-family:var(--font);background:var(--bg0);color:var(--t0);font-size:12p
 .res-sw-l{font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B3FA0}
 .res-sw input{width:96px;accent-color:#6B3FA0;margin:0}
 .res-sw-t{display:flex;gap:7px;font-weight:600}.res-sw-t span.on{color:#6B3FA0;text-decoration:underline}
-.res-card.mini-card{top:auto;bottom:132px;width:172px;padding:5px;border-radius:7px}
+.res-card.mini-card{top:auto;bottom:96px;width:172px;padding:5px;border-radius:7px}
+.res-card.mini-card{width:190px;max-height:60vh;overflow:auto}
+.mc-link{display:block;margin:4px 3px 0;padding:0;border:0;background:none;font:inherit;font-size:9.5px;color:var(--t2);text-decoration:underline;cursor:pointer;text-align:left}
+.mc-more{margin:4px 3px 2px;font-size:9.5px;line-height:1.45;color:var(--t2)}
 .res-card.mini-card .rc-o{padding:5px 8px;font-size:10px;margin:0}
 .res-card.mini-card .rc-o b{font-size:10px;font-weight:600}
 .res-card.mini-card .rc-f{font-size:9px;line-height:1.35;margin:4px 3px 1px}
@@ -276,7 +279,7 @@ body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 .zoom-btn:last-child{border-bottom:none}
 .zoom-btn:hover{background:var(--bg3);color:var(--t0)}
 .zoom-reset{height:24px}
-.legend-box{left:14px;bottom:36px}
+.legend-box{left:14px;bottom:8px}
 .map-legend,.choro-legend{border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .ml-label,.ml-head{letter-spacing:.1em}
 .mtt{border-radius:6px;box-shadow:var(--shadow);border:1px solid var(--border);backdrop-filter:blur(6px)}
@@ -344,7 +347,7 @@ body.m-filt .m-backdrop{display:block}
 .filter-banner{display:none!important}
 .res-card{top:8px;left:8px;width:176px;padding:8px 9px}
 .res-card .rc-s{display:none}
-.res-card.mini-card{top:auto!important;bottom:52px!important;left:8px;width:160px;padding:5px}
+.res-card.mini-card{top:auto!important;bottom:52px!important;left:8px;width:176px;padding:5px;max-height:50vh}
 #adv-card .rc-s{display:block;font-size:10px;line-height:1.4}
 .legend-box{left:8px;bottom:8px;max-width:calc(100% - 16px)}
 .zoom-controls{top:8px;right:8px}
@@ -546,8 +549,8 @@ body.m-filt .m-backdrop{display:block}
           <button class="zoom-btn zoom-reset" onclick="zoomReset()">FIT</button>
           <button class="zoom-btn" id="topoBtn" onclick="toggleToponyms()" title="Show / hide country names" style="font-size:11px;font-weight:600">Aa</button>
         </div>
-        <div class="res-card mini-card" id="by-card" style="display:none;border-color:#8B4513" title="In some mines uranium is recovered as a by-product of another main metal or of phosphate."><button class="rc-o" id="by-btn" onclick="toggleByOnly()"><b>Only mines with by-product uranium</b></button><div class="rc-f" id="by-f" style="display:none">Other mines are treated as primary uranium producers.</div></div>
-        <div class="res-card mini-card" id="rec-card" style="display:none;border-color:#1B8A7A" title="MOX is fuel containing plutonium recovered from used fuel. Some plants can also load fuel made from reprocessed uranium."><button class="rc-o" id="rec-btn" onclick="toggleRecOnly()"><b>Only plants authorised to use recycled fuel</b></button><div class="rc-f" id="rec-f" style="display:none">Solid ring: fuel in use. Hollow ring: licensed or used in the past, not loaded now.</div></div>
+        <div class="res-card mini-card" id="by-card" style="display:none;border-color:#8B4513" title="In some mines uranium is recovered as a by-product of another main metal or of phosphate."><button class="rc-o" id="by-btn" onclick="toggleByOnly()"><b>Only mines with by-product uranium</b></button><button class="mc-link" id="by-lnk" onclick="toggleMore('by')">What does this mean?</button><div class="mc-more" id="by-more" style="display:none">Uranium is normally mined for its own sake. In a few mines it is a by-product: the mine is run mainly for another product, such as copper, gold or phosphate, and uranium is recovered from the same ore as a bonus.</div><div class="rc-f" id="by-f" style="display:none">Other mines are treated as primary uranium producers.</div></div>
+        <div class="res-card mini-card" id="rec-card" style="display:none;border-color:#1B8A7A" title="MOX is fuel containing plutonium recovered from used fuel. Some plants can also load fuel made from reprocessed uranium."><button class="rc-o" id="rec-btn" onclick="toggleRecOnly()"><b>Only plants authorised to use recycled fuel</b></button><button class="mc-link" id="rec-lnk" onclick="toggleMore('rec')">What does this mean?</button><div class="mc-more" id="rec-more" style="display:none">Used reactor fuel still contains valuable material. It can be reprocessed to recover plutonium, which is mixed with uranium to make MOX fuel, and uranium, which can be enriched again. Only some reactors are licensed to load these fuels. This button keeps only those plants.</div><div class="rc-f" id="rec-f" style="display:none">Solid ring: fuel in use. Hollow ring: licensed or used in the past, not loaded now.</div></div>
         <div class="res-card" id="adv-card" style="display:none;border-color:#AA4499"><div class="rc-t">Advanced fuels</div><div class="rc-s">HALEU is uranium enriched to between 5% and 20% U-235, LEU+ to between 5% and 10%. Many new reactor designs need them. Hollow symbols are projects not yet operating.</div></div>
         <div class="res-card" id="res-sw" style="display:none"><div class="rc-t">How costly is it to extract?</div><div class="rc-s">Uranium that can be mined for less than a given price. Higher price limits include more deposits, so the map fills up.</div><div class="rc-opts" id="res-opts"></div><div class="rc-f">Price per kg of uranium (USD/kgU). Grey countries reported no resources in this category, which does not always mean there are none. Source: OECD-NEA/IAEA, Uranium 2024 (Red Book), identified recoverable resources as of 1 January 2023.</div></div>
         <div class="legend-box">
@@ -1229,6 +1232,7 @@ function buildRecPanel(body){
   if(!list.length)h+='<div class="cp-empty">No plant for this selection.</div>';
   body.insertAdjacentHTML('beforeend',h);
 }
+function toggleMore(k){const e=document.getElementById(k+'-more'),l=document.getElementById(k+'-lnk');if(!e||!l)return;const o=e.style.display==='none';e.style.display=o?'block':'none';l.textContent=o?'Hide explanation':'What does this mean?';}
 function byOn(){return state.byOnly&&state.chainStep==='natU';}
 function toggleByOnly(){state.byOnly=!state.byOnly;applyStateToUI();renderMap();updateChartPanel();}
 function updateByCard(){const c=document.getElementById('by-card');if(!c)return;c.style.display=state.chainStep==='natU'?'':'none';const b=document.getElementById('by-btn'),f=document.getElementById('by-f');if(b)b.classList.toggle('on',byOn());if(f)f.style.display=byOn()?'':'none';}
@@ -1500,7 +1504,9 @@ function updateLegend(){
       const ordered=Object.keys(SITE_TYPES).filter(t=>lastShown.types.has(t));
       const itm=ts=>ts.map(t=>{const cfg=SITE_TYPES[t];return `<span class="ml-item">${symbolSVG(cfg.shape,cfg.color,3.4)}${cfg.label}</span>`;}).join('');
       const nonFab=ordered.filter(t=>!FAB_KEYS.includes(t)&&!NPP_TYPE_KEYS.includes(t)),fab=ordered.filter(t=>FAB_KEYS.includes(t)),npp=ordered.filter(t=>NPP_TYPE_KEYS.includes(t));
-      if(nonFab.length)html+=`<div class="ml-group"><span class="ml-label">Facilities</span>${itm(nonFab)}</div>`;
+      const mineT=nonFab.filter(t=>MINE_KEYS.includes(t)),otherT=nonFab.filter(t=>!MINE_KEYS.includes(t));
+      const mineItm=mineT.length?`<span class="ml-item">${symbolSVG('circle',SITE_TYPES[mineT[0]].color,3.4)}Uranium mine</span>`:'';
+      if(nonFab.length)html+=`<div class="ml-group"><span class="ml-label">Facilities</span>${mineItm}${itm(otherT)}</div>`;
       if(fab.length)html+=`<div class="ml-group"><span class="ml-label">Fuel type</span>${itm(fab)}</div>`;
       if(npp.length)html+=`<div class="ml-group"><span class="ml-label">Power plant type</span>${itm(npp)}</div>`;
       if(SHOW_HALEU&&lastShown.types.has('enrichment')){html+=`<span class="ml-item" style="margin-left:6px"><span class="ml-dot" style="background:#27498C;border:1.5px solid #F2B705;box-sizing:border-box"></span>HALEU-capable</span>`;}
