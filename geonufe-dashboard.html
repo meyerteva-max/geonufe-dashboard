@@ -1484,6 +1484,7 @@ function applyOwnerFilter(){state.ownerFilter=document.getElementById('owner-sel
 function clearOwnerFilter(){state.ownerFilter='';document.getElementById('owner-sel').value='';onSelectionChanged();}
 function setChainStep(step,btn){
   if(state.chainStep===step){clearChainStep();return;}
+  if(state.countries.length||state.ownerFilter){state.countries=[];state.ownerFilter='';const os=document.getElementById('owner-sel');if(os)os.value='';document.querySelectorAll('#country-list input:checked').forEach(i=>{i.checked=false;});if(_prevStatuses){if(STATUS_LIST.every(s=>state.statuses[s]))state.statuses=_prevStatuses;_prevStatuses=null;}_prevSiteTypes=null;}
   if(state.chainStep==='advFuel'&&step!=='advFuel'&&_prevStatuses&&!state.ownerFilter){state.statuses=_prevStatuses;_prevStatuses=null;}
   if(step==='advFuel'){if(!_prevStatuses)_prevStatuses={...state.statuses};STATUS_LIST.forEach(s=>{state.statuses[s]=true;});}
   state.recOnly=false;state.byOnly=false;state.chainStep=step;state.showAllTypes=false;clearChainUI();btn.classList.add('active');btn.style.background=CHAIN_COLORS[step];btn.style.color='#fff';btn.style.borderColor='transparent';document.getElementById('chain-clear').style.display='';
