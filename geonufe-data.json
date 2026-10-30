@@ -1553,7 +1553,15 @@
    "capacity": 4000,
    "shareholder": "Rosatom (100%)",
    "reactorCount": 4,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "trial",
+   "moxUnits": 2,
+   "moxUse": "not loading",
+   "repuAuth": "trial",
+   "repuUnits": 2,
+   "repuUse": "not loading",
+   "recNote": "REMIX fuel (uranium and plutonium recovered from used fuel, mixed with enriched uranium) was tested in lead assemblies at unit 3 from 2016 and unit 1 from 2021. The tests ended in 2026, and no commercial licence was reported."
   },
   {
    "id": "d145",
@@ -1589,7 +1597,12 @@
    "capacity": 1470,
    "shareholder": "Rosatom (100%)",
    "reactorCount": 1,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 1,
+   "moxUse": "loading",
+   "recNote": "BN-800 fast reactor (unit 4), reported to operate with full MOX core loads."
   },
   {
    "id": "d148",
@@ -1988,7 +2001,12 @@
    "capacity": 2360,
    "shareholder": "Kyushu Electric Power Company (100%)",
    "reactorCount": 2,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 1,
+   "moxUse": "loading",
+   "recNote": "Unit 3 is one of the four reactors using MOX as of February 2026 (Japan Atomic Energy Commission). Unit 4 and the other Japanese reactors have no MOX permission reported."
   },
   {
    "id": "d182",
@@ -2000,7 +2018,12 @@
    "capacity": 890,
    "shareholder": "Shikoku Electric Power Company (100%)",
    "reactorCount": 1,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 1,
+   "moxUse": "loading",
+   "recNote": "Unit 3 is one of the four reactors using MOX as of February 2026 (Japan Atomic Energy Commission). It was granted restart permission on the assumption of MOX use."
   },
   {
    "id": "d183",
@@ -2072,7 +2095,12 @@
    "capacity": 3392,
    "shareholder": "Kansai Electric Power Company (100%)",
    "reactorCount": 4,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 2,
+   "moxUse": "loading",
+   "recNote": "Units 3 and 4 are two of the four reactors using MOX as of February 2026 (Japan Atomic Energy Commission), with restart permission granted on the assumption of MOX use. Units 1 and 2 have no MOX permission reported."
   },
   {
    "id": "d189",
@@ -3036,7 +3064,8 @@
    "capacity": 1039,
    "shareholder": "Belgian State (50%) / Engie (50%)",
    "reactorCount": 1,
-   "status": "operating"
+   "status": "operating",
+   "comment": "Doel 3 used MOX until the end of the 1990s and is now closed. The operating units run on uranium oxide fuel only."
   },
   {
    "id": "d269",
@@ -3048,7 +3077,8 @@
    "capacity": 1046,
    "shareholder": "Belgian State (50%) / Engie (50%)",
    "reactorCount": 1,
-   "status": "operating"
+   "status": "operating",
+   "comment": "Tihange 2 used MOX until the end of the 1990s and is now closed. The operating units run on uranium oxide fuel only."
   },
   {
    "id": "d270",
@@ -3108,7 +3138,12 @@
    "country": "France",
    "shareholder": "EDF (100%)",
    "reactorCount": 4,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 2,
+   "moxUse": "loading",
+   "recNote": "MOX-licensed units: 1 and 2, as listed in the ASN decision on MOX reload management. Units 3 and 4 are not listed in that document."
   },
   {
    "id": "d275",
@@ -3132,7 +3167,12 @@
    "country": "France",
    "shareholder": "EDF (100%)",
    "reactorCount": 4,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 4,
+   "moxUse": "loading",
+   "recNote": "Units B1 to B4 are listed in the ASN decision on MOX reload management."
   },
   {
    "id": "d277",
@@ -3168,7 +3208,12 @@
    "country": "France",
    "shareholder": "EDF (100%)",
    "reactorCount": 4,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "repuAuth": "licensed",
+   "repuUnits": 4,
+   "repuUse": "loading",
+   "recNote": "All four units are certified for enriched reprocessed uranium (ERU). EDF used it from 1994 to 2013, then restarted with a full ERU core in unit 2. Framatome supplies the assemblies under a contract for 2023 to 2032, and EDF aims to extend ERU to some 1300 MWe reactors by 2027."
   },
   {
    "id": "d280",
@@ -3180,7 +3225,12 @@
    "country": "France",
    "shareholder": "EDF (100%)",
    "reactorCount": 4,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 4,
+   "moxUse": "loading",
+   "recNote": "Units 1 to 4 are listed in the ASN decision on MOX reload management."
   },
   {
    "id": "d281",
@@ -3216,7 +3266,12 @@
    "country": "France",
    "shareholder": "EDF (100%)",
    "reactorCount": 5,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 6,
+   "moxUse": "loading",
+   "recNote": "Units 1 to 6 are listed in the ASN decision on MOX reload management."
   },
   {
    "id": "d284",
@@ -3276,7 +3331,12 @@
    "country": "France",
    "shareholder": "EDF (100%)",
    "reactorCount": 2,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 2,
+   "moxUse": "loading",
+   "recNote": "Units B1 and B2 are listed in the ASN decision on MOX reload management."
   },
   {
    "id": "d289",
@@ -3288,7 +3348,12 @@
    "country": "France",
    "shareholder": "EDF (100%)",
    "reactorCount": 4,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 4,
+   "moxUse": "loading",
+   "recNote": "Units 1 to 4 are listed in the ASN decision on MOX reload management."
   },
   {
    "id": "d290",
@@ -3300,7 +3365,15 @@
    "capacity": 485,
    "shareholder": "EPZ (100%)",
    "reactorCount": 1,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "licensed",
+   "moxUnits": 1,
+   "moxUse": "loading",
+   "repuAuth": "licensed",
+   "repuUnits": 1,
+   "repuUse": "loading",
+   "recNote": "MOX was first loaded in 2014 after an application filed in 2008, and recycled uranium had been loaded earlier. Current use was not rechecked."
   },
   {
    "id": "d291",
@@ -3384,7 +3457,11 @@
    "capacity": 730,
    "shareholder": "Axpo (100%)",
    "reactorCount": 2,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "historical",
+   "moxUse": "historical",
+   "recNote": "Switzerland has used MOX in the past, with cladding failures reported in 1990 and 1997. Current authorisation and use at Beznau were not verified."
   },
   {
    "id": "d298",
@@ -3396,7 +3473,11 @@
    "capacity": 1010,
    "shareholder": "Alpiq (40%) / Axpo (25%) / City of Zurich (15%) / Centralschweizerische Kraftwerke (12.5%) / Energie Wasser Bern (7.5%)",
    "reactorCount": 1,
-   "status": "operating"
+   "status": "operating",
+   "rec": true,
+   "moxAuth": "historical",
+   "moxUse": "historical",
+   "recNote": "Switzerland has used MOX in the past. Current authorisation and use at Gösgen were not verified."
   },
   {
    "id": "d299",
