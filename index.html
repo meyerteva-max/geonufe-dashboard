@@ -504,7 +504,7 @@ body.m-filt .m-backdrop{display:block}
         <div class="dd-item" onclick="setZoneFromDD('resCost80')"><input type="radio" name="zone-radio" id="zr-resCost80"><span class="dd-grad" style="background:linear-gradient(to right,#f1e9f7,#6B3FA0)"></span>&lt; USD 80/kgU</div>
         <div class="dd-item" onclick="setZoneFromDD('resCost130')"><input type="radio" name="zone-radio" id="zr-resCost130"><span class="dd-grad" style="background:linear-gradient(to right,#f1e9f7,#6B3FA0)"></span>&lt; USD 130/kgU</div>
         <div class="dd-item" onclick="setZoneFromDD('resCost260')"><input type="radio" name="zone-radio" id="zr-resCost260"><span class="dd-grad" style="background:linear-gradient(to right,#f1e9f7,#6B3FA0)"></span>&lt; USD 260/kgU</div>
-        <div class="dd-item" onclick="setZoneFromDD('resDU')"><input type="radio" name="zone-radio" id="zr-resDU"><span class="dd-grad" style="background:linear-gradient(to right,#ece6f3,#4B2E83)"></span>Depleted uranium stock</div>
+        <div class="dd-item" onclick="setZoneFromDD('resDU')"><input type="radio" name="zone-radio" id="zr-resDU"><span class="dd-grad" style="background:none;display:inline-flex;align-items:center;gap:2px"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4B2E83;opacity:.6"></i><i style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#4B2E83;opacity:.6"></i></span>Depleted uranium stock</div>
       </div>
     </div>
     <div class="bar1-sep"></div>
@@ -545,6 +545,7 @@ body.m-filt .m-backdrop{display:block}
           <rect width="760" height="390" style="fill:var(--ocean)"/>
           <g id="zoomable">
             <g id="countries-layer"></g>
+            <g id="du-layer"></g>
             <g id="flows-layer"></g>
             <g id="sites-layer"></g>
             <g id="labels-layer"></g>
@@ -718,7 +719,7 @@ const centroids={};
 let activeChartInstances=[],panelOpen=false,panelWasActive=false;
 let selectedSiteId=null,selectedLabelEl=null;
 let stageMax={},fitScale=1,lastShown={types:new Set(),statuses:new Set()};
-const MAP_W=760,MAP_H=390;
+const MAP_W=760,MAP_H=390;const DU_RMAX=20,DU_REF=700;
 // Marker sizing (screen px at zoom 1): area strictly proportional to capacity within a stage, floored at R_MIN_PX.
 const THEMES={light:{land:'#EEECE8',landSel:'#DDDAD3',border:'#D2CEC6',tone:c=>d3.color(c).darker(0.9).formatHex(),halo:'rgba(255,255,255,.95)',label:'#16181B',labelHalo:'rgba(255,255,255,.92)',surface:'#FFFFFF',tick:'#7D838B',dark:false},dark:{land:'#1E262F',landSel:'#2C3743',border:'#0C1116',tone:c=>d3.color(c).brighter(0.6).formatHex(),halo:'rgba(12,17,22,.95)',label:'#E8ECF0',labelHalo:'rgba(12,17,22,.92)',surface:'#141A20',tick:'#87919C',dark:true}};
 function TH(){return THEMES[document.documentElement.dataset.theme==='dark'?'dark':'light'];}
@@ -1539,7 +1540,9 @@ function updateLegend(){
       const strokeItems=levels.map(({frac,label})=>{const sw=(1.2+(frac*8)).toFixed(1);return `<span class="ml-stroke-item"><span class="ml-stroke-bar" style="width:24px;height:${sw}px"></span>${label}</span>`;}).join('');
       html+=`<div class="ml-group"><span class="ml-label">Flow type</span>${typeItems}<span style="width:1px;height:12px;background:var(--border);margin:0 4px;flex-shrink:0"></span><span class="ml-label">Volume</span>${strokeItems}${routeLegend()}</div>`;
     }
-    if(zoneOn){const cfg=ZONE_CFG[state.zoneMode];
+    if(zoneOn&&state.zoneMode==='resDU'){const fs=fitScale||1,dd=[25,100,400].map(v=>{const d=Math.max(2*DU_RMAX*Math.sqrt(v/DU_REF)*fs,4);return `<span class="ml-item" style="gap:4px"><svg width="${d+2}" height="${d+2}" style="flex-shrink:0"><circle cx="${(d+2)/2}" cy="${(d+2)/2}" r="${d/2}" fill="#4B2E83" fill-opacity="0.55" stroke="#2f1c57" stroke-width="0.9"/></svg>${v}</span>`;}).join('');
+      html=`<div class="ml-group"><span class="ml-label">Depleted uranium stock (thousand tonnes U, circle area)</span>${dd}</div>`+html;}
+    else if(zoneOn){const cfg=ZONE_CFG[state.zoneMode];
       html=`<div class="ml-group"><span class="ml-label">${/^resCost/.test(state.zoneMode)?'Identified recoverable uranium resources (% of world)':cfg.label}</span>${/^resCost/.test(state.zoneMode)?`<span class="ml-item" style="font-weight:600;color:#6B3FA0">Extraction cost: ${cfg.label.match(/<USD \d+\/kgU/)[0].replace('<','< ').replace('/kgU',' per kgU')}</span>`:''}<span class="ml-item">0${cfg.unit||'%'}</span><span class="ml-grad" style="background:linear-gradient(to right,${zFrom(cfg)},${zTo(cfg)})"></span><span class="ml-item">${cfg.max||100}${cfg.unit||'%'}</span></div>`+html;}
     inner.innerHTML=html;
   }
@@ -1585,6 +1588,7 @@ function applyZoomScale(k){
   d3.selectAll('.cp').attr('stroke-width',0.6/k);
   d3.select('#link-arrow').attr('markerWidth',10/k).attr('markerHeight',10/k);
   d3.selectAll('.step-label').each(function(){const t=d3.select(this),dx=(this._r*s+5/k)*this._dir;t.attr('x',this._sx+dx).attr('y',this._sy+3.5/k).attr('font-size',10/k).attr('stroke-width',3/k).style('display',k>=3?null:'none');});
+  d3.selectAll('.du-c').each(function(){d3.select(this).attr('transform',`translate(${this._cx},${this._cy}) scale(${1/k})`);});
   d3.selectAll('.site-link').attr('stroke-width',1.4/k).attr('stroke-dasharray',`${4/k},${3/k}`);
   d3.selectAll('.site-marker').each(function(){d3.select(this).attr('transform',`translate(${this._cx},${this._cy}) scale(${s})`);});
   d3.selectAll('.site-label').each(function(){d3.select(this).attr('font-size',9*s).attr('stroke-width',3*s).attr('y',this._sy-(this._r+3)*s);});
@@ -1671,10 +1675,20 @@ function renderMap(){
   const curK=d3.zoomTransform(svgEl.node()).k,zs=1/Math.sqrt(curK);
   d3.select('#countries-layer').selectAll('.cp').attr('fill',function(d){
     const c=countryOfFeature(d),sel=cf.length&&c&&cf.includes(c);
-    if(state.zoneMode==='none')return routeTint(c)||(sel?TH().landSel:TH().land);
+    if(state.zoneMode==='none'||state.zoneMode==='resDU')return(state.zoneMode==='none'&&routeTint(c))||(sel?TH().landSel:TH().land);
     if(cf.length&&!sel)return TH().land;
     const zd=getZoneData(d);if(!zd)return TH().land;const val=zd[state.zoneMode];if(val==null||val<=0)return TH().land;return choroColor(val,ZONE_CFG[state.zoneMode]);
   }).attr('opacity',function(d){if(!cf.length)return 1;const c=countryOfFeature(d);return(c&&cf.includes(c))?1:0.4;});
+
+  // ── Depleted uranium stocks: proportional circles (absolute quantity, area proportional to kt U) ──
+  d3.select('#du-layer').selectAll('*').remove();
+  if(state.zoneMode==='resDU'){const tt0=document.getElementById('tooltip');
+    zones.filter(z=>z.resDU!=null&&(!cf.length||cf.includes(z.country))&&getCountryPos(z.country)).sort((a,b)=>b.resDU-a.resDU).forEach(z=>{
+      const [cx,cy]=getCountryPos(z.country),r=DU_RMAX*Math.sqrt(z.resDU/DU_REF);
+      const g=d3.select('#du-layer').append('g').attr('class','du-c').attr('transform',`translate(${cx},${cy}) scale(${1/curK})`).style('cursor','default');g.node()._cx=cx;g.node()._cy=cy;
+      g.append('circle').attr('r',r).attr('fill','#4B2E83').attr('fill-opacity',0.55).attr('stroke','#2f1c57').attr('stroke-width',0.9);
+      g.on('mousemove',event=>{const rr=mw.getBoundingClientRect();document.getElementById('ttc').textContent=z.country;document.getElementById('ttr').textContent=`Depleted uranium stock: ${z.resDU.toLocaleString('en-US')} kt U (${z.duYear}, ${z.duConf})`;tt0.style.display='block';tt0.style.left=Math.min(event.clientX-rr.left+14,mw.clientWidth-230)+'px';tt0.style.top=Math.max(event.clientY-rr.top-10,0)+'px';}).on('mouseleave',()=>{tt0.style.display='none';});
+    });}
 
   // ── Flows: one solid ribbon per flow, plus an invisible wider hit area for the hover tooltip ──
   d3.select('#flows-layer').selectAll('*').remove();let visFlows=0;
