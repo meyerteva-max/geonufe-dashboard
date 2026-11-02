@@ -388,7 +388,7 @@ body.m-filt .m-backdrop{display:block}
         <div class="tut-intro">Welcome to the Observatory of Nuclear Fuel Supplies, a tool developed within the <a href="https://geonufe.eu/" target="_blank" rel="noopener">GeoNuFE</a> project, funded by the <a href="https://erc.europa.eu/" target="_blank" rel="noopener">European Research Council</a>. It maps the facilities, trade flows and national shares of the global nuclear fuel cycle, from uranium mining to power plants.</div>
         <div class="tut-item"><div><strong>Start with the map.</strong> Click any facility to see who owns it, its status, its capacity and our notes. Within each step of the fuel cycle, the size of a symbol follows capacity, so a large circle or square is a large plant.</div></div>
         <div class="tut-item"><div><strong>The Quick view row</strong> is the fastest way in: one click sets the map up for a step of the chain (uranium resources, mining, conversion, enrichment, fuel fabrication or power plants). Click the chip again, or the cross next to the chips, to go back to the full map.</div></div>
-        <div class="tut-item"><div><strong>Customize</strong> lets you build your own view. By default only operating facilities are shown; Status adds suspended, under construction and planned ones. Flows draws the trade in uranium products between countries, and Production share shades countries by their weight in a step of the cycle.</div></div>
+        <div class="tut-item"><div><strong>Customize</strong> lets you build your own view. By default only operating facilities are shown; Status adds suspended, under construction and planned ones. Flows draws the trade in uranium products between countries, and Country shares shades countries by their weight in a step of the cycle, computed from the operating facilities shown on the map.</div></div>
         <div class="tut-item"><div><strong>Flows</strong> run from the exporting to the importing country, and thicker lines mean larger volumes. Once flows are on, the year slider (all years by default) and the From/To menu let you narrow down to a period or to a route.</div></div>
         <div class="tut-item"><div><strong>Country and Owner</strong> filters zoom the map in and open a summary in the statistics panel. Choosing an owner lists all of its facilities, whatever their status, with the share it holds in each.</div></div>
         <div class="tut-item"><div><strong>The Statistics panel</strong> (tab on the right edge) follows whatever you have on the map. Capacities count operating facilities only. You can drag its edge to make it wider.</div></div>
@@ -491,13 +491,13 @@ body.m-filt .m-backdrop{display:block}
       </div>
     </div>
     <div class="dd-wrap" id="dd-zone">
-      <button class="dd-btn" id="dd-zone-btn" onclick="toggleDropdown('zone')"><span id="dd-zone-label">Production share</span><span class="dd-caret">▼</span></button>
+      <button class="dd-btn" id="dd-zone-btn" onclick="toggleDropdown('zone')"><span id="dd-zone-label">Country shares</span><span class="dd-caret">▼</span></button>
       <div class="dd-panel" id="dd-zone-panel">
-        <div class="dd-panel-header"><span>Production share</span><button class="dd-select-all" id="zone-selnone" style="display:none" onclick="setZoneFromDD('none')">Deselect all</button></div>
+        <div class="dd-panel-header"><span>Country shares</span><button class="dd-select-all" id="zone-selnone" style="display:none" onclick="setZoneFromDD('none')">Deselect all</button></div>
         <div class="dd-item" onclick="setZoneFromDD('none')"><input type="radio" name="zone-radio" id="zr-none" checked><span style="width:18px;height:5px;flex-shrink:0"></span>None</div>
-        <div class="dd-item" onclick="setZoneFromDD('natU')"><input type="radio" name="zone-radio" id="zr-natU"><span class="dd-grad" style="background:linear-gradient(to right,#f5ede8,#8B4513)"></span>Natural uranium production</div>
-        <div class="dd-item" onclick="setZoneFromDD('convU')"><input type="radio" name="zone-radio" id="zr-convU"><span class="dd-grad" style="background:linear-gradient(to right,#fdf0e4,#E8820A)"></span>Converted uranium production</div>
-        <div class="dd-item" onclick="setZoneFromDD('enrU')"><input type="radio" name="zone-radio" id="zr-enrU"><span class="dd-grad" style="background:linear-gradient(to right,#e8eef8,#27498C)"></span>Enriched uranium production</div>
+        <div class="dd-item" onclick="setZoneFromDD('natU')"><input type="radio" name="zone-radio" id="zr-natU"><span class="dd-grad" style="background:linear-gradient(to right,#f5ede8,#8B4513)"></span>Mining capacity</div>
+        <div class="dd-item" onclick="setZoneFromDD('convU')"><input type="radio" name="zone-radio" id="zr-convU"><span class="dd-grad" style="background:linear-gradient(to right,#fdf0e4,#E8820A)"></span>Conversion capacity</div>
+        <div class="dd-item" onclick="setZoneFromDD('enrU')"><input type="radio" name="zone-radio" id="zr-enrU"><span class="dd-grad" style="background:linear-gradient(to right,#e8eef8,#27498C)"></span>Enrichment capacity</div>
         <div class="dd-item" onclick="setZoneFromDD('nucMix')"><input type="radio" name="zone-radio" id="zr-nucMix"><span class="dd-grad" style="background:linear-gradient(to right,#faecec,#C0392B)"></span>Nuclear share in electricity mix</div>
         <div class="dd-panel-header" style="margin-top:6px;border-top:1px solid #e0ddd6;padding-top:8px"><span>Uranium identified recoverable resources</span></div>
         <div class="dd-item" onclick="setZoneFromDD('resCost40')"><input type="radio" name="zone-radio" id="zr-resCost40"><span class="dd-grad" style="background:linear-gradient(to right,#f1e9f7,#6B3FA0)"></span>&lt; USD 40/kgU</div>
@@ -662,7 +662,7 @@ const STATUS_LIST=['operating','suspended','under construction','planned'];
 const STATUS_LABEL={operating:'Operating',suspended:'Suspended','under construction':'Under construction',planned:'Planned'};
 const MINE_METHOD={'mine-isl':'ISL','mine-underground':'Underground','mine-openpit':'Open pit'};
 const MAT={'Natural U':{label:'Natural uranium',color:'#8B4513'},'Converted U':{label:'Converted uranium',color:'#E8820A'},'Enriched U':{label:'Enriched uranium',color:'#27498C'},'Fuel asm.':{label:'Fuel assemblies',color:'#4C8C4A'}};
-const ZONE_CFG={natU:{label:'Natural uranium production share (%)',color:'#8B4513',from:'#f5ede8'},convU:{label:'Converted uranium production share (%)',color:'#E8820A',from:'#fdf0e4'},enrU:{label:'Enriched uranium production share (%)',color:'#27498C',from:'#e8eef8'},nucMix:{label:'Nuclear share in electricity mix (%)',color:'#3A4756',from:'#eef0f3',dark:'#B9C6D6'},resCost40:{label:'Uranium identified recoverable resources — <USD 40/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost80:{label:'Uranium identified recoverable resources — <USD 80/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost130:{label:'Uranium identified recoverable resources — <USD 130/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost260:{label:'Uranium identified recoverable resources — <USD 260/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resDU:{label:'Depleted uranium stock (thousand tonnes U)',color:'#4B2E83',from:'#ece6f3',max:700,unit:' kt U'}};
+const ZONE_CFG={natU:{label:'Mining capacity, share of world (%)',color:'#8B4513',from:'#f5ede8'},convU:{label:'Conversion capacity, share of world (%)',color:'#E8820A',from:'#fdf0e4'},enrU:{label:'Enrichment capacity, share of world (%)',color:'#27498C',from:'#e8eef8'},nucMix:{label:'Nuclear share in electricity mix (%)',color:'#3A4756',from:'#eef0f3',dark:'#B9C6D6'},resCost40:{label:'Uranium identified recoverable resources — <USD 40/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost80:{label:'Uranium identified recoverable resources — <USD 80/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost130:{label:'Uranium identified recoverable resources — <USD 130/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resCost260:{label:'Uranium identified recoverable resources — <USD 260/kgU (% of world)',color:'#6B3FA0',from:'#f1e9f7'},resDU:{label:'Depleted uranium stock (thousand tonnes U)',color:'#4B2E83',from:'#ece6f3',max:700,unit:' kt U'}};
 const CHAIN_MAP={
   natU:{sites:MINE_KEYS,flows:[],zone:'natU'},
   convU:{sites:['conversion'],flows:[],zone:'convU'},
@@ -760,7 +760,7 @@ function updateZoneBtn(){syncSelAll();const btn=document.getElementById('dd-zone
 function updateCountryBtn(){const btn=document.getElementById('dd-country-btn'),label=document.getElementById('dd-country-label'),n=state.countries.length;if(n){btn.classList.add('has-selection');label.textContent=n===1?state.countries[0]:`${n} countries`;}else{btn.classList.remove('has-selection');label.textContent='Country';}
   document.querySelectorAll('#country-list input').forEach(cb=>{cb.checked=state.countries.includes(cb.value);});}
 function updateOwnerBtn(){const btn=document.getElementById('dd-owner-btn'),label=document.getElementById('dd-owner-label');if(state.ownerFilter){btn.classList.add('has-selection');label.textContent=state.ownerFilter;}else{btn.classList.remove('has-selection');label.textContent='Owner';}}
-const LOCK_MSG='Not available when an owner is selected: flows and production shares are country-level data, not attached to owners.';
+const LOCK_MSG='Not available when an owner is selected: flows and country shares are country-level data, not attached to owners.';
 function updateLockUI(){const lock=ownerLocked();['flows','zone'].forEach(id=>{const b=document.getElementById('dd-'+id+'-btn');b.classList.toggle('disabled',lock);b.title=lock?LOCK_MSG:'';if(lock){document.getElementById('dd-'+id+'-panel').classList.remove('open');b.classList.remove('open');}});}
 function updateYearSliderVisibility(){const anyFlow=Object.values(state.flowMats).some(Boolean);const wrap=document.getElementById('year-slider-wrap');if(wrap)wrap.style.display=anyFlow?'flex':'none';}
 let yearSliderYears=[];
@@ -864,6 +864,17 @@ function computeCapacityByFuelType(types){
   return totals;
 }
 function sumCap(types,country){let t=0;sites.forEach(s=>{if(!isOp(s)||!s.capacity||!types.includes(s.type))return;if(country&&s.country!==country)return;t+=s.capacity;});return t;}
+// Country shades follow the same numbers as the statistics panel: shares of world operating capacity, derived from the sites.
+function alignZoneShares(){
+  const defs=[['natU',MINE_KEYS],['convU',['conversion']],['enrU',['enrichment']]];
+  const byC={};zones.forEach(z=>{if(!byC[z.country]||(z.year||0)>(byC[z.country].year||0))byC[z.country]=z;});
+  defs.forEach(([k,types])=>{
+    const tot={};let w=0;
+    sites.forEach(s=>{if(!types.includes(s.type)||!s.capacity||!isOp(s))return;tot[s.country]=(tot[s.country]||0)+s.capacity;w+=s.capacity;});
+    Object.keys(byC).forEach(c=>{if(byC[c][k]!==undefined)byC[c]['src_'+k]=byC[c][k];byC[c][k]=null;});
+    Object.keys(tot).forEach(c=>{if(!byC[c]){byC[c]={country:c,year:CAPACITY_YEAR};zones.push(byC[c]);}const v=100*tot[c]/w;byC[c][k]=v<1?Math.round(v*100)/100:Math.round(v*10)/10;});
+  });
+}
 function zoneVal(country,key){const z=zones.filter(z=>z.country===country&&z[key]!=null).sort((a,b)=>b.year-a.year)[0];return z?z[key]:null;}
 const fmtN=v=>Math.round(v).toLocaleString('en-US');
 const fmtP=v=>(v<0.1&&v>0?'<0.1':v.toFixed(v<10?1:0))+'%';
@@ -887,7 +898,7 @@ function buildCountrySummary(country){
   const res=[];
   [['resCost40','< USD 40/kgU'],['resCost80','< USD 80/kgU'],['resCost130','< USD 130/kgU'],['resCost260','< USD 260/kgU']].forEach(([k,lab])=>{const v=zoneVal(country,k);if(v!=null)res.push([lab,v+'%']);});
   {const v=zoneVal(country,'resDU');if(v!=null)res.push(['Depleted uranium stock',v+' kt U']);}
-  const body=sec('Nuclear power',nuc)+sec('Share of world capacity',cap)+sec('Share of world production',prod)+sec('Identified recoverable resources and depleted uranium',res);
+  const body=sec('Nuclear power',nuc)+sec('Share of world capacity',cap)+sec('Identified recoverable resources and depleted uranium',res);
   return `<div class="cs-block"><div class="cs-head">${country}</div>${body||'<div class="cs-foot">No data for this country in the dataset.</div>'}</div>`;
 }
 function buildCentroids(features){const idToNames={};Object.entries(nameToId).forEach(([name,id])=>{if(!idToNames[id])idToNames[id]=[];idToNames[id].push(name);});features.forEach(f=>{const id=+f.id;if(!idToNames[id])return;let geo;if(f.geometry&&f.geometry.type==='MultiPolygon'){let best=null,bestArea=-1;f.geometry.coordinates.forEach(polyCoords=>{const feat={type:'Feature',geometry:{type:'Polygon',coordinates:polyCoords}};const area=Math.abs(d3.geoArea(feat));if(area>bestArea){bestArea=area;best=feat;}});geo=best?d3.geoCentroid(best):d3.geoCentroid(f);}else{geo=d3.geoCentroid(f);}const pt=proj(geo);if(!pt||isNaN(pt[0]))return;idToNames[id].forEach(name=>{centroids[name]=pt;});});}
@@ -1556,7 +1567,7 @@ async function loadAll(){
     sites=Array.isArray(json.sites)?json.sites:[];
     flows=Array.isArray(json.flows)?json.flows:[];
     zones=Array.isArray(json.zones)?json.zones:[];
-    meta=json.meta||{};
+    meta=json.meta||{};alignZoneShares();
   }catch(e){
     console.warn('Could not load geonufe-data.json, using fallback sample data.',e);
     document.getElementById('loadError').querySelector('p').textContent=
@@ -1771,7 +1782,7 @@ function renderMap(){
   if(flowsOn&&flowYearLabel())bt+=(bt?' · ':'')+`Flow year: <strong>${flowYearLabel()}</strong>`;
   if(SHOW_HALEU&&state.haleuOnly)bt+=(bt?' · ':'')+`<strong>HALEU only</strong>`;
   const plain=bt.replace(/<[^>]+>/g,'');
-  if(of){bt+=`<br><span class="fb-note">Flows and production share are not available for an owner selection.</span>`;}
+  if(of){bt+=`<br><span class="fb-note">Flows and country shares are not available for an owner selection.</span>`;}
   if(bt){banner.innerHTML=bt;banner.style.display='block';ia.textContent=plain;ia.style.display=plain?'':'none';}else{banner.style.display='none';ia.style.display='none';}
 }
 function zoomBy(f){svgEl.transition().duration(300).call(zoomBehavior.scaleBy,f);}
