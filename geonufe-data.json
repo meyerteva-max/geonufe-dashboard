@@ -3625,14 +3625,15 @@
     },
     {
       "id": "d311",
-      "name": "Upper Spring Creek (Brevard)",
+      "name": "Upper Spring Creek",
       "type": "mine-isl",
       "country": "USA",
       "lat": 28.5,
       "lon": -98,
       "shareholder": "enCore Energy",
       "status": "planned",
-      "coordConfidence": "Low-Moderate"
+      "coordConfidence": "Low-Moderate",
+      "comment": "Also called Brevard."
     },
     {
       "id": "d312",
@@ -3691,14 +3692,15 @@
     },
     {
       "id": "d317",
-      "name": "Waterbury Lake (THT deposit)",
+      "name": "Waterbury Lake",
       "type": "mine-isl",
       "lat": 57.4,
       "lon": -105.6,
       "country": "Canada",
       "shareholder": "Denison",
       "status": "planned",
-      "coordConfidence": "Low"
+      "coordConfidence": "Low",
+      "comment": "THT deposit."
     },
     {
       "id": "d318",
@@ -3768,7 +3770,7 @@
     },
     {
       "id": "d324",
-      "name": "Zuuvch Ovoo (also spelled Zoovch Ovoo)",
+      "name": "Zuuvch Ovoo",
       "type": "mine-isl",
       "lat": 43.7,
       "lon": 110,
@@ -3777,7 +3779,7 @@
       "status": "under construction",
       "coordConfidence": "Moderate",
       "capacity": 2500,
-      "comment": "Construction started in June 2026. Nominal output about 2,500 tU per year over a 30-year life, with first production expected around 2030. The Mongolian state receives more than half of the direct benefits. The capacity shown is the planned nominal output."
+      "comment": "Also spelled Zoovch Ovoo. Construction started in June 2026. Nominal output about 2,500 tU per year over a 30-year life, with first production expected around 2030. The Mongolian state receives more than half of the direct benefits. The capacity shown is the planned nominal output."
     },
     {
       "id": "d325",
@@ -3791,14 +3793,15 @@
     },
     {
       "id": "d326",
-      "name": "Amarillo Grande (Ivana deposit)",
+      "name": "Amarillo Grande",
       "type": "mine-isl",
       "lat": -40.8,
       "lon": -66,
       "country": "Argentina",
       "shareholder": "Blue Sky Uranium",
       "status": "planned",
-      "coordConfidence": "Low"
+      "coordConfidence": "Low",
+      "comment": "Ivana deposit."
     },
     {
       "id": "d327",
@@ -3858,14 +3861,15 @@
     },
     {
       "id": "d332",
-      "name": "Salamanca / Retortillo",
+      "name": "Retortillo",
       "type": "mine-openpit",
       "country": "Spain",
       "lat": 41,
       "lon": -6.3,
       "shareholder": "Berkeley Energia Ltd",
       "status": "suspended",
-      "coordConfidence": "Low"
+      "coordConfidence": "Low",
+      "comment": "Part of the Salamanca project."
     },
     {
       "id": "d333",
@@ -3913,25 +3917,27 @@
     },
     {
       "id": "d337",
-      "name": "Sunday Mine Complex",
+      "name": "Sunday",
       "type": "mine-underground",
       "country": "USA",
       "lat": 38.05,
       "lon": -108.9,
       "shareholder": "Western Uranium & Vanadium Corp",
       "status": "planned",
-      "coordConfidence": "Moderate"
+      "coordConfidence": "Moderate",
+      "comment": "Sunday Mine Complex."
     },
     {
       "id": "d338",
-      "name": "Hansen/Taylor Ranch",
+      "name": "Hansen-Taylor",
       "type": "mine-underground",
       "country": "USA",
       "lat": 38.7,
       "lon": -105.5,
       "shareholder": "Western Uranium & Vanadium Corp",
       "status": "planned",
-      "coordConfidence": "Moderate"
+      "coordConfidence": "Moderate",
+      "comment": "Hansen and Taylor Ranch."
     },
     {
       "id": "d339",
@@ -3969,14 +3975,15 @@
     },
     {
       "id": "d342",
-      "name": "Patterson Lake South (PLS)",
+      "name": "Patterson Lake South",
       "type": "mine-underground",
       "lat": 58.5,
       "lon": -109.5,
       "country": "Canada",
       "shareholder": "Paladin Energy",
       "status": "planned",
-      "coordConfidence": "Low-Moderate"
+      "coordConfidence": "Low-Moderate",
+      "comment": "Also called PLS."
     },
     {
       "id": "d343",
@@ -4034,14 +4041,15 @@
     },
     {
       "id": "d348",
-      "name": "KPM (Kylleng-Pyndengsohiong-Mawthabah, formerly Domiasiat)",
+      "name": "KPM (Domiasiat)",
       "type": "mine-underground",
       "lat": 25.5,
       "lon": 91,
       "country": "India",
       "shareholder": "Government of India (100%)",
       "status": "suspended",
-      "coordConfidence": "Low"
+      "coordConfidence": "Low",
+      "comment": "Full name Kylleng-Pyndengsohiong-Mawthabah (KPM), formerly Domiasiat."
     },
     {
       "id": "d349",
@@ -4114,25 +4122,27 @@
     },
     {
       "id": "d355",
-      "name": "Novazza / Val Vedello",
+      "name": "Novazza",
       "type": "mine-underground",
       "lat": 46,
       "lon": 10.1,
       "country": "Italy",
       "shareholder": "Zenith Energy Ltd",
       "status": "planned",
-      "coordConfidence": "Low"
+      "coordConfidence": "Low",
+      "comment": "Novazza and Val Vedello deposits."
     },
     {
       "id": "d356",
-      "name": "Yuty and other Paraguay projects",
+      "name": "Yuty",
       "type": "mine-unspecified",
       "lat": -26.6,
       "lon": -56.2,
       "country": "Paraguay",
       "shareholder": "Uranium Energy Corp",
       "status": "planned",
-      "coordConfidence": "Low"
+      "coordConfidence": "Low",
+      "comment": "Yuty and other uranium projects in Paraguay."
     },
     {
       "id": "d357",
@@ -4147,14 +4157,15 @@
     },
     {
       "id": "d358",
-      "name": "Jordan Uranium Mining Company (JUMCO) — central Jordan carbonate uranium",
+      "name": "JUMCO",
       "type": "mine-unspecified",
       "lat": 31.5,
       "lon": 36.5,
       "country": "Jordan",
       "shareholder": "Jordan Atomic Energy Commission",
       "status": "planned",
-      "coordConfidence": "Low"
+      "coordConfidence": "Low",
+      "comment": "Jordan Uranium Mining Company (JUMCO) project, carbonate-hosted uranium in central Jordan."
     },
     {
       "id": "d359",
@@ -4707,7 +4718,7 @@
     },
     {
       "id": "d401",
-      "name": "Phoenix (Wheeler River)",
+      "name": "Phoenix",
       "type": "mine-isl",
       "lat": 57.5,
       "lon": -104.6,
@@ -4715,7 +4726,7 @@
       "shareholder": "Denison Mines (90%) / JCU (10%)",
       "status": "under construction",
       "coordConfidence": "Low",
-      "comment": "Investment decision taken in February 2026 and full-scale construction launched in July. First production is targeted for mid-2028 using in-situ recovery."
+      "comment": "Phoenix deposit of the Wheeler River project. Investment decision taken in February 2026 and full-scale construction launched in July. First production is targeted for mid-2028 using in-situ recovery."
     },
     {
       "id": "d402",
