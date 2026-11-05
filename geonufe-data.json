@@ -1,7 +1,7 @@
 {
   "meta": {
     "schemaVersion": 2,
-    "lastUpdated": "2026-11-03"
+    "lastUpdated": "2026-11-05"
   },
   "sites": [
     {
@@ -768,9 +768,10 @@
       "lat": -22.48,
       "lon": 15.02,
       "country": "Namibia",
-      "capacity": 3185,
+      "capacity": 2700,
       "shareholder": "CNNC (69%) / Iranian Foreign Investment Company (15%) / South African Government (10%) / Government of Namibia (3%) / Others (3%)",
-      "status": "operating"
+      "status": "operating",
+      "comment": "Output was 3,185 t U3O8 in 2025 (about 2,700 tU), the highest since 2011, and the capacity shown is that figure in tU. Life of mine runs to 2036 (Phase 4 pit), and a feasibility study on the Z20 deposit is due in 2026. Mining is contracted to Beifang Mining. CNNC has controlled the mine since 2019."
     },
     {
       "id": "d74",
@@ -779,9 +780,10 @@
       "lat": -22.767,
       "lon": 14.517,
       "country": "Namibia",
-      "capacity": 5430,
+      "capacity": 4600,
       "shareholder": "CGN (90%) / Government of Namibia (10%)",
-      "status": "operating"
+      "status": "operating",
+      "comment": "Output was 5,429 t U3O8 in 2025 (about 4,600 tU), above plan, and the capacity shown is that figure in tU. Design capacity is about 5,100 tU per year. A heap leach plant adding about 580 t U3O8 per year is planned for end-2027, along with a desalination plant. Most output goes to China. CGN holds its share through Taurus Minerals, alongside the China-Africa Development Fund."
     },
     {
       "id": "d75",
@@ -792,7 +794,8 @@
       "country": "Namibia",
       "capacity": 1830,
       "shareholder": "Paladin Energy (75%) / CNNC (25%)",
-      "status": "operating"
+      "status": "operating",
+      "comment": "Mining ramp-up was declared complete in July 2026. Output was 4.82 Mlb U3O8 (about 1,850 tU) in the 2026 financial year, and 1.00 Mlb in the September 2026 quarter, with recovery down to 85%. Guidance for the 2027 financial year is 5.1 to 5.6 Mlb U3O8 (about 1,960 to 2,150 tU)."
     },
     {
       "id": "d76",
@@ -803,7 +806,8 @@
       "country": "Australia",
       "capacity": 1700,
       "shareholder": "General Atomics (100%)",
-      "status": "operating"
+      "status": "operating",
+      "comment": "In situ leach mine run by Heathgate, owned by Quasar Resources and General Atomics. Four deposits are in production (West, East, Northeast and North). Solution is processed at the Beverley plant. Output is typically about 2,000 t U3O8 (about 1,700 tU), and it was 1,503 t U3O8 in 2022. No production figures have been published since, and the company is privately held."
     },
     {
       "id": "d77",
@@ -814,7 +818,8 @@
       "country": "Australia",
       "capacity": 500,
       "shareholder": "Boss Energy (100%)",
-      "status": "operating"
+      "status": "operating",
+      "comment": "In situ leach mine in ramp-up. The September 2026 quarter produced 0.36 Mlb U3O8, a run rate of about 550 tU per year. A study published in August 2026 gives 13.8 Mlb over 9 years, down from 21.8 Mlb over 11 years in the 2021 study. Feed grade has fallen and costs are rising. Only about 16% of future output is under contract."
     },
     {
       "id": "d78",
@@ -852,7 +857,7 @@
       "capacity": 7100,
       "shareholder": "Cameco (69.805%) / Orano (30.195%)",
       "status": "operating",
-      "comment": "Flooding in May 2026 cut a supply bridge and reduced mining for about two weeks. Ore is slurried about 80 km to the Key Lake mill, which has a longer maintenance outage in 2026. Licensed to 2043. The 7,100 tU per year figure is licensed capacity; 2026 guidance is 14.0 to 16.5 Mlb U3O8, about 5,400 to 6,350 tU."
+      "comment": "Flooding in May 2026 cut a supply bridge and reduced mining for about two weeks. Ore is slurried about 80 km to the Key Lake mill, which has a longer maintenance outage in 2026. Licensed to 2043. The 7,100 tU per year figure is licensed capacity; 2026 guidance was narrowed to 14.0 to 14.5 Mlb U3O8 (100%), about 5,400 to 5,600 tU."
     },
     {
       "id": "d81",
@@ -863,7 +868,7 @@
       "country": "Canada",
       "capacity": 300,
       "shareholder": "Orano (77.5%) / Denison Mines (22.5%)",
-      "comment": "Uses the SABRE method, a high-pressure water jet drilled from surface, with no underground entry required.",
+      "comment": "Uses the SABRE method, a high-pressure water jet drilled from surface, with no underground entry required. The McClean Lake mill, operated by Orano, is the only mill that processes Cigar Lake ore, so a mill outage stops that mine.",
       "status": "operating"
     },
     {
@@ -886,7 +891,8 @@
       "country": "USA",
       "capacity": 770,
       "shareholder": "Ur-Energy Inc. (100%)",
-      "status": "operating"
+      "status": "operating",
+      "comment": "In situ leach mine producing since its 2022 restart. Output was 140,873 lb U3O8 in the second quarter of 2026, the highest quarter since the restart, or about 54 tU. The 770 tU per year figure is licensed capacity, well above current output. Mine life now runs to 2039. The central plant also processes resin from Shirley Basin."
     },
     {
       "id": "d84",
@@ -900,7 +906,7 @@
       "status": "operating"
     },
     {
-      "id": "650",
+      "id": "d412",
       "name": "Ross CPP",
       "type": "mine-isl",
       "lat": 44.4,
@@ -4888,6 +4894,18 @@
       "status": "planned",
       "coordConfidence": "Low",
       "comment": "Alum shale deposit in Jämtland (Berg and Åre municipalities), held through Bergslagen Metals AB. A preliminary economic assessment (June 2026) outlines an open pit producing about 3.3 million lb U3O8 (about 1,270 tU) a year over 13 years, with vanadium, potash, molybdenum, nickel and zinc as co-products. No mining concession or construction decision yet. The position is the centre of the Viken nr 3 exploration permit, not the pit location."
+    },
+    {
+      "id": "d413",
+      "name": "Shirley Basin",
+      "type": "mine-isl",
+      "lat": 42.2,
+      "lon": -106.2,
+      "country": "USA",
+      "shareholder": "Ur-Energy Inc. (100%)",
+      "status": "operating",
+      "coordConfidence": "Low",
+      "comment": "In situ leach mine with limited operations since April 2026 and full authorization from Wyoming regulators on 29 June 2026. Uranium-loaded resin is trucked to the Lost Creek plant for processing. Capacity is not published, and the position is approximate."
     }
   ],
   "flows": [
